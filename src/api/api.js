@@ -1,7 +1,7 @@
 import axios from "axios"
-import { useAuthStore } from "@/stores/useAuth";
+import { useAuthStore } from "@/stores/authStore";
 let api = axios.create({
-  baseURL: 'https://blogs.tt.linkpc.net/api/v1/',
+  baseURL: VITE_API_URL,
   headers: {
     'Content-type': 'application/json',
     Accept: "application/json"
