@@ -9,7 +9,6 @@ import Sidebar from '@/components/comment/Sidebar.vue'
     <div class="main">
       <Sidebar />
       <div class="content">
-        <!-- Your page content goes here -->
         <router-view />
       </div>
     </div>

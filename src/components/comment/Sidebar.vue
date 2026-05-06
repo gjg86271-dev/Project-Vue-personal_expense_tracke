@@ -5,8 +5,7 @@
     </div>
 
     <nav class="sidebar-nav">
-      <!-- Active item: filled blue -->
-      <RouterLink to="/dashboard" class="nav-item nav-item--active" active-class="nav-item--active">
+      <RouterLink to="/dashboard" class="nav-item" active-class="nav-item--active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <rect x="3" y="3" width="8" height="8" rx="1"/>
           <rect x="13" y="3" width="8" height="8" rx="1"/>
@@ -16,8 +15,7 @@
         <span>ផ្ទាំងគ្រប់គ្រង</span>
       </RouterLink>
 
-      <!-- Regular items: icon + text, large spacing -->
-      <RouterLink to="/transactions" class="nav-item" active-class="nav-item--active">
+      <RouterLink to="/transactions" class="nav-item" disabled>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
           <path d="M3 17h6M3 20h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -26,20 +24,20 @@
         <span>ប្រតិបត្តិការ</span>
       </RouterLink>
 
-      <RouterLink to="/reports" class="nav-item" active-class="nav-item--active">
+      <RouterLink to="/report" class="nav-item" disabled>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span>របាយការណ៍</span>
       </RouterLink>
 
-      <RouterLink to="/settings" class="nav-item" active-class="nav-item--active">
+      <RouterLink to="/budget" class="nav-item" disabled>
         <i class="bi bi-credit-card-2-front"></i>
         <span>ថវិកា</span>
       </RouterLink>
 
-      <RouterLink to="/settings" class="nav-item" active-class="nav-item--active">
-       <i class="bi bi-bullseye"></i>
+      <RouterLink to="/goal" class="nav-item" disabled>
+        <i class="bi bi-bullseye"></i>
         <span>គោលដៅ</span>
       </RouterLink>
     </nav>
@@ -57,7 +55,7 @@
 </template>
 
 <script setup>
-import { RouterLink, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 const router = useRouter()
 function handleLogout() {
   router.push('/login')
@@ -65,11 +63,8 @@ function handleLogout() {
 </script>
 
 <style scoped>
-
-
-
 .sidebar {
-  width: 240px;
+  width: 300px;
   min-width: 240px;
   height: 100vh;
   padding: 24px 16px;
@@ -80,7 +75,6 @@ function handleLogout() {
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
 }
 
-/* Title "ចំណាយ" — large, bold, matching screenshot */
 .title {
   font-size: 22px;
   font-weight: 700;
@@ -96,7 +90,6 @@ function handleLogout() {
   gap: 6px;
 }
 
-/* Base nav item */
 .nav-item {
   display: flex;
   align-items: center;
@@ -117,12 +110,16 @@ function handleLogout() {
   line-height: 1.6;
 }
 
-.nav-item:hover {
+.nav-item:hover:not(:disabled) {
   background: #e8edf7;
   color: #1d3a8a;
 }
 
-/* Active — solid dark blue, full width, white text */
+.nav-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .nav-item--active {
   background: #1e3a8a !important;
   color: #ffffff !important;
@@ -140,7 +137,6 @@ function handleLogout() {
   margin: 20px 0;
 }
 
-/* Logout — red */
 .logout {
   color: #dc2626;
   font-weight: 600;

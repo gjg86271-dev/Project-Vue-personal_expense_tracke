@@ -14,7 +14,7 @@
 
       <div class="divider"></div>
 
-      <div class="profile">
+      <RouterLink to="/profile" class="profile">
         <img
           v-if="avatarUrl"
           :src="avatarUrl"
@@ -27,13 +27,14 @@
           <div class="profile-name">{{ name }}</div>
           <div class="profile-email">{{ email }}</div>
         </div>
-      </div>
+      </RouterLink>
     </div>
   </header>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+
 
 const props = defineProps({
   name: {
@@ -71,10 +72,9 @@ const initials = computed(() =>
   border-bottom: 1px solid #e5e7eb;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
 }
-
 .brand-icon {
-  width: 130px;
-  height: 50px;
+  width: 160px;
+  height: 60px;
   object-fit: contain;
 }
 
