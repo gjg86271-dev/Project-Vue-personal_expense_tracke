@@ -1,151 +1,151 @@
 <template>
-  <div class="sidebar">
-    <!-- Header -->
+  <aside class="sidebar">
     <div class="sidebar-header">
-      <h2>ចំណាយ</h2>
+      <h2 class="title">ម៉ីនុយ</h2>
     </div>
 
-    <!-- Navigation Items -->
-    <div class="sidebar-content">
-      <!-- Dashboard -->
-      <div class="nav-item">
-        <i class="icon-grid"></i>
+    <nav class="sidebar-nav">
+      <RouterLink to="/dashboard" class="nav-item" active-class="nav-item--active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="8" height="8" rx="1"/>
+          <rect x="13" y="3" width="8" height="8" rx="1"/>
+          <rect x="3" y="13" width="8" height="8" rx="1"/>
+          <rect x="13" y="13" width="8" height="8" rx="1"/>
+        </svg>
         <span>ផ្ទាំងគ្រប់គ្រង</span>
-      </div>
+      </RouterLink>
 
-      <!-- Reports -->
-      <div class="nav-item">
-        <i class="icon-document"></i>
+      <RouterLink to="/transactions" class="nav-item" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M3 17h6M3 20h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M16 8v12m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>ប្រតិបត្តិការ</span>
+      </RouterLink>
+
+      <RouterLink to="/report" class="nav-item" disabled>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <span>របាយការណ៍</span>
-      </div>
+      </RouterLink>
 
-      <!-- Statistics Button -->
-      <button class="btn-statistics">
-        <i class="icon-chart"></i>
-        <span>ស្ថិតិលម្អិត</span>
-      </button>
+      <RouterLink to="/budget" class="nav-item" disabled>
+        <i class="bi bi-credit-card-2-front"></i>
+        <span>ថវិកា</span>
+      </RouterLink>
 
-      <!-- Sign Out Button -->
-      <button class="btn-signin">
-        <i class="icon-signin"></i>
-        <span>ចូល</span>
-      </button>
+      <RouterLink to="/goal" class="nav-item" disabled>
+        <i class="bi bi-bullseye"></i>
+        <span>គោលដៅ</span>
+      </RouterLink>
+    </nav>
 
-      <!-- Divider -->
-      <hr class="divider">
+    <hr class="divider" />
 
-      <!-- Logout -->
-      <div class="nav-item logout">
-        <i class="icon-logout"></i>
-        <span>ចាកចេញ</span>
-      </div>
-    </div>
-  </div>
+    <button class="nav-item logout" @click="handleLogout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M17 16l4-4m0 0l-4-4m4 4H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13 21H6a2 2 0 01-2-2V5a2 2 0 012-2h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>តាកចេញ</span>
+    </button>
+  </aside>
 </template>
 
 <script setup>
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
+function handleLogout() {
+  router.push('/login')
+}
 </script>
 
 <style scoped>
 .sidebar {
-  flex: 0 0 260px;
-  width: 260px;
-  max-width: 260px;
-  padding: 18px;
-  background-color: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-}
-
-.sidebar-header {
-  margin-bottom: 20px;
-}
-
-.sidebar-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-}
-
-.sidebar-content {
+  width: 300px;
+  min-width: 240px;
+  height: 100vh;
+  padding: 24px 16px;
+  background: #f5f6fa;
+  border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 24px 4px;
+  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  letter-spacing: 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 14px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
   cursor: pointer;
-  color: #666;
-  border-radius: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.nav-item:hover {
-  background-color: #d9e7ff;
-  color: #1a3a7a;
-  transform: translateX(2px);
-}
-
-.btn-statistics {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: #a8c5e8;
+  background: none;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #333;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  line-height: 1.6;
 }
 
-.btn-statistics:hover {
-  background-color: #94b5d8;
-  transform: translateY(-1px);
+.nav-item:hover:not(:disabled) {
+  background: #e8edf7;
+  color: #1d3a8a;
 }
 
-.btn-signin {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: #003d7a;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  color: white;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+.nav-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
-.btn-signin:hover {
-  background-color: #002d5a;
-  transform: translateY(-1px);
+.nav-item--active {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.nav-item--active:hover {
+  background: #1e40af !important;
 }
 
 .divider {
   border: none;
-  border-top: 1px solid #ddd;
-  margin: 8px 0;
+  border-top: 1.5px solid #d1d5db;
+  margin: 20px 0;
 }
 
 .logout {
-  color: #ff0000;
-  font-weight: 500;
-  transition: color 0.2s ease, transform 0.2s ease;
+  color: #dc2626;
+  font-weight: 600;
+  gap: 14px;
+  margin-top: 0;
 }
 
 .logout:hover {
-  color: #cc0000;
-  transform: translateX(2px);
+  background: #fef2f2;
+  color: #b91c1c;
 }
-
 </style>
