@@ -2,8 +2,8 @@
   <div class="card">
     <div class="top">
       <div>
-        <h3>Budget Overview</h3>
-        <p>Monthly budget spending</p>
+        <h3>ទិដ្ឋភាពថវិកា</h3>
+        <p>ចំណាយប្រចាំខែ</p>
       </div>
 
       <div class="amount">
@@ -26,8 +26,8 @@
 
     <!-- Bottom -->
     <div class="bottom">
-      <span class="percent">{{ percent.toFixed(1) }}% used</span>
-      <span class="left">${{ left.toFixed(2) }} left</span>
+      <span class="percent">{{ percent.toFixed(1) }}% បានប្រើ</span>
+      <span class="left">${{ left.toFixed(2) }} នៅខ្វះ</span>
     </div>
   </div>
 </template>

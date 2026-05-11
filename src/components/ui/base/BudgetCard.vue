@@ -1,41 +1,43 @@
 <template>
   <div class="card">
+
     <!-- Header -->
     <div class="card-header">
-      <div>
+      <div class="title">
         <h3>{{ budget.category?.name || 'No Category' }}</h3>
         <p>Monthly Budget</p>
       </div>
 
       <div class="actions">
-        <span @click="editBudget">
-            <i class="bi bi-pencil-square"></i>
-        </span>
-        <span @click="deleteBudget">
-            <i class="bi bi-trash3"></i>
-        </span>
+        <button @click="editBudget">
+          <i class="bi bi-pencil-square"></i>
+        </button>
+
+        <button @click="deleteBudget" class="danger">
+          <i class="bi bi-trash3"></i>
+        </button>
       </div>
     </div>
 
     <!-- Info -->
     <div class="info">
       <div class="row">
-        <span>Spent</span>
+        <span>ចំណាយ</span>
         <span class="spent">${{ spent.toFixed(2) }}</span>
       </div>
 
       <div class="row">
-        <span>Budget</span>
-        <span>${{ total.toFixed(2) }}</span>
+        <span>ថវិកា</span>
+        <span class="total">${{ total.toFixed(2) }}</span>
       </div>
     </div>
 
-    <!-- Progress Bar -->
+    <!-- Progress -->
     <div class="progress-bar">
       <div
         class="progress"
         :style="{
-          width: percent > 0 ? percent + '%' : '6px',
+          width: Math.min(percent, 100) + '%',
           background: color
         }"
       ></div>
@@ -44,20 +46,32 @@
     <!-- Bottom -->
     <div class="bottom">
       <span>{{ percent.toFixed(1) }}% used</span>
-      <span>${{ left.toFixed(2) }} left</span>
+      <span class="left">${{ left.toFixed(2) }} left</span>
     </div>
 
     <!-- Warning -->
     <div class="warning" v-if="percent >= 80">
       ⚠️ Budget almost exceeded!
     </div>
+
   </div>
 </template>
+
 <script setup>
 import { computed } from 'vue'
+import { useTransactionStore } from '@/stores/transactionStore'
+import { onMounted } from 'vue'
 
-const emit = defineEmits(['edit-budget', 'delete-budget'])
 
+const transactionStore = useTransactionStore()
+onMounted(() => {
+  transactionStore.fetchTransactions()
+})
+
+const emit = defineEmits([
+  'edit-budget',
+  'delete-budget'
+])
 
 const props = defineProps({
   budget: {
@@ -66,26 +80,49 @@ const props = defineProps({
   }
 })
 
-const spent = computed(() => Number(props.budget.spentAmount) || 0)
-const total = computed(() => Number(props.budget.limitAmount) || 0)
-
-const percent = computed(() => {
-  if (!total.value) return 0
-  return Math.min((spent.value / total.value) * 100, 100)
+/* API Values */
+const spent = computed(() => {
+  return transactionStore.transactions
+    .filter(t =>
+      t.category?.id === props.budget.category?.id &&
+      t.category?.type === 'EXPENSE'
+    )
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0)
 })
 
-const left = computed(() => Math.max(total.value - spent.value, 0))
+const total = computed(() =>
+  Number(props.budget?.limitAmount ?? 0)
+)
 
+/* Progress */
+const percent = computed(() => {
+  if (!total.value) return 0
+
+  return Math.min(
+    (spent.value / total.value) * 100,
+    100
+  )
+})
+
+/* Remaining */
+const left = computed(() =>
+  Math.max(total.value - spent.value, 0)
+)
+
+/* Progress Color */
 const color = computed(() => {
   if (percent.value >= 80) {
     return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
   }
+
   if (percent.value >= 50) {
     return 'linear-gradient(90deg, #faad14, #ffd666)'
   }
+
   return 'linear-gradient(90deg, #16c35b, #73d13d)'
 })
 
+/* Events */
 function editBudget() {
   emit('edit-budget', props.budget)
 }
@@ -97,35 +134,60 @@ function deleteBudget() {
 
 <style scoped>
 .card {
-    margin-top: 20px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  width: 100%;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+  margin-top: 20px;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
 }
 
 /* Header */
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
 }
 
-.card-header h3 {
+.title h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
-.card-header p {
+.title p {
   margin: 2px 0 0;
-  font-size: 13px;
+  font-size: 12px;
   color: #888;
 }
 
-.actions span {
-  margin-left: 8px;
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actions button {
+  border: none;
+  background: #f3f4f6;
+  padding: 6px 8px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.actions button:hover {
+  background: #e5e7eb;
+}
+
+.actions .danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 /* Info */
@@ -136,44 +198,56 @@ function deleteBudget() {
 .row {
   display: flex;
   justify-content: space-between;
-  margin: 4px 0;
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 
 .spent {
-  color: #faad14;
-  font-weight: bold;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.total {
+  color: #111827;
+  font-weight: 600;
 }
 
 /* Progress */
 .progress-bar {
-  height: 10px;
-  background: #f1f3f5;
+  height: 8px;
+  background: #e5e7eb;
   border-radius: 999px;
   overflow: hidden;
-  margin: 12px 0;
+  margin-top: 12px;
 }
 
 .progress {
   height: 100%;
   border-radius: 999px;
-  transition: width 0.4s ease, background 0.3s ease;
-  position: relative;
+  transition: width 0.4s ease;
 }
 
 /* Bottom */
 .bottom {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.left {
+  font-weight: 600;
+  color: #111827;
 }
 
 /* Warning */
 .warning {
   margin-top: 10px;
-  background: #fff3cd;
-  color: #856404;
   padding: 8px;
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 12px;
 }
 </style>
