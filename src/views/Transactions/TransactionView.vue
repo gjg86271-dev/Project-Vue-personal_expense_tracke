@@ -20,10 +20,39 @@ async function fetchAlltransaction () {
 onMounted(() => {
   fetchAlltransaction()
 })
+
+//detele
+
+async function deletIDtransaction(id) {
+  try{
+    const res = await api.delete(`transactions/${id}`)
+    transactions.value = transactions.value.filter(
+      item => item.id !== id
+    )
+  }catch(error){
+    console.log(error)
+  }
+}
+
+//update
+
+async function updateIDtransaction(id,form) {
+  try{
+    const res = await api.put(`transactions/${id}`, form);
+    
+    transactions.value = transactions.value.map(item => 
+      item.id === id ? res.data : item
+    );
+  }catch(error){
+    console.log(error)
+  }
+}
 </script>
 
 <template>
   <div class="container mt-4">
-    <TransactionForm :items="transactions" />
+    <TransactionForm :items="transactions" 
+    @delete-transaction="deletIDtransaction"
+    @update-transaction="updateIDtransaction"/>
   </div>
 </template>

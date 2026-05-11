@@ -1,22 +1,14 @@
 <template>
-  <div class="container">
-
+  <div class="container"   style="font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;">
     <!-- Header -->
     <div class="top-bar">
-      <h2 class="title">My Budgets</h2>
-
-      <button
-        class="add-btn"
-        @click="openAddModal"
-      >
-        + Add Budget
-      </button>
+      <h2 class="title">ថវិការបស់ខ្ញុំ</h2>
+     
+      <button class="add-btn" @click="openAddModal">បន្ថែមគម្រោងថវិកា</button>
     </div>
 
     <!-- Loading -->
-    <div v-if="budgetStore.loading">
-      Loading...
-    </div>
+    <div v-if="budgetStore.loading">កំពុងដំណើរការ...</div>
 
     <!-- Overview -->
     <CardOverView
@@ -38,24 +30,39 @@
     <!-- ADD / EDIT MODAL -->
     <BaseModal
       v-if="showModal"
-      :title="isEditing ? 'Edit Budget' : 'Add Budget'"
+      :title="isEditing ? 'កែសម្រួលថវិកា' : 'បន្ថែមថវិកា'"
       @close-modal="closeModal"
     >
-      <!-- BODY -->
       <template #body>
-
-        <div class="form-group">
-          <label>Category Name</label>
-
-          <input
-            v-model="form.category.name"
-            type="text"
-            placeholder="Enter category"
-          />
+        <!-- ERROR -->
+        <div v-if="errorMessage" class="error-box">
+          {{ errorMessage }}
         </div>
 
+        <!-- SUCCESS -->
+        <div v-if="successMessage" class="success-box">
+          {{ successMessage }}
+        </div>
+        <!-- CATEGORY -->
         <div class="form-group">
-          <label>Budget Amount</label>
+          <label>ឈ្មោះប្រភេទ</label>
+
+          <select class="form-select" v-model="form.categoryId">
+            <option disabled value="">ជ្រើសរើសប្រភេទ</option>
+
+            <option
+              v-for="category in expenseCategories"
+              :key="category.id"
+              :value="category.id"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- AMOUNT -->
+        <div class="form-group">
+          <label>បរិមាណថវិកា</label>
 
           <input
             v-model="form.limitAmount"
@@ -63,26 +70,13 @@
             placeholder="Enter amount"
           />
         </div>
-
       </template>
 
-      <!-- FOOTER -->
       <template #footer>
-
-        <button
-          class="cancel-btn"
-          @click="closeModal"
-        >
-          Cancel
+        <button class="cancel-btn" @click="closeModal">បោះបង់</button>
+        <button class="save-btn" @click="saveBudget">
+          {{ isEditing ? "Update" : "Save" }}
         </button>
-
-        <button
-          class="save-btn"
-          @click="saveBudget"
-        >
-          {{ isEditing ? 'Update' : 'Save' }}
-        </button>
-
       </template>
     </BaseModal>
 
@@ -92,177 +86,168 @@
       title="Delete Budget"
       @close-modal="closeDeleteModal"
     >
-      <!-- BODY -->
       <template #body>
-
         <div class="delete-body">
-          <div class="delete-icon">
-            🗑️
-          </div>
+          <div class="delete-icon">🗑️</div>
 
-          <h3>Delete Budget?</h3>
+          <h3>លុបថវិកា?</h3>
 
           <p>
-            Are you sure you want to delete
+            តើអ្នកប្រាកដថាចង់លុប
             <strong>
               {{ selectedBudget?.category?.name }}
             </strong>
             ?
           </p>
         </div>
-
       </template>
 
-      <!-- FOOTER -->
       <template #footer>
-
-        <button
-          class="cancel-btn"
-          @click="closeDeleteModal"
-        >
-          Cancel
-        </button>
-
-        <button
-          class="delete-btn"
-          @click="deleteBudget"
-        >
-          Delete
-        </button>
-
+        <button class="cancel-btn" @click="closeDeleteModal">បោះបង់</button>
+        <button class="delete-btn" @click="deleteBudget">លុប</button>
       </template>
     </BaseModal>
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from "vue";
+import { useBudgetStore } from "@/stores/budgetStore";
+import { useCategoryStore } from "@/stores/categoryStore";
 
-import { useBudgetStore } from '@/stores/budgetStore'
+import BaseCard from "@/components/ui/base/BudgetCard.vue";
+import CardOverView from "@/components/ui/base/OverViewCard.vue";
+import BaseModal from "@/components/ui/base/BaseModal.vue";
+import { useTransactionStore } from "@/stores/transactionStore";
 
-import BaseCard from '@/components/ui/base/BudgetCard.vue'
-import CardOverView from '@/components/ui/base/OverViewCard.vue'
-import BaseModal from '@/components/ui/base/BaseModal.vue'
+/* STORES */
+const budgetStore = useBudgetStore();
+const categoryStore = useCategoryStore();
+const transactionStore = useTransactionStore();
+/* MODALS */
+const showModal = ref(false);
+const showDeleteModal = ref(false);
+const isEditing = ref(false);
+const errorMessage = ref("");
+const successMessage = ref("");
+/* DATA */
+const selectedBudget = ref(null);
 
-const budgetStore = useBudgetStore()
-
-/* ADD + EDIT MODAL */
-const showModal = ref(false)
-
-const isEditing = ref(false)
-
-/* DELETE MODAL */
-const showDeleteModal = ref(false)
-
-const selectedBudget = ref(null)
-
-/* FORM */
 const form = ref({
   id: null,
-  category: {
-    name: ''
-  },
-  limitAmount: 0
-})
+  categoryId: "",
+  limitAmount: 0,
+});
 
 /* FETCH */
 onMounted(async () => {
-  await budgetStore.fetchBudgets()
-  await budgetStore.fetchCategoryBreakdown()
-})
+  await budgetStore.fetchBudgets();
+  await budgetStore.fetchCategoryBreakdown();
+  await categoryStore.fetchAllCategories();
+  await transactionStore.fetchTransactions();
+});
+
+const expenseCategories = computed(() => {
+  return categoryStore.categories.filter((c) => c.type === "EXPENSE");
+});
 
 /* ADD */
 function openAddModal() {
-
-  isEditing.value = false
+  isEditing.value = false;
 
   form.value = {
     id: null,
-    category: {
-      name: ''
-    },
-    limitAmount: 0
-  }
+    categoryId: "",
+    limitAmount: 0,
+  };
 
-  showModal.value = true
+  showModal.value = true;
 }
 
 /* EDIT */
 function openEditModal(budget) {
-
-  isEditing.value = true
+  isEditing.value = true;
 
   form.value = {
-    ...budget,
-    category: {
-      ...budget.category
-    }
-  }
+    id: budget.id,
+    categoryId: budget.category?.id,
+    limitAmount: budget.limitAmount,
+  };
 
-  showModal.value = true
+  showModal.value = true;
+}
+
+/* DELETE OPEN MODAL (FIXED) */
+function openDeleteModal(budget) {
+  selectedBudget.value = budget;
+  showDeleteModal.value = true;
 }
 
 /* DELETE */
-function openDeleteModal(budget) {
+async function deleteBudget() {
+  if (!selectedBudget.value) return;
 
-  selectedBudget.value = budget
+  await budgetStore.deleteBudget(selectedBudget.value.id);
+  await budgetStore.fetchBudgets();
 
-  showDeleteModal.value = true
+  closeDeleteModal();
 }
 
 /* SAVE */
-function saveBudget() {
+async function saveBudget() {
+  errorMessage.value = "";
+  successMessage.value = "";
 
-  if (isEditing.value) {
+  // VALIDATION ONLY FOR ADD
+  if (!isEditing.value) {
 
-    const index = budgetStore.budgets.findIndex(
-      item => item.id === form.value.id
-    )
-
-    if (index !== -1) {
-      budgetStore.budgets[index] = {
-        ...form.value
-      }
+    if (!form.value.categoryId) {
+      errorMessage.value = "សូមជ្រើសរើសប្រភេទ";
+      return;
     }
 
-    console.log('UPDATED')
-
-  } else {
-
-    const newBudget = {
-      ...form.value,
-      id: Date.now(),
-      spentAmount: 0
+    if (!form.value.limitAmount || form.value.limitAmount <= 0) {
+      errorMessage.value = "សូមបញ្ចូលចំនួនថវិកា";
+      return;
     }
-
-    budgetStore.budgets.push(newBudget)
-
-    console.log('CREATED')
   }
 
-  closeModal()
+  const payload = {
+    categoryId: form.value.categoryId,
+    limitAmount: Number(form.value.limitAmount),
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+  };
+
+  try {
+    if (isEditing.value) {
+      await budgetStore.updateBudget(form.value.id, payload);
+      successMessage.value = "កែសម្រួលថវិកាជោគជ័យ";
+    } else {
+      await budgetStore.createBudget(payload);
+      successMessage.value = "បន្ថែមថវិកាជោគជ័យ";
+    }
+
+    await budgetStore.fetchBudgets();
+
+    setTimeout(() => {
+      closeModal();
+      successMessage.value = "";
+    }, 1000);
+
+  } catch (error) {
+    console.error(error);
+    errorMessage.value = "មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ";
+  }
 }
-
-/* DELETE */
-function deleteBudget() {
-
-  budgetStore.budgets = budgetStore.budgets.filter(
-    item => item.id !== selectedBudget.value.id
-  )
-
-  console.log('DELETED')
-
-  closeDeleteModal()
-}
-
 /* CLOSE */
 function closeModal() {
-  showModal.value = false
+  showModal.value = false;
 }
 
 function closeDeleteModal() {
-  showDeleteModal.value = false
+  showDeleteModal.value = false;
+  selectedBudget.value = null;
 }
 </script>
 
@@ -273,29 +258,25 @@ function closeDeleteModal() {
   min-height: 100vh;
 }
 
-/* Top */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   margin-bottom: 20px;
 }
 
 .title {
-  margin: 0;
   font-size: 28px;
   font-weight: 700;
 }
 
-/* Grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
 }
 
-/* Buttons */
+/* buttons */
 .add-btn,
 .save-btn,
 .cancel-btn,
@@ -322,7 +303,7 @@ function closeDeleteModal() {
   color: white;
 }
 
-/* Form */
+/* form */
 .form-group {
   margin-bottom: 18px;
 }
@@ -333,36 +314,39 @@ function closeDeleteModal() {
   font-weight: 600;
 }
 
-.form-group input {
+.form-group input,
+.form-select {
   width: 100%;
   padding: 12px;
-
   border: 1px solid #ddd;
   border-radius: 10px;
-
-  outline: none;
 }
 
-.form-group input:focus {
-  border-color: #1677ff;
-}
-
-/* Delete Modal */
+/* delete */
 .delete-body {
   text-align: center;
-  padding: 10px;
 }
 
 .delete-icon {
   font-size: 50px;
-  margin-bottom: 12px;
-}
-
-.delete-body h3 {
   margin-bottom: 10px;
 }
+/* messages */
+.error-box {
+  background: #ffeaea;
+  color: #d90429;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
 
-.delete-body p {
-  color: #666;
+.success-box {
+  background: #e8fff1;
+  color: #15803d;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: 600;
 }
 </style>
