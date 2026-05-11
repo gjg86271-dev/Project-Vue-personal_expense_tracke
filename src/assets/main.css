@@ -1,1 +1,81 @@
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'KantumruyPro' !important;
+    background-color: #f5f5f5;
+    color: #333;
+}
+:root {
+
+  /* Bootstrap Core Theme Colors */
+  --bs-primary: #7da3f5;
+  --bs-primary-rgb: 55, 119, 254;
+
+  --bs-secondary: #1D4ED8;
+  --bs-secondary-rgb: 29, 78, 216;
+
+  --bs-success: #22C55E;
+  --bs-success-rgb: 34, 197, 94;
+
+  --bs-info: #22D3EE;
+  --bs-info-rgb: 34, 211, 238;
+
+  --bs-warning: #FACC15;
+  --bs-warning-rgb: 250, 204, 21;
+
+  --bs-danger: #EF4444;
+  --bs-danger-rgb: 239, 68, 68;
+
+  --bs-light: #F8FAFC;
+  --bs-light-rgb: 248, 250, 252;
+
+  --bs-dark: #0F172A;
+  --bs-dark-rgb: 15, 23, 42;
+
+  /* Body */
+  --bs-body-bg: #F8FAFC;
+  --bs-body-color: #0F172A;
+
+  /* Borders */
+  --bs-border-color: #E2E8F0;
+  --bs-border-color-translucent: rgba(226, 232, 240, 0.5);
+
+  /* Cards */
+  --bs-card-bg: #ffffff;
+  --bs-card-color: #0F172A;
+  --bs-card-border-color: #E2E8F0;
+
+  /* Inputs */
+  --bs-input-bg: #F8FAFC;
+  --bs-input-color: #0F172A;
+  --bs-input-border-color: #CBD5E1;
+  --bs-input-focus-border-color: #3777FE;
+  --bs-input-focus-box-shadow: 0 0 0 0.2rem rgba(55, 119, 254, 0.25);
+
+  /* Buttons */
+  --bs-btn-border-radius: 0.625rem;
+
+  /* Links */
+  --bs-link-color: #3777FE;
+  --bs-link-hover-color: #b0c9ff;
+
+  /* Sidebar / Custom */
+  --bs-sidebar-bg: #ffffff;
+  --bs-sidebar-color: #0F172A;
+  --bs-sidebar-active-bg: #E8F0FE;
+  --bs-sidebar-active-color: #3777FE;
+
+  /* Modal / Popover */
+  --bs-modal-bg: #ffffff;
+  --bs-popover-bg: #ffffff;
+  --bs-popover-border-color: #E2E8F0;
+
+  /* Focus Ring */
+  --bs-focus-ring-color: rgba(55, 119, 254, 0.25);
+}
+
