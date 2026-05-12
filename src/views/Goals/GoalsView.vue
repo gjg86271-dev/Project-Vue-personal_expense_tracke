@@ -1,4 +1,3 @@
-
 <template>
   <div class="dashboard">
     <!-- Header -->
@@ -8,141 +7,550 @@
         <p>តាមដានគោលដៅសន្សំរបស់អ្នក</p>
       </div>
 
-      <button class="add-btn">
+      <button
+        class="add-btn"
+        @click="showModal = true"
+      >
         បន្ថែមគោលដៅ
         <span>+</span>
       </button>
     </div>
 
-    <!-- Stats -->
+    <!-- CREATE MODAL -->
+    <div
+      v-if="showModal"
+      class="modal-overlay"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2>បន្ថែមគោលដៅ</h2>
+
+          <span
+            class="close-btn"
+            @click="closeModal"
+          >
+            ✕
+          </span>
+        </div>
+
+        <form @submit.prevent="createGoal">
+          <div class="form-group">
+            <label>ឈ្មោះគោលដៅ</label>
+
+            <input
+              type="text"
+              v-model="form.name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Target Amount</label>
+
+            <input
+              type="number"
+              v-model="form.targetAmount"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Deadline</label>
+
+            <input
+              type="date"
+              v-model="form.deadline"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+          >
+            Save Goal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div
+      v-if="showEditModal"
+      class="modal-overlay"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2>Edit Goal</h2>
+
+          <span
+            class="close-btn"
+            @click="closeEditModal"
+          >
+            ✕
+          </span>
+        </div>
+
+        <form @submit.prevent="updateGoal">
+          <div class="form-group">
+            <label>Goal Name</label>
+
+            <input
+              type="text"
+              v-model="editForm.name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Target Amount</label>
+
+            <input
+              type="number"
+              v-model="editForm.targetAmount"
+              required
+            />
+          </div>
+
+         
+
+          <div class="form-group">
+            <label>Deadline</label>
+
+            <input
+              type="date"
+              v-model="editForm.deadline"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+          >
+            Update Goal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PROGRESS MODAL -->
+    <div
+      v-if="showProgressModal"
+      class="modal-overlay"
+    >
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2>Add Goal Progress</h2>
+
+          <span
+            class="close-btn"
+            @click="closeProgressModal"
+          >
+            ✕
+          </span>
+        </div>
+
+        <form
+          @submit.prevent="
+            submitGoalProgress
+          "
+        >
+          <div class="form-group">
+            <label>Amount</label>
+
+            <input
+              type="number"
+              v-model="progressAmount"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+          >
+            Save Progress
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card">
-        
         <h4>គោលដៅសរុប</h4>
-        <h2>3</h2>
+
+        <h2>{{ goals.length }}</h2>
+
         <p>active</p>
       </div>
 
       <div class="stat-card">
-        
         <h4>ប្រាក់សន្សំសរុប</h4>
-        <h2>$260,000</h2>
+
+        <h2>
+          ${{ totalSaved.toLocaleString() }}
+        </h2>
+
         <p>across all goals</p>
       </div>
 
       <div class="stat-card">
-        
         <h4>នៅសល់</h4>
-        <h2>$530,000</h2>
+
+        <h2>
+          ${{
+            totalRemaining.toLocaleString()
+          }}
+        </h2>
+
         <p>to reach targets</p>
       </div>
     </div>
 
-    <!-- Goal Cards -->
+    <!-- GOAL CARD -->
     <div
       class="goal-card"
       v-for="goal in goals"
       :key="goal.id"
     >
-      <!-- Top -->
+      <!-- TOP -->
       <div class="goal-top">
         <div class="goal-info">
-        
-
+      
           <div>
             <div class="title-row">
               <h3>{{ goal.name }}</h3>
 
-        
+              <span class="status">
+                {{ goal.progress }}%
+              </span>
             </div>
 
-            <p>គោលដៅសន្សំ</p>
+            <p>
+              Deadline:
+              {{ formatDate(goal.deadline) }}
+            </p>
           </div>
         </div>
 
         <div class="actions">
-          <span>
-            <i class="bi bi-pencil-square"></i>
+          <span
+            @click="
+              openEditModal(goal)
+            "
+          >
+            <i
+              class="bi bi-pencil-square"
+            ></i>
           </span>
-          <span>
+
+          <span
+            @click="
+              removeGoal(goal.id)
+            "
+          >
             <i class="bi bi-trash3"></i>
           </span>
         </div>
       </div>
 
-      <!-- Progress -->
+      <!-- PROGRESS -->
       <div class="progress-section">
         <div class="progress-label">
-          <span>{{ goal.progress }}% completed</span>
+          <span>
+            {{ goal.progress }}%
+            completed
+          </span>
         </div>
 
         <div class="progress-bar">
           <div
             class="progress-fill"
             :style="{
-              width: goal.progress + '%',
-              background: goal.color
+              width:
+                goal.progress + '%',
+              background:
+                goal.color,
             }"
           ></div>
         </div>
       </div>
 
-      <!-- Bottom -->
+      <!-- BOTTOM -->
       <div class="goal-bottom">
         <div>
-          <h2>${{ goal.saved.toLocaleString() }}</h2>
+          <h2>
+            ${{
+              goal.saved.toLocaleString()
+            }}
+          </h2>
+
           <p>បានសន្សំ</p>
         </div>
 
         <div class="remaining">
-          <h2>${{ goal.remaining.toLocaleString() }}</h2>
+          <h2>
+            ${{
+              goal.remaining.toLocaleString()
+            }}
+          </h2>
+
           <p>នៅសល់</p>
         </div>
       </div>
 
-      <!-- Buttons -->
+      <!-- BUTTON -->
       <div class="buttons">
-        <button class="save-btn">បន្ថែមប្រាក់</button>
+        <button
+          class="save-btn   bg-green-500 text-black px-2 py-1 rounded  border-0 shadow-sm mt-2"
+          @click="
+            openProgressModal(goal)
+          "
+        >
+          បន្ថែមប្រាក់
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-const goals = [
-  {
-    id: 1,
-    name: 'វិស្សមកាល',
-    progress: 30,
-    saved: 60000,
-    remaining: 140000,
-    color: '#ff7a00'
-  },
-  {
-    id: 2,
-    name: 'ផ្ទះថ្មី',
-    progress: 25,
-    saved: 125000,
-    remaining: 375000,
-    color: '#149647'
-  },
-  {
-    id: 3,
-    name: 'មូលនិធិបន្ទាន់',
-    progress: 85,
-    saved: 85000,
-    remaining: 15000,
-    color: '#149647'
-  }
-]
-</script>
+import {
+  computed,
+  onMounted,
+  ref,
+} from "vue";
 
+import { useGoalsStore } from "@/stores/goalStore";
+
+const goalStore = useGoalsStore();
+
+const showModal = ref(false);
+
+const showEditModal = ref(false);
+
+const showProgressModal =
+  ref(false);
+
+const form = ref({
+  name: "",
+  targetAmount: "",
+  deadline: "",
+});
+
+const editForm = ref({
+  id: "",
+  name: "",
+  targetAmount: "",
+  deadline: "",
+});
+
+const selectedGoalId = ref("");
+
+const progressAmount = ref("");
+
+
+onMounted(async () => {
+  await goalStore.fetchAllGoals();
+});
+
+
+const goals = computed(() => {
+  return goalStore.goals.map(
+    (goal) => {
+      const saved =
+        goal.currentAmount || 0;
+
+      const target =
+        goal.targetAmount || 0;
+
+      const progress =
+        target > 0
+          ? Math.round(
+              (saved / target) *
+                100
+            )
+          : 0;
+
+      return {
+        ...goal,
+        saved,
+        remaining:
+          target - saved,
+        progress,
+
+        color:
+          progress >= 70
+            ? "#16a34a"
+            : progress >= 30
+            ? "#ff7a00"
+            : "#ef4444",
+      };
+    }
+  );
+});
+
+const totalSaved = computed(() => {
+  return goals.value.reduce(
+    (total, goal) =>
+      total + goal.saved,
+    0
+  );
+});
+
+const totalRemaining =
+  computed(() => {
+    return goals.value.reduce(
+      (total, goal) =>
+        total +
+        goal.remaining,
+      0
+    );
+  });
+
+
+async function createGoal() {
+  const payload = {
+    name: form.value.name,
+
+    targetAmount: Number(
+      form.value.targetAmount
+    ),
+
+    deadline:
+      form.value.deadline,
+  };
+
+  await goalStore.createGoal(
+    payload
+  );
+
+  await goalStore.fetchAllGoals();
+
+  closeModal();
+}
+
+
+function openEditModal(goal) {
+  showEditModal.value = true;
+
+  editForm.value = {
+    id: goal.id,
+
+    name: goal.name,
+
+    targetAmount:
+      goal.targetAmount,
+
+    deadline:
+      goal.deadline?.split(
+        "T"
+      )[0],
+  };
+}
+
+async function updateGoal() {
+  const payload = {
+    name: editForm.value.name,
+
+    targetAmount: Number(
+      editForm.value
+        .targetAmount
+    ),
+
+    currentAmount: Number(
+      editForm.value
+        .currentAmount
+    ),
+
+    deadline:
+      editForm.value.deadline,
+  };
+
+  await goalStore.updateGoal(
+    editForm.value.id,
+    payload
+  );
+
+  await goalStore.fetchAllGoals();
+
+  closeEditModal();
+}
+
+
+async function removeGoal(id) {
+  await goalStore.deleteGoal(id);
+
+  await goalStore.fetchAllGoals();
+}
+
+
+function openProgressModal(goal) {
+  selectedGoalId.value =
+    goal.id;
+
+  progressAmount.value = "";
+
+  showProgressModal.value = true;
+}
+
+function closeProgressModal() {
+  showProgressModal.value = false;
+
+  progressAmount.value = "";
+
+  selectedGoalId.value = "";
+}
+
+async function submitGoalProgress() {
+  await goalStore.addGoalProgress(
+    selectedGoalId.value,
+    progressAmount.value
+  );
+
+  await goalStore.fetchAllGoals();
+
+  closeProgressModal();
+}
+
+
+function closeModal() {
+  showModal.value = false;
+
+  form.value = {
+    name: "",
+    targetAmount: "",
+    deadline: "",
+  };
+}
+
+function closeEditModal() {
+  showEditModal.value = false;
+
+  editForm.value = {
+    id: "",
+    name: "",
+    targetAmount: "",
+    currentAmount: "",
+    deadline: "",
+  };
+}
+
+
+function formatDate(date) {
+  return new Date(
+    date
+  ).toLocaleDateString();
+}
+</script>
 <style scoped>
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
 }
 
 .dashboard {
@@ -161,7 +569,6 @@ const goals = [
 
 .header h1 {
   font-size: 32px;
-  font-weight: 700;
   color: #1d2433;
 }
 
@@ -171,20 +578,16 @@ const goals = [
 }
 
 .add-btn {
-  border: 2px solid #d6dff0;
-  background: white;
-  padding: 12px 20px;
+  border: none;
+  background: #2450c5;
+  color: white;
+  padding: 12px 22px;
   border-radius: 30px;
-  color: #5c6bc0;
-  font-weight: 600;
   cursor: pointer;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.add-btn span {
-  font-size: 18px;
 }
 
 /* Stats */
@@ -192,104 +595,71 @@ const goals = [
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
-  margin-bottom: 35px;
+  margin-bottom: 30px;
 }
 
 .stat-card {
   background: white;
   border-radius: 20px;
   padding: 25px;
-  position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.top-icon {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 18px;
 }
 
 .stat-card h4 {
-  color: #687385;
-  margin-bottom: 12px;
-  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 10px;
 }
 
 .stat-card h2 {
-  font-size: 34px;
-  color: #101828;
-  margin-bottom: 5px;
-}
-
-.stat-card p {
-  color: #98a2b3;
-  font-size: 14px;
+  font-size: 32px;
 }
 
 /* Goal Card */
 .goal-card {
   background: white;
   border-radius: 24px;
-  padding: 28px;
-  margin-bottom: 28px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 25px;
+  margin-bottom: 25px;
 }
 
 .goal-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 25px;
 }
 
 .goal-info {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  gap: 15px;
 }
 
 .goal-icon {
   width: 55px;
   height: 55px;
-  border-radius: 50%;
   background: #1f2a44;
+  border-radius: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   color: white;
-  font-size: 22px;
 }
 
 .title-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.title-row h3 {
-  font-size: 22px;
-  color: #101828;
-}
-
-.risk {
-  background: #dcfce7;
-  color: #16a34a;
+.status {
+  background: #dbeafe;
+  color: #1d4ed8;
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
-}
-
-.goal-info p {
-  color: #98a2b3;
-  margin-top: 5px;
 }
 
 .actions {
   display: flex;
-  gap: 14px;
-  font-size: 18px;
+  gap: 15px;
   cursor: pointer;
 }
 
@@ -302,95 +672,84 @@ const goals = [
   display: flex;
   justify-content: flex-end;
   margin-bottom: 10px;
-  font-weight: 600;
-  color: #374151;
 }
 
 .progress-bar {
   width: 100%;
   height: 10px;
-  background: #dbe2ef;
+  background: #e5e7eb;
   border-radius: 20px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  border-radius: 20px;
 }
 
 /* Bottom */
 .goal-bottom {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.goal-bottom h2 {
-  font-size: 34px;
-  font-weight: 700;
-}
-
-.goal-bottom p {
-  color: #98a2b3;
-  margin-top: 5px;
 }
 
 .remaining {
   text-align: right;
 }
 
-.remaining h2 {
-  color: #f59e0b;
-}
-
-/* Buttons */
-.buttons {
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: flex-end;
-  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
-.save-btn {
+.modal-box {
+  width: 420px;
+  background: white;
+  border-radius: 24px;
+  padding: 25px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  outline: none;
+}
+
+.submit-btn {
+  width: 100%;
+  border: none;
   background: #2450c5;
   color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 30px;
-  font-weight: 600;
+  padding: 14px;
+  border-radius: 14px;
   cursor: pointer;
-}
-
-.details-btn {
-  border: 2px solid #d6dff0;
-  background: white;
-  color: #8ea2c8;
-  padding: 14px 22px;
-  border-radius: 30px;
   font-weight: 600;
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .goal-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .remaining {
-    text-align: left;
-  }
-
-  .buttons {
-    flex-direction: column;
-  }
 }
 </style>
