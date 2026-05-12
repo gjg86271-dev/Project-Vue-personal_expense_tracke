@@ -36,14 +36,31 @@ async function deletIDtransaction(id) {
 
 //update
 
-async function updateIDtransaction(id,form) {
-  try{
-    const res = await api.put(`transactions/${id}`, form);
-    
-    transactions.value = transactions.value.map(item => 
-      item.id === id ? res.data : item
-    );
-  }catch(error){
+async function updateIDtransaction(id, form) {
+  try {
+    const res = await api.put(
+      `transactions/${id}`,
+      form
+    )
+    transactions.value = transactions.value.map(item =>
+      item.id === id
+        ? res.data.data
+        : item
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// Create
+async function createTransaction(form) {
+  try {
+
+    await api.post('transactions', form)
+
+    fetchAlltransaction()
+
+  } catch (error) {
     console.log(error)
   }
 }
@@ -53,6 +70,7 @@ async function updateIDtransaction(id,form) {
   <div class="container mt-4">
     <TransactionForm :items="transactions" 
     @delete-transaction="deletIDtransaction"
-    @update-transaction="updateIDtransaction"/>
+    @update-transaction="updateIDtransaction"
+    @create-transaction="createTransaction"/>
   </div>
 </template>

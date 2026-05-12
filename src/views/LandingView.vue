@@ -1,115 +1,123 @@
 <template>
-    <header class="navbar"  style="font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;" >
-        <div class="navbar-left">
-            <img src="/src/assets/img/image.png" alt="ExpenseTracker" class="brand-icon" />
-        </div>
+  <div class="app-wrapper">
 
-        <div class="navbar-right">
-          
-            <RouterLink to="/login" class="btn btn-secondary px-5 rounded-5 border-secondary">ចូលប្រើគណនី</RouterLink>
-            <div class="divider"></div>
+    <!-- Background layers -->
+    <div class="bg-blob bg-blob-left"></div>
+    <div class="bg-blob bg-blob-right"></div>
+    <div class="bg-blob bg-blob-top"></div>
+    <div class="bg-dots"></div>
+    <div class="deco-ring deco-ring-tl"></div>
+    <div class="deco-ring deco-ring-br"></div>
 
-            
-        </div>
-    </header>
+    <!-- App content -->
+    <Header />
+
+    <main class="main-content">
+      <RouterView />
+      <div class="deco-ring deco-ring-br"></div>
+    </main>
+
+
+    <Footerlanding />
+
+  </div>
 </template>
+
+<script setup>
+import Header from '@/components/commentlanding/Header.vue'
+import Footerlanding from '@/components/commentlanding/Footerlanding.vue';
+import { RouterView } from 'vue-router'
+</script>
+
 <style scoped>
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
-}
-.brand-icon {
-  width: 160px;
-  height: 60px;
-  object-fit: contain;
+.app-wrapper {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  background: linear-gradient(135deg,
+      #EEF4FF 0%,
+      #F5F8FF 60%,
+      #E8F0FE 100%);
 }
 
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.main-content {
+  position: relative;
+  z-index: 1;
 }
 
-/* Bell button — no border, just icon */
-.icon-button {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: none;
-  color: #6b7280;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  transition: background 0.15s;
-}
-
-.icon-button:hover {
-  background: #f1f5f9;
-  color: #111827;
-}
-
-/* Vertical divider between bell and profile */
-.divider {
-  width: 1px;
-  height: 32px;
-  background: #e5e7eb;
-}
-
-.profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-/* Real photo avatar */
-.avatar-img {
-  width: 40px;
-  height: 40px;
+/* Blobs */
+.bg-blob {
+  position: absolute;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e5e7eb;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Fallback initials avatar */
-.avatar {
-  width: 40px;
-  height: 40px;
+.bg-blob-left {
+  top: -120px;
+  left: -120px;
+  width: 520px;
+  height: 460px;
+  background: radial-gradient(ellipse,
+      rgba(200, 217, 255, 0.55) 0%,
+      transparent 70%);
+}
+
+.bg-blob-right {
+  bottom: -120px;
+  right: -120px;
+  width: 480px;
+  height: 420px;
+  background: radial-gradient(ellipse,
+      rgba(181, 212, 244, 0.45) 0%,
+      transparent 70%);
+}
+
+.bg-blob-top {
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 340px;
+  background: radial-gradient(ellipse,
+      rgba(221, 232, 255, 0.6) 0%,
+      transparent 70%);
+}
+
+/* Dot Grid */
+.bg-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle,
+      rgba(55, 138, 221, 0.12) 1.5px,
+      transparent 1.5px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Decorative rings */
+.deco-ring {
+  position: absolute;
   border-radius: 50%;
-  background: #2563eb;
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 14px;
-  flex-shrink: 0;
+  border: 1px solid rgba(55, 138, 221, 0.1);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.profile-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+.deco-ring-tl {
+  top: -60px;
+  left: -60px;
+  width: 280px;
+  height: 280px;
+  box-shadow: 0 0 0 50px rgba(55, 138, 221, 0.04);
 }
 
-.profile-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-
-.profile-email {
-  font-size: 11px;
-  color: #6b7280;
-  white-space: nowrap;
-  line-height: 1.3;
+.deco-ring-br {
+  bottom: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  box-shadow: 0 0 0 60px rgba(24, 95, 165, 0.04);
 }
 </style>
