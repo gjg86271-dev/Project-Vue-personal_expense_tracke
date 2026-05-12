@@ -6,9 +6,10 @@
             <h1 class="fw-bold">ប្រតិបត្តិការ</h1>
             <p class="text-secondary">គ្រប់គ្រងប្រតិបត្តិការហិរញ្ញវត្ថុរបស់អ្នកទាំងអស់</p>
           </div>
-          <button class="btn btn-primary rounded-5  "
+          <button class="btn btn-primary rounded-5" @click="openModal()"
             style="font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important; height: 50px; width: 180px ; font-size: 18px;"><i
-              class="bi bi-plus"></i> បន្ថែមប្រតិបត្តិការ </button>
+            class="bi bi-plus"></i> បន្ថែមប្រតិបត្តិការ 
+          </button>
         </div>
     <div class="row">
       <div class="col">
@@ -68,12 +69,12 @@
     
     <thead class="table-secondary">
       <tr class="text-center">
-        <th>Date</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Type</th>
-        <th>Amount</th>
-        <th>Actions</th>
+        <th>កាលបរិច្ឆេទ</th>
+        <th>ការពិពណ៌នា</th>
+        <th>ប្រភេទទូទៅ</th>
+        <th>លក្ខណៈ</th>
+        <th>ចំនួនទឹកប្រាក់</th>
+        <th>សកម្មភាព</th>
       </tr>
     </thead>
 
@@ -151,24 +152,52 @@
       <div class="form-group mb-3">
         <label>Category Name</label>
 
-        <input
-          v-model="form.category.name"
-          type="text"
-          class="form-control"
-          placeholder="Enter category"
-        />
+          <select class="form-select" v-model="form.categoryId">
+
+  <option disabled value="">
+    Select Category
+  </option>
+
+  <option
+    v-for="category in categories"
+    :key="category.id"
+    :value="category.id"
+  >
+    {{ category.name }}
+  </option>
+
+</select>
       </div>
 
       <div class="form-group">
         <label>Budget Amount</label>
 
         <input
-          v-model="form.limitAmount"
+          v-model="form.amount"
           type="number"
           class="form-control"
           placeholder="Enter amount"
         />
       </div>
+      <div class="form-group mt-3">
+      <label>Notes</label>
+
+      <input
+        v-model="form.notes"
+        type="text"
+        class="form-control"
+        placeholder="Enter notes"
+      />
+    </div>
+    <div class="form-group mt-3">
+    <label>Date</label>
+
+    <input
+      v-model="form.transactionDate"
+      type="date"
+      class="form-control"
+    />
+  </div>
 
     </template>
 
@@ -246,8 +275,19 @@
   </BaseModal>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import BaseModal from '../ui/base/BaseModal.vue'
+import { useCategoryStore } from '@/stores/categoryStore'
+
+const categoryStore = useCategoryStore();
+
+onMounted(async()=>{
+  await categoryStore.fetchAllCategories();
+})
+
+const categories = computed(() => {
+  return categoryStore.categories
+})
 
 const props = defineProps({
   items: {
@@ -257,8 +297,10 @@ const props = defineProps({
 })
 const emit = defineEmits([
   'delete-transaction',
-  'update-transaction'
+  'update-transaction',
+  'create-transaction'
 ])
+
 
   // EDIT MODAL
 const showModal = ref(false)
@@ -268,48 +310,52 @@ const showDeleteModal = ref(false)
 const selectedBudget = ref(null)
   // FORM
 const form = reactive({
-  category: {
-    name: ''
-  },
-  limitAmount: ''
+  categoryId: '',
+  amount: '',
+  transactionDate: '',
+  notes: ''
 })
 
   // OPEN EDIT MODAL
 function openModal(item = null) {
-
   showModal.value = true
 
   if (item) {
-
     isEditing.value = true
-
-    // IMPORTANT
     selectedBudget.value = item
 
-    form.category.name = item.category?.name || ''
-    form.limitAmount = item.amount || ''
-
+    form.categoryId = item.category?.id || ''
+    form.amount = item.amount || ''
+    form.notes = item.notes || ''
+    form.transactionDate = item.transactionDate?.split('T')[0] || ''
   } else {
-
     isEditing.value = false
-
     selectedBudget.value = null
 
-    form.category.name = ''
-    form.limitAmount = ''
+    form.categoryId = ''
+    form.amount = ''
+    form.notes = ''
+    form.transactionDate = ''
   }
 }
-  // CLOSE EDIT MODAL
+// CLOSE EDIT MODAL
 function closeModal() {
   showModal.value = false
 }
 //  SAVE
 function saveBudget() {
-  console.log(form)
-    emit('update-transaction', {
-    id: selectedBudget.value.id,
-    form: form 
-  })
+  if (isEditing.value) {
+    emit(
+      'update-transaction',
+      selectedBudget.value.id,
+      form
+    )
+  } else {
+    emit(
+      'create-transaction',
+      form
+    )
+  }
   closeModal()
 }
   // OPEN DELETE MODAL
@@ -324,7 +370,6 @@ function closeDeleteModal() {
 }
   // DELETE
 function deleteBudget() {
-  console.log('Delete Budget:', selectedBudget.value)
   // delete logic here
   emit(
     'delete-transaction',

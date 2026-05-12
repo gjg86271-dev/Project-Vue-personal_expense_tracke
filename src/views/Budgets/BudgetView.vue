@@ -39,7 +39,7 @@
           {{ errorMessage }}
         </div>
 
-        <!-- SUCCESS -->
+        <!-- SUCCESS --> 
         <div v-if="successMessage" class="success-box">
           {{ successMessage }}
         </div>
