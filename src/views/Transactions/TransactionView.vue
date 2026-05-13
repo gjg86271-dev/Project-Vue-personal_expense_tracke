@@ -2,8 +2,12 @@
 import { ref, onMounted } from 'vue'
 import api from '@/api/api'
 import TransactionForm from '@/components/form/TransactionForm.vue'
+import { useTransactionStore } from '@/stores/transactionStore'
+
+
 
 const transactions = ref([])
+const transactionsitmes = ref({})
 
 async function fetchAlltransaction () {
   try {
@@ -11,6 +15,10 @@ async function fetchAlltransaction () {
       'transactions?_page=1&_per_page=10&sortBy=id&sortDir=asc'
     )
     transactions.value = res.data.data.items
+    
+    
+    
+    
 
   } catch (error) {
     console.log(error)

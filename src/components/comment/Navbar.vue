@@ -1,6 +1,15 @@
 <template>
   <header class="navbar">
     <div class="navbar-left">
+      <!-- Toggle Button -->
+      <button class="icon-button me-2" @click="emit('toggle-sidebar')" type="button" aria-label="Toggle Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M3 12h18M3 18h18"
+            stroke="currentColor" stroke-width="2"
+            stroke-linecap="round"/>
+        </svg>
+      </button>
+
       <img src="/src/assets/img/image.png" alt="ExpenseTracker" class="brand-icon" />
     </div>
 
@@ -14,17 +23,14 @@
 
       <div class="divider"></div>
 
-      <!-- Profile Dropdown Trigger -->
       <div class="profile-wrapper" ref="triggerRef">
         <button class="profile" @click="toggleDropdown" type="button">
           <img v-if="avatarUrl" :src="avatarUrl" :alt="name" class="avatar-img" />
           <div v-else class="avatar">{{ initials }}</div>
-
           <div class="profile-text">
             <div class="profile-name">{{ name }}</div>
             <div class="profile-email">{{ email }}</div>
           </div>
-
           <svg class="chevron" :class="{ open: isOpen }"
             width="14" height="14" viewBox="0 0 24 24" fill="none">
             <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"
@@ -35,11 +41,9 @@
     </div>
   </header>
 
-  <!-- Teleport to body -->
   <Teleport to="body">
     <Transition name="dropdown">
       <div v-if="isOpen" ref="menuRef" :style="menuStyle">
-        <!-- Header -->
         <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;">
           <img v-if="avatarUrl" :src="avatarUrl" :alt="name"
             style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;flex-shrink:0;" />
@@ -55,7 +59,6 @@
 
         <div style="height:1px;background:#e5e7eb;margin:0;"></div>
 
-        <!-- Profile link -->
         <RouterLink
           to="/profile"
           @click="isOpen = false"
@@ -73,7 +76,6 @@
 
         <div style="height:1px;background:#e5e7eb;margin:0;"></div>
 
-        <!-- Logout -->
         <button
           @click="handleLogout"
           type="button"
@@ -101,12 +103,12 @@ const props = defineProps({
   avatarUrl: { type: String, default: null }
 })
 
-const emit = defineEmits(['logout'])
+const emit = defineEmits(['logout', 'toggle-sidebar'])  // ✅ បន្ថែម toggle-sidebar
 
-const isOpen    = ref(false)
+const isOpen     = ref(false)
 const triggerRef = ref(null)
-const menuRef   = ref(null)
-const menuStyle = ref({})
+const menuRef    = ref(null)
+const menuStyle  = ref({})
 
 const initials = computed(() =>
   props.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -168,9 +170,15 @@ onUnmounted(() => {
   align-items: center;
   padding: 0 20px;
   height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  background: #bad7f8;
+  /* border-bottom: 1px solid #e5e7eb; */
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .brand-icon {
@@ -272,7 +280,6 @@ onUnmounted(() => {
 }
 .chevron.open { transform: rotate(180deg); }
 
-/* Transition for teleported dropdown */
 :global(.dropdown-enter-active),
 :global(.dropdown-leave-active) {
   transition: opacity 0.15s ease, transform 0.15s ease;
