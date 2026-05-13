@@ -1,9 +1,15 @@
 <template>
-  <div class="container"   style="font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;">
+  <div
+    class="container"
+    style="
+      font-family:
+        &quot;Kantumruy Pro&quot;, &quot;Khmer OS&quot;, sans-serif !important;
+    "
+  >
     <!-- Header -->
     <div class="top-bar">
       <h2 class="title">ថវិការបស់ខ្ញុំ</h2>
-     
+
       <button class="add-btn" @click="openAddModal">បន្ថែមគម្រោងថវិកា</button>
     </div>
 
@@ -27,7 +33,7 @@
       />
     </div>
 
-    <!-- ADD / EDIT MODAL -->
+   
     <BaseModal
       v-if="showModal"
       :title="isEditing ? 'កែសម្រួលថវិកា' : 'បន្ថែមថវិកា'"
@@ -39,11 +45,11 @@
           {{ errorMessage }}
         </div>
 
-        <!-- SUCCESS -->
+        <!-- SUCCESS --> 
         <div v-if="successMessage" class="success-box">
           {{ successMessage }}
         </div>
-        <!-- CATEGORY -->
+        
         <div class="form-group">
           <label>ឈ្មោះប្រភេទ</label>
 
@@ -80,7 +86,7 @@
       </template>
     </BaseModal>
 
-    <!-- DELETE MODAL -->
+   
     <BaseModal
       v-if="showDeleteModal"
       title="Delete Budget"
@@ -200,7 +206,6 @@ async function saveBudget() {
 
   // VALIDATION ONLY FOR ADD
   if (!isEditing.value) {
-
     if (!form.value.categoryId) {
       errorMessage.value = "សូមជ្រើសរើសប្រភេទ";
       return;
@@ -234,7 +239,6 @@ async function saveBudget() {
       closeModal();
       successMessage.value = "";
     }, 1000);
-
   } catch (error) {
     console.error(error);
     errorMessage.value = "មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ";

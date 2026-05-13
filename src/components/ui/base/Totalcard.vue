@@ -9,8 +9,6 @@
             </div>
             <div class="card-subtitle">{{ formattedValue }}</div>
             <div class="card-text">
-
-
             </div>
         </div>
     </div>
