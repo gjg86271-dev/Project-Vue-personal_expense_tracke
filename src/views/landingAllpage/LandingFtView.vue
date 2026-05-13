@@ -274,11 +274,6 @@ import { RouterLink } from 'vue-router';
     border-radius: 18px;
     border: 0.5px solid #e2e8f0;
 }
-
-/* .herobanner {
-    margin: 100px 0;
-} */
-
 .img-card-hero {
     width: 400px;
     height: 400px;

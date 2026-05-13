@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-
 import LoginView from '@/views/LoginView.vue'
 
 import LayoutsDashboard from '@/components/layouts/LayoutsDashboard.vue'
@@ -16,30 +15,38 @@ import LandingView from '@/views/LandingView.vue'
 import LandingFtView from '@/views/landingAllpage/LandingFtView.vue'
 import LandingAboutView from '@/views/landingAllpage/LandingAboutView.vue'
 import LandingHomeView from '@/views/landingAllpage/LandingHomeView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+
   routes: [
+    // Landing
     {
       path: '/landing',
       component: LandingView,
       redirect: '/landing/homelanding',
+
       children: [
         {
           path: 'homelanding',
           name: 'landing',
           component: LandingHomeView,
+
           meta: {
             title: 'Landing Page',
           },
         },
+
         {
           path: 'function',
           name: 'landingfunction',
           component: LandingFtView,
+
           meta: {
-            title: 'Landing Page',
+            title: 'Function Page',
           },
         },
+
         {
           path: 'about',
           name: 'landingabout',
@@ -51,6 +58,8 @@ const router = createRouter({
         },
       ],
     },
+
+    // Login
     {
       path: '/login',
       name: 'login',
@@ -60,43 +69,54 @@ const router = createRouter({
         title: 'Login',
       },
     },
+
+    // Dashboard
     {
       path: '/',
       component: LayoutsDashboard,
       redirect: '/dashboard',
+
       children: [
         {
           path: 'dashboard',
           name: 'dashboard',
           component: HomeView,
+
           meta: {
             title: 'Dashboard',
           },
         },
+
         {
           path: 'budget',
           name: 'budget',
           component: BudgetView,
+
           meta: {
             title: 'Budget',
           },
         },
+
         {
           path: 'transactions',
           name: 'transactions',
           component: TransactionView,
+
           meta: {
             title: 'Transactions',
           },
         },
+
         {
           path: 'goal',
           name: 'goal',
           component: GoalsView,
+
           meta: {
             title: 'Goals',
           },
         },
+
         {
           path: 'report',
           name: 'report',
@@ -106,6 +126,7 @@ const router = createRouter({
             title: 'Reports',
           },
         },
+
         {
           path: 'profile',
           name: 'profile',
@@ -117,17 +138,18 @@ const router = createRouter({
         },
       ],
     },
+
+    // 404
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/landing/web',
+      redirect: '/landing/homelanding',
     },
   ],
 })
 
-// router.beforeEach((to, from, next) => {
-//   document.title = to.meta.title || 'Expense Tracker'
-
-//   next()
-// })
+// Change title
+router.beforeEach((to, from) => {
+  document.title = to.meta.title || 'Expense Tracker'
+})
 
 export default router
