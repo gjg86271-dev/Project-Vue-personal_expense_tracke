@@ -11,7 +11,7 @@
       <div class="actions">
         <button @click="editBudget">
           <i class="bi bi-pencil-square"></i>
-        </button>
+        </button> 
 
         <button @click="deleteBudget" class="danger">
           <i class="bi bi-trash3"></i>

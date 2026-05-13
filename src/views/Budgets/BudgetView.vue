@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="container"
-    style="
-      font-family:
-        &quot;Kantumruy Pro&quot;, &quot;Khmer OS&quot;, sans-serif !important;
-    "
-  >
+  <div class="container font">
     <!-- Header -->
     <div class="top-bar">
       <h2 class="title">ថវិការបស់ខ្ញុំ</h2>
@@ -33,7 +27,6 @@
       />
     </div>
 
-   
     <BaseModal
       v-if="showModal"
       :title="isEditing ? 'កែសម្រួលថវិកា' : 'បន្ថែមថវិកា'"
@@ -41,15 +34,7 @@
     >
       <template #body>
         <!-- ERROR -->
-        <div v-if="errorMessage" class="error-box">
-          {{ errorMessage }}
-        </div>
 
-      
-        <div v-if="successMessage" class="success-box">
-          {{ successMessage }}
-        </div>
-        
         <div class="form-group">
           <label>ឈ្មោះប្រភេទ</label>
 
@@ -86,7 +71,6 @@
       </template>
     </BaseModal>
 
-   
     <BaseModal
       v-if="showDeleteModal"
       title="Delete Budget"
@@ -113,6 +97,12 @@
         <button class="delete-btn" @click="deleteBudget">លុប</button>
       </template>
     </BaseModal>
+
+    <!-- TOAST -->
+
+    <div v-if="toast.show" :class="['app-toast', toast.type]">
+      {{ toast.message }}
+    </div>
   </div>
 </template>
 
@@ -134,8 +124,7 @@ const transactionStore = useTransactionStore();
 const showModal = ref(false);
 const showDeleteModal = ref(false);
 const isEditing = ref(false);
-const errorMessage = ref("");
-const successMessage = ref("");
+
 /* DATA */
 const selectedBudget = ref(null);
 
@@ -144,6 +133,27 @@ const form = ref({
   categoryId: "",
   limitAmount: 0,
 });
+
+/* TOAST */
+const toast = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showToast(message, type = "success") {
+  toast.value.show = false;
+
+  setTimeout(() => {
+    toast.value.message = message;
+    toast.value.type = type;
+    toast.value.show = true;
+
+    setTimeout(() => {
+      toast.value.show = false;
+    }, 3000);
+  }, 100);
+}
 
 /* FETCH */
 onMounted(async () => {
@@ -201,20 +211,14 @@ async function deleteBudget() {
 
 /* SAVE */
 async function saveBudget() {
-  errorMessage.value = "";
-  successMessage.value = "";
+  if (!form.value.categoryId) {
+    showToast("សូមជ្រើសរើសប្រភេទ", "error");
+    return;
+  }
 
-  // VALIDATION ONLY FOR ADD
-  if (!isEditing.value) {
-    if (!form.value.categoryId) {
-      errorMessage.value = "សូមជ្រើសរើសប្រភេទ";
-      return;
-    }
-
-    if (!form.value.limitAmount || form.value.limitAmount <= 0) {
-      errorMessage.value = "សូមបញ្ចូលចំនួនថវិកា";
-      return;
-    }
+  if (!form.value.limitAmount || form.value.limitAmount <= 0) {
+    showToast("សូមបញ្ចូលចំនួនថវិកា", "error");
+    return;
   }
 
   const payload = {
@@ -227,21 +231,20 @@ async function saveBudget() {
   try {
     if (isEditing.value) {
       await budgetStore.updateBudget(form.value.id, payload);
-      successMessage.value = "កែសម្រួលថវិកាជោគជ័យ";
+      showToast("កែសម្រួលថវិកាជោគជ័យ", "success");
     } else {
       await budgetStore.createBudget(payload);
-      successMessage.value = "បន្ថែមថវិកាជោគជ័យ";
+      showToast("បន្ថែមថវិកាជោគជ័យ", "success");
     }
 
     await budgetStore.fetchBudgets();
 
     setTimeout(() => {
       closeModal();
-      successMessage.value = "";
     }, 1000);
   } catch (error) {
     console.error(error);
-    errorMessage.value = "មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ";
+    showToast("មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ", "error");
   }
 }
 /* CLOSE */
@@ -262,6 +265,49 @@ function closeDeleteModal() {
   min-height: 100vh;
 }
 
+.font {
+  font-family: "Kantumruy Pro", "Khmer OS", sans-serif !important;
+}
+
+/* TOAST */
+
+/* TOAST */
+.app-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 280px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  z-index: 999999;
+  animation: slideIn 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* SUCCESS */
+.app-toast.success {
+  background: #16a34a;
+}
+
+/* ERROR */
+.app-toast.error {
+  background: #dc2626;
+}
+
+/* ANIMATION */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 .top-bar {
   display: flex;
   justify-content: space-between;
