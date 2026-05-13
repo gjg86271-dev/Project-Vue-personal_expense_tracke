@@ -60,7 +60,7 @@
             </div>
         </div>
     </section>
-    <section class="section-2 bg-success-subtle p-5">
+    <section class="section-2 p-5">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -206,7 +206,7 @@
             </div>
         </div>
     </section>
-    <section class="section-5 py-5 bg-success-subtle ">
+    <section class="section-5 py-5 ">
         <div class="container">
             <!-- Title -->
             <div class="text-center mb-5">
@@ -217,15 +217,15 @@
                     អ្នកពិការញ្ចៀរពីក្រោយការបង្កើតបទពិសោធន៍ដ៏អស្ចារ្យរបស់ កាក់សេន
                 </p>
             </div>
-            <div class="row g-4 justify-content-center">
-                <!-- Member 4 -->
-                <div class="col-md-4">
+
+            <!-- Row 1 - 3 members -->
+            <div class="row g-4 justify-content-center mt-4 ">
+                <div class="col-md-3">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
-                        <img src="/src/assets/img/team-1.jpg" alt="member4"
-                        class="rounded-circle mx-auto mb-3"
-                        style="width: 100px; height: 100px; object-fit: cover;">
+                        <img src="/src/assets/img/team-1.jpg" alt="member4" class="rounded-circle mx-auto mb-3"
+                            style="width: 100px; height: 100px; object-fit: cover;">
                         <span class="badge text-primary mb-2" style="background-color: #e0e8ff;">
-                           Team Leader
+                            Team Leader
                         </span>
                         <h6 class="fw-bold">Seng Sidomanatt</h6>
                         <p class="text-secondary small">អ្នកដឹកនាំProject និងចូលរួមបង្កើតទគេហទំព័រ</p>
@@ -236,16 +236,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Row 1 - 3 members -->
-            <div class="row g-4 justify-content-center mt-4 ">
                 <!-- Member 1 -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
-                        <img src="/src/assets/img/Maphotos.jpg" alt="member1"
-                        class="rounded-circle mx-auto mb-3"
-                        style="width: 100px; height: 100px; object-fit: cover;">
+                        <img src="/src/assets/img/Maphotos.jpg" alt="member1" class="rounded-circle mx-auto mb-3"
+                            style="width: 100px; height: 100px; object-fit: cover;">
                         <span class="badge text-primary mb-2" style="background-color: #e0e8ff;">
                             Team Member
                         </span>
@@ -259,11 +254,10 @@
                     </div>
                 </div>
                 <!-- Member 2 -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
                         <img src="/src/assets/img/photo_2026-05-11_14-11-43.jpg" alt="member2"
-                        class="rounded-circle mx-auto mb-3"
-                        style="width: 100px; height: 100px; object-fit: cover;">
+                            class="rounded-circle mx-auto mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                         <span class="badge text-primary mb-2" style="background-color: #e0e8ff;">
                             Team Member
                         </span>
@@ -277,11 +271,10 @@
                     </div>
                 </div>
                 <!-- Member 3 -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
                         <img src="/src/assets/img/photo_1_2025-04-01_15-00-40 copy.JPG" alt="member3"
-                        class="rounded-circle mx-auto mb-3"
-                        style="width: 100px; height: 100px; object-fit: cover;">
+                            class="rounded-circle mx-auto mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                         <span class="badge text-primary mb-2" style="background-color: #e0e8ff;">
                             Team Member
                         </span>
@@ -291,6 +284,37 @@
                             <a href="#" class="text-primary"><i class="bi bi-telegram"></i></a>
                             <a href="#" class="text-primary"><i class="bi bi-facebook"></i></a>
                             <a href="#" class="text-primary"><i class="bi bi-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-6 mb-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card border-0  bg-transparent ">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card border-0 p-5  ">
+                                    <img src="/src/assets/img/ANT logo HD-QyOYtqJc.png"  width="160px" class=" m-auto mb-3 ">
+                                    <div class="card-title text-center">
+                                        <h1 class="text-success">សេចក្តីថ្លែងអំណរគុណចំពោះ</h1>
+                                        <div class="catd-text text-center mt-4" style="padding: 0 200px;">
+                                            <p>
+                                                ថ្នាក់បណ្តុះបណ្តាលបច្ចេកវិទ្យាអាន ANT ព្រមទាំងលោកគ្រូ  <span
+                                                    class="text-primary">...</span>
+                                                និងអ្នកគ្រូ <span class="text-primary">យឹម ស្រីយ៉ឺ</span> ។
+                                                ក្រុមរបស់យើងមានអារម្មណ៍សោមនស្សរីករាយយ៉ាងខ្លាំងដែលទទួលបានអាហារូបករណ៍លើជំនាញការអភិវឌ្ឍន៍គេហទំព័រនេះ។
+                                                អាហារូបករណ៍នេះពិតជាបានជួយសម្រាលបន្ទុកហិរញ្ញវត្ថុសម្រាប់ការសិក្សាដល់ក្រុមយើងខ្ញុំទាំងអស់គ្នា។
+                                                ក្រោមការណែនាំពីលោកគ្រូអ្នកគ្រូ
+                                                ក្រុមយើងខ្ញុំប្តេជ្ញាខិតខំប្រឹងប្រែងសិក្សាដើម្បីកសាងសមត្ថភាពឱ្យបានខ្លាំងពូកែ
+                                                ដើម្បីអាចចូលរួមចំណែកជួយដល់សង្គមជាតិទៅថ្ងៃអនាគត។</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

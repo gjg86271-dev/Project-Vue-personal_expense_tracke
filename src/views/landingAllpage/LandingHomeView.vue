@@ -51,7 +51,7 @@
             </div>
         </div>
     </section>
-    <section class="section-2 bg-success-subtle p-5" 
+    <section class="section-2  p-5" 
         style="font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important; margin-top: 160px;">
         <div class="container">
             <div class="row">
@@ -192,7 +192,7 @@
             </div>
         </div>
     </section>
-    <section class="section-4 bg-transparent mb-0 bg-success-subtle p-5"
+    <section class="section-4 bg-transparent mb-0  p-5"
         style="font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important; margin-top: 160px;">
         <div class="container">
             <div class="row align-items-center g-5">
