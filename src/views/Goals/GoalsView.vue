@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard font">
     <!-- Header -->
     <div class="header">
       <div>
@@ -7,171 +7,95 @@
         <p>តាមដានគោលដៅសន្សំរបស់អ្នក</p>
       </div>
 
-      <button
-        class="add-btn"
-        @click="showModal = true"
-      >
+      <button class="add-btn" @click="showModal = true">
         បន្ថែមគោលដៅ
         <span>+</span>
       </button>
     </div>
 
     <!-- CREATE MODAL -->
-    <div
-      v-if="showModal"
-      class="modal-overlay"
-    >
+    <div v-if="showModal" class="modal-overlay">
       <div class="modal-box">
         <div class="modal-header">
           <h2>បន្ថែមគោលដៅ</h2>
 
-          <span
-            class="close-btn"
-            @click="closeModal"
-          >
-            ✕
-          </span>
+          <span class="close-btn" @click="closeModal"> ✕ </span>
         </div>
 
         <form @submit.prevent="createGoal">
           <div class="form-group">
             <label>ឈ្មោះគោលដៅ</label>
 
-            <input
-              type="text"
-              v-model="form.name"
-              required
-            />
+            <input type="text" v-model="form.name" required />
           </div>
 
           <div class="form-group">
             <label>Target Amount</label>
 
-            <input
-              type="number"
-              v-model="form.targetAmount"
-              required
-            />
+            <input type="number" v-model="form.targetAmount" required />
           </div>
 
           <div class="form-group">
             <label>Deadline</label>
 
-            <input
-              type="date"
-              v-model="form.deadline"
-              required
-            />
+            <input type="date" v-model="form.deadline" required />
           </div>
 
-          <button
-            type="submit"
-            class="submit-btn"
-          >
-            Save Goal
-          </button>
+          <button type="submit" class="submit-btn">Save Goal</button>
         </form>
       </div>
     </div>
 
     <!-- EDIT MODAL -->
-    <div
-      v-if="showEditModal"
-      class="modal-overlay"
-    >
+    <div v-if="showEditModal" class="modal-overlay">
       <div class="modal-box">
         <div class="modal-header">
           <h2>Edit Goal</h2>
 
-          <span
-            class="close-btn"
-            @click="closeEditModal"
-          >
-            ✕
-          </span>
+          <span class="close-btn" @click="closeEditModal"> ✕ </span>
         </div>
 
         <form @submit.prevent="updateGoal">
           <div class="form-group">
             <label>Goal Name</label>
 
-            <input
-              type="text"
-              v-model="editForm.name"
-              required
-            />
+            <input type="text" v-model="editForm.name" required />
           </div>
 
           <div class="form-group">
             <label>Target Amount</label>
 
-            <input
-              type="number"
-              v-model="editForm.targetAmount"
-              required
-            />
+            <input type="number" v-model="editForm.targetAmount" required />
           </div>
-
-         
 
           <div class="form-group">
             <label>Deadline</label>
 
-            <input
-              type="date"
-              v-model="editForm.deadline"
-              required
-            />
+            <input type="date" v-model="editForm.deadline" required />
           </div>
 
-          <button
-            type="submit"
-            class="submit-btn"
-          >
-            Update Goal
-          </button>
+          <button type="submit" class="submit-btn">Update Goal</button>
         </form>
       </div>
     </div>
 
     <!-- PROGRESS MODAL -->
-    <div
-      v-if="showProgressModal"
-      class="modal-overlay"
-    >
+    <div v-if="showProgressModal" class="modal-overlay">
       <div class="modal-box">
         <div class="modal-header">
           <h2>Add Goal Progress</h2>
 
-          <span
-            class="close-btn"
-            @click="closeProgressModal"
-          >
-            ✕
-          </span>
+          <span class="close-btn" @click="closeProgressModal"> ✕ </span>
         </div>
 
-        <form
-          @submit.prevent="
-            submitGoalProgress
-          "
-        >
+        <form @submit.prevent="submitGoalProgress">
           <div class="form-group">
             <label>Amount</label>
 
-            <input
-              type="number"
-              v-model="progressAmount"
-              required
-            />
+            <input type="number" v-model="progressAmount" required />
           </div>
 
-          <button
-            type="submit"
-            class="submit-btn"
-          >
-            Save Progress
-          </button>
+          <button type="submit" class="submit-btn">Save Progress</button>
         </form>
       </div>
     </div>
@@ -189,9 +113,7 @@
       <div class="stat-card">
         <h4>ប្រាក់សន្សំសរុប</h4>
 
-        <h2>
-          ${{ totalSaved.toLocaleString() }}
-        </h2>
+        <h2>${{ totalSaved.toLocaleString() }}</h2>
 
         <p>across all goals</p>
       </div>
@@ -199,33 +121,22 @@
       <div class="stat-card">
         <h4>នៅសល់</h4>
 
-        <h2>
-          ${{
-            totalRemaining.toLocaleString()
-          }}
-        </h2>
+        <h2>${{ totalRemaining.toLocaleString() }}</h2>
 
         <p>to reach targets</p>
       </div>
     </div>
 
     <!-- GOAL CARD -->
-    <div
-      class="goal-card"
-      v-for="goal in goals"
-      :key="goal.id"
-    >
+    <div class="goal-card" v-for="goal in goals" :key="goal.id">
       <!-- TOP -->
       <div class="goal-top">
         <div class="goal-info">
-      
           <div>
             <div class="title-row">
               <h3>{{ goal.name }}</h3>
 
-              <span class="status">
-                {{ goal.progress }}%
-              </span>
+              <span class="status"> {{ goal.progress }}% </span>
             </div>
 
             <p>
@@ -236,21 +147,11 @@
         </div>
 
         <div class="actions">
-          <span
-            @click="
-              openEditModal(goal)
-            "
-          >
-            <i
-              class="bi bi-pencil-square"
-            ></i>
+          <span @click="openEditModal(goal)">
+            <i class="bi bi-pencil-square"></i>
           </span>
 
-          <span
-            @click="
-              removeGoal(goal.id)
-            "
-          >
+          <span @click="removeGoal(goal.id)">
             <i class="bi bi-trash3"></i>
           </span>
         </div>
@@ -259,20 +160,15 @@
       <!-- PROGRESS -->
       <div class="progress-section">
         <div class="progress-label">
-          <span>
-            {{ goal.progress }}%
-            completed
-          </span>
+          <span> {{ goal.progress }}% completed </span>
         </div>
 
         <div class="progress-bar">
           <div
             class="progress-fill"
             :style="{
-              width:
-                goal.progress + '%',
-              background:
-                goal.color,
+              width: goal.progress + '%',
+              background: goal.color,
             }"
           ></div>
         </div>
@@ -281,21 +177,13 @@
       <!-- BOTTOM -->
       <div class="goal-bottom">
         <div>
-          <h2>
-            ${{
-              goal.saved.toLocaleString()
-            }}
-          </h2>
+          <h2>${{ goal.saved.toLocaleString() }}</h2>
 
           <p>បានសន្សំ</p>
         </div>
 
         <div class="remaining">
-          <h2>
-            ${{
-              goal.remaining.toLocaleString()
-            }}
-          </h2>
+          <h2>${{ goal.remaining.toLocaleString() }}</h2>
 
           <p>នៅសល់</p>
         </div>
@@ -304,10 +192,8 @@
       <!-- BUTTON -->
       <div class="buttons">
         <button
-          class="save-btn   bg-green-500 text-black px-2 py-1 rounded  border-0 shadow-sm mt-2"
-          @click="
-            openProgressModal(goal)
-          "
+          class="save-btn bg-green-500 text-black px-2 py-1 rounded border-0 shadow-sm mt-2"
+          @click="openProgressModal(goal)"
         >
           បន្ថែមប្រាក់
         </button>
@@ -317,11 +203,7 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  onMounted,
-  ref,
-} from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { useGoalsStore } from "@/stores/goalStore";
 
@@ -331,8 +213,7 @@ const showModal = ref(false);
 
 const showEditModal = ref(false);
 
-const showProgressModal =
-  ref(false);
+const showProgressModal = ref(false);
 
 const form = ref({
   name: "",
@@ -351,87 +232,53 @@ const selectedGoalId = ref("");
 
 const progressAmount = ref("");
 
-
 onMounted(async () => {
   await goalStore.fetchAllGoals();
 });
 
-
 const goals = computed(() => {
-  return goalStore.goals.map(
-    (goal) => {
-      const saved =
-        goal.currentAmount || 0;
+  return goalStore.goals.map((goal) => {
+    const saved = goal.currentAmount || 0;
 
-      const target =
-        goal.targetAmount || 0;
+    const target = goal.targetAmount || 0;
 
-      const progress =
-        target > 0
-          ? Math.round(
-              (saved / target) *
-                100
-            )
-          : 0;
+    const progress = target > 0 ? Math.round((saved / target) * 100) : 0;
 
-      return {
-        ...goal,
-        saved,
-        remaining:
-          target - saved,
-        progress,
+    return {
+      ...goal,
+      saved,
+      remaining: target - saved,
+      progress,
 
-        color:
-          progress >= 70
-            ? "#16a34a"
-            : progress >= 30
-            ? "#ff7a00"
-            : "#ef4444",
-      };
-    }
-  );
+      color:
+        progress >= 70 ? "#16a34a" : progress >= 30 ? "#ff7a00" : "#ef4444",
+    };
+  });
 });
 
 const totalSaved = computed(() => {
-  return goals.value.reduce(
-    (total, goal) =>
-      total + goal.saved,
-    0
-  );
+  return goals.value.reduce((total, goal) => total + goal.saved, 0);
 });
 
-const totalRemaining =
-  computed(() => {
-    return goals.value.reduce(
-      (total, goal) =>
-        total +
-        goal.remaining,
-      0
-    );
-  });
-
+const totalRemaining = computed(() => {
+  return goals.value.reduce((total, goal) => total + goal.remaining, 0);
+});
 
 async function createGoal() {
   const payload = {
     name: form.value.name,
 
-    targetAmount: Number(
-      form.value.targetAmount
-    ),
+    targetAmount: Number(form.value.targetAmount),
 
-    deadline:
-      form.value.deadline,
+    deadline: form.value.deadline,
   };
 
-  await goalStore.createGoal(
-    payload
-  );
+  await goalStore.createGoal(payload);
 
   await goalStore.fetchAllGoals();
 
   closeModal();
 }
-
 
 function openEditModal(goal) {
   showEditModal.value = true;
@@ -441,13 +288,9 @@ function openEditModal(goal) {
 
     name: goal.name,
 
-    targetAmount:
-      goal.targetAmount,
+    targetAmount: goal.targetAmount,
 
-    deadline:
-      goal.deadline?.split(
-        "T"
-      )[0],
+    deadline: goal.deadline?.split("T")[0],
   };
 }
 
@@ -455,30 +298,19 @@ async function updateGoal() {
   const payload = {
     name: editForm.value.name,
 
-    targetAmount: Number(
-      editForm.value
-        .targetAmount
-    ),
+    targetAmount: Number(editForm.value.targetAmount),
 
-    currentAmount: Number(
-      editForm.value
-        .currentAmount
-    ),
+    currentAmount: Number(editForm.value.currentAmount),
 
-    deadline:
-      editForm.value.deadline,
+    deadline: editForm.value.deadline,
   };
 
-  await goalStore.updateGoal(
-    editForm.value.id,
-    payload
-  );
+  await goalStore.updateGoal(editForm.value.id, payload);
 
   await goalStore.fetchAllGoals();
 
   closeEditModal();
 }
-
 
 async function removeGoal(id) {
   await goalStore.deleteGoal(id);
@@ -486,10 +318,8 @@ async function removeGoal(id) {
   await goalStore.fetchAllGoals();
 }
 
-
 function openProgressModal(goal) {
-  selectedGoalId.value =
-    goal.id;
+  selectedGoalId.value = goal.id;
 
   progressAmount.value = "";
 
@@ -505,16 +335,12 @@ function closeProgressModal() {
 }
 
 async function submitGoalProgress() {
-  await goalStore.addGoalProgress(
-    selectedGoalId.value,
-    progressAmount.value
-  );
+  await goalStore.addGoalProgress(selectedGoalId.value, progressAmount.value);
 
   await goalStore.fetchAllGoals();
 
   closeProgressModal();
 }
-
 
 function closeModal() {
   showModal.value = false;
@@ -538,11 +364,8 @@ function closeEditModal() {
   };
 }
 
-
 function formatDate(date) {
-  return new Date(
-    date
-  ).toLocaleDateString();
+  return new Date(date).toLocaleDateString();
 }
 </script>
 <style scoped>
@@ -559,6 +382,9 @@ function formatDate(date) {
   min-height: 100vh;
 }
 
+.font {
+  font-family: "Kantumruy Pro", "Khmer OS", sans-serif !important;
+}
 /* Header */
 .header {
   display: flex;
