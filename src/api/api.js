@@ -1,19 +1,32 @@
 import axios from "axios"
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthStore } from "@/stores/useAuthStore";
+const baseURL = (import.meta.env.VITE_API_URL || 'https://ant-g2-pet.tt.linkpc.net/api/v1').replace(/\/?$/, '/')
+
 let api = axios.create({
-  baseURL: VITE_API_URL,
+  baseURL,
   headers: {
-    'Content-type': 'application/json',
-    Accept: "application/json"
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
   }
 
 })
 
-api.interceptors.request.use((config) => {
-  const authStore = useAuthStore();
+const publicAuthEndpoints = [
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/otp/send',
+  '/otp/resend',
+  '/otp/verify',
+]
 
-  if (authStore.token) {
-    config.headers.Authorization = `Bearer ${authStore.token}`;
+
+api.interceptors.request.use((config) => {
+  const authStore = useAuthStore()
+  const requestUrl = config.url || ''
+  const isPublicAuthEndpoint = publicAuthEndpoints.some((endpoint) => requestUrl.includes(endpoint))
+
+  if (authStore.token && !isPublicAuthEndpoint) {
+    config.headers.Authorization = `Bearer ${authStore.token}`
   }
 
   return config
