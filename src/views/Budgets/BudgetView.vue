@@ -259,48 +259,294 @@ function closeDeleteModal() {
 </script>
 
 <style scoped>
+/* =========================================
+   MODERN BUDGET DASHBOARD UI
+========================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .container {
-  padding: 24px;
-  background: #f5f7fb;
   min-height: 100vh;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top left, #eef2ff 0%, transparent 30%),
+    radial-gradient(circle at bottom right, #ede9fe 0%, transparent 30%),
+    linear-gradient(135deg, #f8fafc, #eef2ff);
+  font-family: "Kantumruy Pro", sans-serif;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.font {
-  font-family: "Kantumruy Pro", "Khmer OS", sans-serif !important;
+/* =========================================
+   HEADER
+========================================= */
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 34px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-/* TOAST */
+.title {
+  font-size: 38px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -1px;
+  position: relative;
+}
 
-/* TOAST */
+.title::after {
+  content: "";
+  width: 70px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+}
+
+/* =========================================
+   ADD BUTTON
+========================================= */
+
+.add-btn {
+  border: none;
+  outline: none;
+  padding: 15px 26px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.35s;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 15px 35px rgba(99, 102, 241, 0.35),
+    inset 0 1px 1px rgba(255,255,255,0.25);
+}
+
+.add-btn::before {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  top: -50px;
+  right: -40px;
+}
+
+.add-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.loading-box {
+  background: white;
+  padding: 20px;
+  border-radius: 22px;
+  margin-bottom: 24px;
+  text-align: center;
+  font-weight: 700;
+  color: #6366f1;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.7;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================
+   GRID
+========================================= */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 26px;
+  margin-top: 28px;
+}
+
+/* =========================================
+   FORM
+========================================= */
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.form-group input,
+.form-select {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 18px;
+  padding: 16px;
+  font-size: 15px;
+  transition: 0.3s ease;
+  font-family: "Kantumruy Pro", sans-serif;
+  color: #111827;
+}
+
+.form-group input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: white;
+  box-shadow:
+    0 0 0 5px rgba(99,102,241,0.12),
+    0 10px 20px rgba(99,102,241,0.08);
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.save-btn,
+.cancel-btn,
+.delete-btn {
+  border: none;
+  padding: 14px 24px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.3s;
+  min-width: 120px;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  box-shadow: 0 10px 25px rgba(99,102,241,0.25);
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(99,102,241,0.35);
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 10px 25px rgba(239,68,68,0.25);
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(239,68,68,0.35);
+}
+
+/* =========================================
+   DELETE MODAL
+========================================= */
+
+.delete-body {
+  text-align: center;
+  padding: 14px 0;
+}
+
+.delete-icon {
+  width: 95px;
+  height: 95px;
+  margin: auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 46px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(239,68,68,0.18);
+}
+
+.delete-body h3 {
+  font-size: 28px;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.delete-body p {
+  color: #6b7280;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.delete-body strong {
+  color: #111827;
+}
+
+/* =========================================
+   TOAST
+========================================= */
+
 .app-toast {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  min-width: 280px;
-  padding: 14px 18px;
-  border-radius: 12px;
+  top: 24px;
+  right: 24px;
+  padding: 18px 24px;
+  border-radius: 20px;
   color: white;
-  font-weight: 600;
-  z-index: 999999;
-  animation: slideIn 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-weight: 700;
+  z-index: 9999;
+  animation: toastSlide 0.35s ease;
+  min-width: 320px;
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 15px 40px rgba(0,0,0,0.15),
+    inset 0 1px 1px rgba(255,255,255,0.2);
 }
 
-/* SUCCESS */
 .app-toast.success {
-  background: #16a34a;
+  background: linear-gradient(135deg, #10b981, #34d399);
 }
 
-/* ERROR */
 .app-toast.error {
-  background: #dc2626;
+  background: linear-gradient(135deg, #ef4444, #f87171);
 }
 
-/* ANIMATION */
-@keyframes slideIn {
+@keyframes toastSlide {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(120px);
   }
 
   to {
@@ -308,95 +554,60 @@ function closeDeleteModal() {
     transform: translateX(0);
   }
 }
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+
+/* =========================================
+   MODAL ANIMATION
+========================================= */
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: 0.3s;
 }
 
-.title {
-  font-size: 28px;
-  font-weight: 700;
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
 }
 
-/* buttons */
-.add-btn,
-.save-btn,
-.cancel-btn,
-.delete-btn {
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-}
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
 
-.add-btn,
-.save-btn {
-  background: #1677ff;
-  color: white;
-}
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.cancel-btn {
-  background: #e5e7eb;
-}
+  .title {
+    font-size: 30px;
+  }
 
-.delete-btn {
-  background: #ff4d4f;
-  color: white;
-}
+  .grid {
+    grid-template-columns: 1fr;
+  }
 
-/* form */
-.form-group {
-  margin-bottom: 18px;
-}
+  .app-toast {
+    left: 20px;
+    right: 20px;
+    min-width: auto;
+  }
 
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-.form-group input,
-.form-select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-/* delete */
-.delete-body {
-  text-align: center;
-}
-
-.delete-icon {
-  font-size: 50px;
-  margin-bottom: 10px;
-}
-/* messages */
-.error-box {
-  background: #ffeaea;
-  color: #d90429;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.success-box {
-  background: #e8fff1;
-  color: #15803d;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-weight: 600;
+  .save-btn,
+  .cancel-btn,
+  .delete-btn {
+    width: 100%;
+  }
 }
 </style>
