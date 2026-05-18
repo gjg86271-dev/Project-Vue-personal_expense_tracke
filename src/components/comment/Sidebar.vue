@@ -65,9 +65,7 @@ function handleLogout() {
   padding: 24px 16px;
   background: #bad7f8;
   border-right: 1px solid #e5e7eb;
-
   border-radius: 20px;
-
   display: flex;
   flex-direction: column;
 }
