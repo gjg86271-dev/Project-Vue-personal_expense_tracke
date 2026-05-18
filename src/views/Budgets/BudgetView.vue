@@ -232,7 +232,28 @@ const form = ref({
   limitAmount: 0,
 })
 
-/* ─── ON MOUNT ────────────────────────────────────────────── */
+/* TOAST */
+const toast = ref({
+  show: false,
+  message: "",
+  type: "success",
+});
+
+function showToast(message, type = "success") {
+  toast.value.show = false;
+
+  setTimeout(() => {
+    toast.value.message = message;
+    toast.value.type = type;
+    toast.value.show = true;
+
+    setTimeout(() => {
+      toast.value.show = false;
+    }, 3000);
+  }, 100);
+}
+
+/* FETCH */
 onMounted(async () => {
   await budgetStore.fetchBudgets(currentPage.value)
   await budgetStore.fetchCategoryBreakdown()
@@ -322,16 +343,34 @@ async function saveBudget() {
 </script>
 
 <style scoped>
+/* =========================================
+   MODERN BUDGET DASHBOARD UI
+========================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .container {
-  padding: 24px;
-  background: #f5f7fb;
   min-height: 100vh;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top left, #eef2ff 0%, transparent 30%),
+    radial-gradient(circle at bottom right, #ede9fe 0%, transparent 30%),
+    linear-gradient(135deg, #f8fafc, #eef2ff);
+  font-family: "Kantumruy Pro", sans-serif;
+  position: relative;
+  overflow-x: hidden;
 }
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 34px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 .title { font-size: 28px; font-weight: 700; }
 .grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
