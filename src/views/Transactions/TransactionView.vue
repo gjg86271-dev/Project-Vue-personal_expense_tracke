@@ -75,7 +75,7 @@ async function createTransaction(form) {
 </script>
 
 <template>
-  <div class="container mt-4">
+  <div class="container">
     <TransactionForm :items="transactions" 
     @delete-transaction="deletIDtransaction"
     @update-transaction="updateIDtransaction"

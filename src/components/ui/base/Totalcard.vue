@@ -18,103 +18,107 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    title: {
-        type: String,
-        default: ''
-    },
-    value: {
-        type: Number,
-        default: 0
-    },
-    currency: {
-        type: String,
-        default: ''
-    },
-    
+  title: { type: String, default: '' },
+  value: { type: Number, default: 0 },
+  currency: { type: String, default: '' }
 })
 
 const formattedValue = computed(() => {
-    return `${props.currency}${props.value.toLocaleString()}`
-})
-
-const trendLabel = computed(() => {
-    const sign = props.trend >= 0 ? '+' : ''
-    return `${sign}${props.trend}%`
+  return `${props.currency}${Number(props.value).toLocaleString()}`
 })
 </script>
 
 <style scoped>
+/* ================= ROOT VARIABLES ================= */
+:root {
+  --sidebar-width: 300px;
+  --sidebar-collapsed-width: 80px;
+}
+
+/* ================= MAIN CARD ================= */
 .card {
-    border-radius: 16px;
-    background: #ffffff;
-    /* width: 220px;
-    font-family: 'Segoe UI', sans-serif; */
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+
+  /* 👇 RESPONSIVE WIDTH BASED ON SIDEBAR */
+  width: calc(100% - var(--sidebar-width));
+
+  transition: all 0.3s ease;
 }
 
+/* when sidebar collapsed */
+body.sidebar-collapsed .card {
+  width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+/* mobile fallback */
+@media (max-width: 992px) {
+  .card {
+    width: 100% !important;
+  }
+}
+
+/* ================= CARD BODY ================= */
 .card-body {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
+/* ================= HEADER ================= */
 .card-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
+/* TITLE */
 .card-title {
-    font-size: 18px;
-    color: #9ca3af;
-    font-weight: 500;
-    font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #9ca3af;
+  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
 }
 
+/* ICON */
 .card-icon {
-    width: 38px;
-    height: 38px;
+  width: 48px;
+  height: 48px;
 
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    flex-shrink: 0;
-    padding: 4px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #9aadc0;
+  border: 1px solid #e5e7eb;
+
+  flex-shrink: 0;
 }
 
+/* ICON SIZE */
 .card-icon svg {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
+/* VALUE */
 .card-subtitle {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
-    line-height: 1.1;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.1;
 }
 
+/* TEXT (optional trend or subtitle) */
 .card-text {
-    font-size: 13px;
-    color: #6b7280;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-.trend-icon {
-    color: #22c55e;
-    font-size: 14px;
-}
-
-.trend-value {
-    color: #22c55e;
-    font-weight: 600;
-}
-
-.trend-desc {
-    color: #9ca3af;
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>

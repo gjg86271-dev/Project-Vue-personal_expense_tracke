@@ -8,37 +8,59 @@ const props = defineProps({
   }
 })
 
+const todayKey = new Date().toLocaleDateString('km-KH', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric'
+})
+
+// Filter តែ transactions ថ្ងៃនេះ
+const todayTransactions = computed(() => {
+  const today = new Date()
+  return props.transactions.filter(item => {
+    const d = new Date(item.transactionDate)
+    return (
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth()    === today.getMonth()    &&
+      d.getDate()     === today.getDate()
+    )
+  })
+})
+
 const groupedItems = computed(() => {
-  const sorted = [...props.transactions].sort(
-    (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
-  )
-  return sorted.reduce((groups, item) => {
-    const dateKey = new Date(item.transactionDate).toLocaleDateString('km-KH', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    })
-    if (!groups[dateKey]) groups[dateKey] = []
-    groups[dateKey].push(item)
-    return groups
-  }, {})
+  return [...todayTransactions.value]
+    .sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate))
+    .reduce((groups, item) => {
+      const dateKey = new Date(item.transactionDate).toLocaleDateString('km-KH', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      })
+      ;(groups[dateKey] ??= []).push(item)
+      return groups
+    }, {})
 })
 </script>
 
 <template>
-  <div v-if="transactions.length > 0">
+  <div v-if="todayTransactions.length > 0">
     <div v-for="(group, date) in groupedItems" :key="date" class="mb-4">
 
       <!-- Date Header -->
-      <h6 class="date-header">{{ date }}</h6>
+      <div class="date-header-wrap">
+        <h6 :class="['date-header', date === todayKey ? 'date-header--today' : '']">
+          {{ date }}
+        </h6>
+        <span v-if="date === todayKey" class="today-badge">ថ្ងៃនេះ</span>
+      </div>
 
       <!-- DESKTOP TABLE -->
-      <div class="table-wrap d-none d-md-block">
+      <div :class="['table-wrap d-none d-md-block', date === todayKey ? 'table-wrap--today' : '']">
         <table class="table mb-0">
           <thead class="table-secondary">
             <tr class="text-center">
-              <th>ម៉ោង</th>
               <th>កំណត់ចំណាំ</th>
               <th>ប្រភេទ</th>
               <th>ចំណូល/ចំណាយ</th>
@@ -47,11 +69,7 @@ const groupedItems = computed(() => {
           </thead>
           <tbody>
             <tr class="text-center" v-for="item in group" :key="item.id">
-              <td class="text-muted small">
-                {{ new Date(item.transactionDate).toLocaleTimeString('en-GB', {
-                  hour: '2-digit', minute: '2-digit'
-                }) }}
-              </td>
+
               <td>{{ item.notes }}</td>
               <td>{{ item.category?.name }}</td>
               <td>
@@ -73,11 +91,8 @@ const groupedItems = computed(() => {
 
       <!-- MOBILE CARDS -->
       <div class="d-md-none">
-        <div
-          v-for="item in group"
-          :key="item.id"
-          class="mobile-card"
-        >
+        <div v-for="item in group" :key="item.id"
+          :class="['mobile-card', date === todayKey ? 'mobile-card--today' : '']">
           <!-- Left: icon + category -->
           <div class="mobile-card__left">
             <div :class="['mobile-icon', item.category?.type === 'INCOME' ? 'icon--income' : 'icon--expense']">
@@ -109,29 +124,54 @@ const groupedItems = computed(() => {
   <!-- EMPTY -->
   <div v-else class="empty-state">
     <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-    គ្មានប្រតិបត្តិការ
+    គ្មានប្រតិបត្តិការថ្ងៃនេះ
   </div>
 </template>
 
 <style scoped>
 /* DATE HEADER */
+.date-header-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
 .date-header {
   font-weight: 700;
   color: #6b7280;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
-  padding-left: 4px;
+  margin-bottom: 0;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+}
+
+.date-header--today {
+  color: #2563eb;
+}
+
+.today-badge {
+  display: inline-block;
+  background: #dbeafe;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  letter-spacing: 0.02em;
 }
 
 /* DESKTOP TABLE */
 .table-wrap {
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
+
+
 
 .table {
   border-collapse: collapse;
@@ -147,8 +187,14 @@ const groupedItems = computed(() => {
   border-radius: 14px;
   padding: 12px 14px;
   margin-bottom: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  border: 1.5px solid transparent;
+}
+
+.mobile-card--today {
+  border-color: #2563eb;
+  background: #f0f6ff;
 }
 
 .mobile-card__left {

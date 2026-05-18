@@ -1,5 +1,6 @@
 <template>
-  <div class="card">
+  <!-- ✅ click card ទាំងមូល → view detail, stop propagation លើ action buttons -->
+  <div class="card" @click="viewBudget">
 
     <!-- Header -->
     <div class="card-header">
@@ -9,11 +10,11 @@
       </div>
 
       <div class="actions">
-        <button @click="editBudget">
+        <button @click.stop="editBudget">
           <i class="bi bi-pencil-square"></i>
-        </button> 
+        </button>
 
-        <button @click="deleteBudget" class="danger">
+        <button @click.stop="deleteBudget" class="danger">
           <i class="bi bi-trash3"></i>
         </button>
       </div>
@@ -58,19 +59,20 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
-import { onMounted } from 'vue'
-
 
 const transactionStore = useTransactionStore()
+
 onMounted(() => {
   transactionStore.fetchTransactions()
 })
 
+// ✅ បន្ថែម 'view-budget'
 const emit = defineEmits([
   'edit-budget',
-  'delete-budget'
+  'delete-budget',
+  'view-budget',
 ])
 
 const props = defineProps({
@@ -80,56 +82,30 @@ const props = defineProps({
   }
 })
 
-/* API Values */
-const spent = computed(() => {
-  return transactionStore.transactions
+/* ─── COMPUTED ────────────────────────────────────────────── */
+const spent = computed(() =>
+  transactionStore.transactions
     .filter(t =>
       t.category?.id === props.budget.category?.id &&
       t.category?.type === 'EXPENSE'
     )
     .reduce((sum, t) => sum + Number(t.amount || 0), 0)
-})
-
-const total = computed(() =>
-  Number(props.budget?.limitAmount ?? 0)
 )
 
-/* Progress */
-const percent = computed(() => {
-  if (!total.value) return 0
+const total   = computed(() => Number(props.budget?.limitAmount ?? 0))
+const percent = computed(() => !total.value ? 0 : Math.min((spent.value / total.value) * 100, 100))
+const left    = computed(() => Math.max(total.value - spent.value, 0))
 
-  return Math.min(
-    (spent.value / total.value) * 100,
-    100
-  )
-})
-
-/* Remaining */
-const left = computed(() =>
-  Math.max(total.value - spent.value, 0)
-)
-
-/* Progress Color */
 const color = computed(() => {
-  if (percent.value >= 80) {
-    return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
-  }
-
-  if (percent.value >= 50) {
-    return 'linear-gradient(90deg, #faad14, #ffd666)'
-  }
-
+  if (percent.value >= 80) return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
+  if (percent.value >= 50) return 'linear-gradient(90deg, #faad14, #ffd666)'
   return 'linear-gradient(90deg, #16c35b, #73d13d)'
 })
 
-/* Events */
-function editBudget() {
-  emit('edit-budget', props.budget)
-}
-
-function deleteBudget() {
-  emit('delete-budget', props.budget)
-}
+/* ─── EVENTS ──────────────────────────────────────────────── */
+function viewBudget()   { emit('view-budget',   props.budget) }  // ✅
+function editBudget()   { emit('edit-budget',   props.budget) }
+function deleteBudget() { emit('delete-budget', props.budget) }
 </script>
 
 <style scoped>
@@ -140,6 +116,7 @@ function deleteBudget() {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   transition: 0.3s;
   margin-top: 20px;
+  cursor: pointer; /* ✅ បង្ហាញ pointer ដឹងថា clickable */
 }
 
 .card:hover {
@@ -181,19 +158,11 @@ function deleteBudget() {
   transition: 0.2s;
 }
 
-.actions button:hover {
-  background: #e5e7eb;
-}
-
-.actions .danger:hover {
-  background: #fee2e2;
-  color: #dc2626;
-}
+.actions button:hover { background: #e5e7eb; }
+.actions .danger:hover { background: #fee2e2; color: #dc2626; }
 
 /* Info */
-.info {
-  margin-top: 12px;
-}
+.info { margin-top: 12px; }
 
 .row {
   display: flex;
@@ -202,15 +171,8 @@ function deleteBudget() {
   font-size: 14px;
 }
 
-.spent {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-.total {
-  color: #111827;
-  font-weight: 600;
-}
+.spent { color: #ef4444; font-weight: 600; }
+.total { color: #111827; font-weight: 600; }
 
 /* Progress */
 .progress-bar {
@@ -236,10 +198,7 @@ function deleteBudget() {
   color: #6b7280;
 }
 
-.left {
-  font-weight: 600;
-  color: #111827;
-}
+.left { font-weight: 600; color: #111827; }
 
 /* Warning */
 .warning {
