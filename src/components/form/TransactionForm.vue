@@ -5,13 +5,13 @@
     <div class="font mb-4">
 
       <!-- HEADER -->
-      <div
-        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+      <!-- HEADER BANNER -->
+      <div class="header-banner">
         <div>
-          <h1 class="fw-bold mb-1">ប្រតិបត្តិការ</h1>
-          <p class="text-secondary mb-0">គ្រប់គ្រងប្រតិបត្តិការហិរញ្ញវត្ថុរបស់អ្នកទាំងអស់</p>
+          <h1>ប្រតិបត្តិការ</h1>
+          <p>គ្រប់គ្រងប្រតិបត្តិការហិរញ្ញវត្ថុរបស់អ្នកទាំងអស់</p>
         </div>
-        <button class="btn btn-primary rounded-5 add-btn" @click="openModal()">
+        <button class="add-btn" @click="openModal()">
           <i class="bi bi-plus"></i> បន្ថែមប្រតិបត្តិការ
         </button>
       </div>
@@ -19,7 +19,7 @@
       <!-- TOTAL CARDS -->
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-4">
-         <TotalCard title="ប្រតិបត្តិការសរុប" :value="totalTransactions">
+          <TotalCard title="ប្រតិបត្តិការសរុប" :value="totalTransactions">
             <template #icon>
               <div class="bg-secondary px-3 py-2 rounded-3 text-white">
                 <i class="bi bi-wallet2 fs-4"></i>
@@ -180,6 +180,11 @@
         </div>
       </div>
 
+      <!-- ─── PAGINATION ──────────────────────────────────────────────────── -->
+      <div v-if="totalPages > 1" class="d-flex justify-content-center mt-4">
+        <Pagination v-model:currentPage="currentPage" :total-pages="totalPages" :sibling-count="1" />
+      </div>
+
     </div>
 
     <!-- CREATE / EDIT MODAL -->
@@ -302,16 +307,14 @@
 </template>
 
 <script setup>
-// ✅ defineProps & defineEmits declared to absorb what the parent passes
-// (so Vue doesn't complain about "extraneous" attrs/events)
 defineProps({
   items: { type: Array, default: () => [] }
 })
-
 defineEmits(['deleteTransaction', 'updateTransaction', 'createTransaction'])
 
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import BaseModal from '../ui/base/BaseModal.vue'
+import Pagination from '@/components/ui/base/PaginAtion.vue'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { useTransactionStore } from '@/stores/transactionStore'
 import TotalCard from '@/components/ui/base/Totalcard.vue'
@@ -320,6 +323,15 @@ import api from '@/api/api'
 // ── STORES ───────────────────────────────────────────
 const categoryStore = useCategoryStore()
 const trstore = useTransactionStore()
+
+// ── PAGINATION ───────────────────────────────────────
+const currentPage = ref(1)
+const totalPages = computed(() => trstore.meta?.totalPages ?? 1)
+
+// ── Watch page change → fetch ─────────────────────────
+watch(currentPage, () => {
+  trstore.fetchTransactions(currentPage.value)
+})
 
 // ── LOADING ──────────────────────────────────────────
 const saveLoading = ref(false)
@@ -465,7 +477,7 @@ async function saveBudget() {
       await api.post('transactions', payload)
     }
     closeModal()
-    await trstore.fetchTransactions()
+    await trstore.fetchTransactions(currentPage.value)
     await fetchAlltotal()
   } catch (err) {
     console.error('Save error:', err)
@@ -488,7 +500,7 @@ async function deleteBudget() {
   try {
     await api.delete(`transactions/${selectedBudget.value.id}`)
     closeDeleteModal()
-    await trstore.fetchTransactions()
+    await trstore.fetchTransactions(currentPage.value)
     await fetchAlltotal()
   } catch (err) {
     console.error('Delete error:', err)
@@ -500,7 +512,7 @@ async function deleteBudget() {
 // ── LIFECYCLE ────────────────────────────────────────
 onMounted(async () => {
   await categoryStore.fetchAllCategories()
-  await trstore.fetchTransactions()
+  await trstore.fetchTransactions(1)
   await fetchAlltotal()
 })
 </script>
@@ -520,13 +532,49 @@ onMounted(async () => {
   font-size: 15px;
   white-space: nowrap;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-white);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  transition: var(--transition);
+}
+
+.add-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ── HEADER BANNER ────────────────────────────────── */
+.header-banner {
+  background: var(--bg-sidebar);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.header-banner h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-white);
+  margin: 0 0 2px 0;
+}
+
+.header-banner p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
 }
 
 /* ── FILTER CARD ──────────────────────────────────── */
 .filter-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
   padding: 14px 18px;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
 }
@@ -544,12 +592,12 @@ onMounted(async () => {
   gap: 6px;
   font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
 .filter-label i {
-  color: #1e3a8a;
+  color: var(--color-primary);
   font-size: 16px;
 }
 
@@ -560,12 +608,12 @@ onMounted(async () => {
 }
 
 .filter-select {
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border-color);
   border-radius: 30px;
   font-size: 13px;
   padding: 7px 16px;
-  color: #374151;
-  background: #f9fafb;
+  color: var(--text-primary);
+  background: var(--bg-input);
   cursor: pointer;
   outline: none;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
@@ -575,8 +623,8 @@ onMounted(async () => {
 
 .filter-select:focus,
 .filter-select:hover {
-  border-color: #1e3a8a;
-  background: #fff;
+  border-color: var(--color-primary);
+  background: var(--bg-card);
 }
 
 .search-box {
@@ -586,21 +634,21 @@ onMounted(async () => {
   flex: 1;
   min-width: 200px;
   height: 40px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border-color);
   border-radius: 50px;
   padding: 0 14px;
-  background: #f9fafb;
+  background: var(--bg-input);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-box.focused {
-  border-color: #1e3a8a;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.08);
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(26, 98, 212, 0.10);
 }
 
 .search-box i {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 14px;
   flex-shrink: 0;
 }
@@ -612,17 +660,17 @@ onMounted(async () => {
   font-size: 14px;
   width: 100%;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .search-box input::placeholder {
-  color: #d1d5db;
+  color: var(--border-color);
 }
 
 .clear-btn {
   border: none;
   background: none;
-  color: #9ca3af;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   font-size: 16px;
@@ -632,29 +680,29 @@ onMounted(async () => {
 }
 
 .clear-btn:hover {
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .reset-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border-color);
   border-radius: 30px;
-  background: #fff;
-  color: #6b7280;
+  background: var(--bg-card);
+  color: var(--text-secondary);
   font-size: 13px;
   padding: 7px 14px;
   cursor: pointer;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  transition: all 0.15s;
+  transition: var(--transition);
   white-space: nowrap;
 }
 
 .reset-btn:hover {
-  border-color: #dc2626;
-  color: #dc2626;
-  background: #fff5f5;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: var(--color-danger-light);
 }
 
 .active-filters {
@@ -663,16 +711,16 @@ onMounted(async () => {
   gap: 6px;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border-color);
 }
 
 .filter-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #eff6ff;
-  color: #1e3a8a;
-  border: 1px solid #bfdbfe;
+  background: var(--color-success-light);
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   font-size: 12px;
   padding: 3px 10px;
@@ -691,9 +739,10 @@ onMounted(async () => {
 
 /* ── DESKTOP TABLE ────────────────────────────────── */
 .table-wrap {
-  border-radius: 16px;
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
 }
 
 .table {
@@ -705,11 +754,12 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
   padding: 12px 14px;
   margin-bottom: 10px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 }
 
 .mobile-card__left {
@@ -729,25 +779,25 @@ onMounted(async () => {
 }
 
 .icon--income {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .icon--expense {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .mobile-card__category {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   line-height: 1.3;
 }
 
 .mobile-card__note {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-secondary);
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -756,7 +806,7 @@ onMounted(async () => {
 
 .mobile-card__date {
   font-size: 11px;
-  color: #d1d5db;
+  color: var(--border-color);
   margin-top: 2px;
 }
 
@@ -768,13 +818,13 @@ onMounted(async () => {
 .amount--income {
   font-size: 15px;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--color-success);
 }
 
 .amount--expense {
   font-size: 15px;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .mobile-card__actions {
@@ -801,32 +851,32 @@ onMounted(async () => {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  border: 2px solid #e5e7eb;
-  background: #f9fafb;
-  color: #6b7280;
+  border: 2px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-secondary);
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  transition: all 0.15s;
+  transition: var(--transition);
 }
 
 .type-btn:hover {
-  background: #f3f4f6;
+  background: var(--bg-body);
 }
 
 .type-btn--income.active {
-  border-color: #16a34a;
-  background: #dcfce7;
-  color: #16a34a;
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .type-btn--expense.active {
-  border-color: #dc2626;
-  background: #fee2e2;
-  color: #dc2626;
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .form-label {
   font-weight: 500;
-  color: #374151;
+  color: var(--text-primary);
   margin-bottom: 6px;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
 }

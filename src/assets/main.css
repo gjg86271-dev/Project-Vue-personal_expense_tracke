@@ -1,81 +1,105 @@
-@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap'); 
-@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap');
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    font-family: 'KantumruyPro' !important;
-    background-color: #f5f5f5;
-    color: #333;
-}
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@100..700&display=swap');
+
 :root {
+  /* font */
+  --font-khmer: 'Kantumruy Pro', sans-serif;
 
-  /* Bootstrap Core Theme Colors */
-  --bs-primary: #7da3f5;
-  --bs-primary-rgb: 55, 119, 254;
+  /* primary — bluer, more vivid */
+  --color-primary: #1a62d4;
+  --color-primary-hover: #145ab0;
 
-  --bs-secondary: #1D4ED8;
-  --bs-secondary-rgb: 29, 78, 216;
+  /* income */
+  --color-success: #16a34a;
+  --color-success-light: #dcfce7;
 
-  --bs-success: #22C55E;
-  --bs-success-rgb: 34, 197, 94;
+  /* expense */
+  --color-danger: #dc2626;
+  --color-danger-light: #fee2e2;
 
-  --bs-info: #22D3EE;
-  --bs-info-rgb: 34, 211, 238;
+  /* background */
+  --bg-body: #f0f4fb;       /* ស្រស់ស្អាត ជាង #f3f6fb */
+  --bg-sidebar: #1a5caa;    /* ពណ៌ navy ស្រស់ */
+  --bg-card: #ffffff;
+  --bg-input: #f9fafb;
 
-  --bs-warning: #FACC15;
-  --bs-warning-rgb: 250, 204, 21;
+  /* text */
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-white: #ffffff;
 
-  --bs-danger: #EF4444;
-  --bs-danger-rgb: 239, 68, 68;
+  /* border */
+  --border-color: #dbe3ee;
 
-  --bs-light: #F8FAFC;
-  --bs-light-rgb: 248, 250, 252;
+  /* shadow */
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  --bs-dark: #0F172A;
-  --bs-dark-rgb: 15, 23, 42;
+  /* radius */
+  --radius: 14px;
 
-  /* Body */
-  --bs-body-bg: #F8FAFC;
-  --bs-body-color: #0F172A;
+  /* transition */
+  --transition: 0.25s ease;
 
-  /* Borders */
-  --bs-border-color: #E2E8F0;
-  --bs-border-color-translucent: rgba(226, 232, 240, 0.5);
+    /* blobs */
+  --blob-color-a: rgba(200, 217, 255, 0.55);
+  --blob-color-b: rgba(181, 212, 244, 0.45);
+  --blob-color-c: rgba(221, 232, 255, 0.60);
 
-  /* Cards */
-  --bs-card-bg: #ffffff;
-  --bs-card-color: #0F172A;
-  --bs-card-border-color: #E2E8F0;
+  /* dot grid */
+  --dot-color: rgba(55, 138, 221, 0.12);
 
-  /* Inputs */
-  --bs-input-bg: #F8FAFC;
-  --bs-input-color: #0F172A;
-  --bs-input-border-color: #CBD5E1;
-  --bs-input-focus-border-color: #3777FE;
-  --bs-input-focus-box-shadow: 0 0 0 0.2rem rgba(55, 119, 254, 0.25);
-
-  /* Buttons */
-  --bs-btn-border-radius: 0.625rem;
-
-  /* Links */
-  --bs-link-color: #3777FE;
-  --bs-link-hover-color: #b0c9ff;
-
-  /* Sidebar / Custom */
-  --bs-sidebar-bg: #ffffff;
-  --bs-sidebar-color: #0F172A;
-  --bs-sidebar-active-bg: #E8F0FE;
-  --bs-sidebar-active-color: #3777FE;
-
-  /* Modal / Popover */
-  --bs-modal-bg: #ffffff;
-  --bs-popover-bg: #ffffff;
-  --bs-popover-border-color: #E2E8F0;
-
-  /* Focus Ring */
-  --bs-focus-ring-color: rgba(55, 119, 254, 0.25);
+  /* deco rings */
+  --ring-border: rgba(55, 138, 221, 0.10);
+  --ring-glow-a: rgba(55, 138, 221, 0.04);
+  --ring-glow-b: rgba(24,  95, 165, 0.04);
 }
 
+/* dark mode */
+.dark {
+  --bg-body: #0a1120;       /* ខ្មៅជ្រៅ navy ស្អាតជាង slate */
+  --bg-sidebar: #0f1c2e;    /* navy ងងឹត */
+  --bg-card: #1e293b;
+  --bg-input: #1a2840;      /* ស្រមោល navy */
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+
+  --border-color: #1e3352;  /* border navy ទន់ */
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+
+  /* success/danger — brighter for dark bg */
+  --color-success: #4ade80;
+  --color-success-light: #14532d;
+  --color-danger: #f87171;
+  --color-danger-light: #450a0a;
+
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+   /* blobs — ពណ៌ navy ស្រស់ ស៊ីគ្នានឹង bg ងងឹត */
+  --blob-color-a: rgba(59, 130, 246, 0.10);
+  --blob-color-b: rgba(37,  99, 235, 0.08);
+  --blob-color-c: rgba(96, 165, 250, 0.07);
+
+  /* dot grid */
+  --dot-color: rgba(96, 165, 250, 0.08);
+
+  /* deco rings */
+  --ring-border: rgba(96, 165, 250, 0.08);
+  --ring-glow-a: rgba(59, 130, 246, 0.04);
+  --ring-glow-b: rgba(37,  99, 235, 0.03);
+}
+
+/* global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-khmer);
+}
+
+body {
+  background: var(--bg-body);
+  color: var(--text-primary);
+  transition: var(--transition);
+}
