@@ -1,0 +1,457 @@
+<script setup>
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/authStore'
+import { useValidator } from '@/composables/useValidator'
+import AuthTimelineSidebar from '@/components/auth/AuthTimelineSidebar.vue'
+
+const { errors, clearFieldError, validateLogin } = useValidator(['email', 'password'])
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const form = reactive({
+  email: '',
+  password: '',
+  rememberMe: false,
+})
+
+const isLoading = ref(false)
+const showPassword = ref(false)
+const formError = ref('')
+
+const steps = [
+  { id: 1, label: 'បង្កើតគណនី',        status: 'completed' },
+  { id: 2, label: 'ផ្ទៀងផ្ទាត់កូដOTP', status: 'completed' },
+  { id: 3, label: 'ចូលប្រើប្រាស់',     status: 'active'    },
+]
+
+const submitLogin = async () => {
+  formError.value = ''
+
+  if (!validateLogin(form)) return
+
+  isLoading.value = true
+
+  try {
+    await authStore.login({
+      email: form.email,
+      password: form.password,
+      rememberMe: form.rememberMe,
+    })
+
+    await Swal.fire({
+      title: 'ជោគជ័យ!',
+      icon: 'success',
+      draggable: true,
+    })
+
+    router.push({ name: 'dashboard' }) // ✅ fixed: was 'home'
+  } catch (error) {
+    const message = authStore.errorMsg || 'Login failed. Please check your email and password.'
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'សូមពិនិត្យមើលលេខកូដអ៊ីមែលរបស់អ្នកនិងពាក្យសម្ងាត់របស់អ្នក។',
+      text: message,
+    })
+  } finally {
+    isLoading.value = false
+  }
+}
+</script>
+
+<template>
+  <main class="login-page">
+    <div class="bg-decoration" aria-hidden="true">
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+      <div class="circle circle-3"></div>
+    </div>
+
+    <button
+      class="back-home-button btn btn-light position-absolute top-0 end-0 m-3 d-inline-flex align-items-center justify-content-start gap-2 rounded-pill border-0 shadow overflow-hidden text-primary fw-bold p-1"
+      style="z-index: 2; color: #042C83"
+      type="button"
+      aria-label="ទំព័រដើម"
+      title="ទំព័រដើម"
+      @click="router.push({ name: 'landing' })"> <!-- ✅ fixed: was 'landing-page' -->
+      <i
+        class="back-home-icon bi bi-house-door-fill d-inline-flex align-items-center justify-content-center rounded-circle text-white bg-primary flex-shrink-0"
+        aria-hidden="true"
+      ></i>
+      <span class="button-label small lh-1">ទំព័រដើម</span>
+    </button>
+
+    <section class="login-frame" aria-label="login">
+      <div class="login-wrapper">
+        <AuthTimelineSidebar :steps="steps" />
+
+        <div class="login-card">
+          <h2 style="color:#042C83"> ស្វាគមន៍ <span style="color:#22C55E">ការត្រឡប់មកវិញ! </span></h2>
+          <p class="login-subtitle">សូមបញ្ចូលព័ត៌មានរបស់អ្នក ដើម្បីចូលប្រើប្រាស់</p>
+
+          <div v-if="formError" class="form-alert" role="alert">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            {{ formError }}
+          </div>
+
+          <form @submit.prevent="submitLogin" novalidate>
+
+            <div class="field-group">
+              <label class="field-label" for="email">អ៊ីមែល</label>
+              <div class="input-shell" :class="{ 'is-invalid': errors.email }">
+                <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
+                <input
+                  id="email"
+                  v-model.trim="form.email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="Example@gmail.com"
+                  required
+                  @input="clearFieldError('email')"
+                  @change="clearFieldError('email')"
+                  @paste="clearFieldError('email')"
+                />
+              </div>
+              <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="password">ពាក្យសម្ងាត់</label>
+              <div class="input-shell" :class="{ 'is-invalid': errors.password }">
+                <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+                <input
+                  id="password"
+                  v-model="form.password"
+                  :type="showPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  placeholder="•••••••••"
+                  required
+                  @input="clearFieldError('password')"
+                />
+                <button
+                  class="icon-button"
+                  type="button"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                  @click="showPassword = !showPassword"
+                >
+                  <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+                </button>
+              </div>
+              <p v-if="errors.password" class="field-error">{{ errors.password }}</p>
+            </div>
+
+            <div class="login-options">
+              <label class="remember-row" for="remember-me">
+                <input id="remember-me" v-model="form.rememberMe" type="checkbox" />
+                <span style="font-weight: 500 !important">ចងចាំខ្ញុំ</span>
+              </label>
+              <RouterLink class="forgot-link" :to="{ name: 'forgot-password' }">
+                ភ្លេចពាក្យសម្ងាត់?
+              </RouterLink>
+            </div>
+
+            <button class="login-button" type="submit" :disabled="isLoading">
+              <span class="button-text">{{ isLoading ? 'កំពុងចូល...' : 'ចូលប្រើ' }}</span>
+            </button>
+
+          </form>
+
+          <div class="register-row">
+            <span class="register-hint">មិនទាន់មានគណនី?</span>
+            <RouterLink class="register-link" :to="{ name: 'register' }">បង្កើតគណនី</RouterLink>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</template>
+
+<style scoped>
+.login-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f4fb;
+  padding: 32px 16px;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.bg-decoration { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.circle { position: absolute; border-radius: 50%; }
+.circle-1 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(26,79,170,0.09) 0%, transparent 70%);
+  top: -140px; right: -100px;
+}
+.circle-2 {
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(24,163,74,0.07) 0%, transparent 70%);
+  bottom: -100px; left: -80px;
+}
+.circle-3 {
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(245,167,0,0.06) 0%, transparent 70%);
+  top: 40%; left: 20%;
+}
+
+.login-frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-wrapper {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: min(100%, 820px);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 4px rgba(26,79,170,0.04),
+    0 16px 48px rgba(26,79,170,0.14),
+    0 40px 80px rgba(26,79,170,0.07);
+}
+
+.back-home-button {
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  max-width: calc(100% - 2rem);
+  white-space: nowrap;
+  transition: width 0.25s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.back-home-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #2b65cc 0%, #18a34a 100%) !important;
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.back-home-button .button-label {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(-6px);
+  transition: max-width 0.25s ease, opacity 0.18s ease, transform 0.2s ease;
+}
+
+.back-home-button:hover,
+.back-home-button:focus-visible {
+  width: 224px;
+  transform: translateY(-2px);
+  box-shadow: 0 1rem 2rem rgba(26,79,170,0.2) !important;
+}
+
+.back-home-button:hover .back-home-icon,
+.back-home-button:focus-visible .back-home-icon {
+  transform: rotate(-6deg) scale(1.03);
+}
+
+.back-home-button:hover .button-label,
+.back-home-button:focus-visible .button-label {
+  max-width: 165px;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.login-card {
+  flex: 1;
+  min-width: 0;
+  padding: 36px 32px 28px;
+  background: #ffffff;
+}
+
+.login-subtitle {
+  margin: 0 0 20px;
+  color: #7a8fae;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.form-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #9f1239;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.form-alert .bi { flex-shrink: 0; font-size: 14px; }
+
+.field-group { margin-bottom: 16px; }
+
+.field-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #111d35;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.input-shell {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  border: 1.5px solid #d0ddef;
+  border-radius: 50px;
+  padding: 0 16px;
+  background: #f7faff;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+.input-shell:focus-within {
+  border-color: #2b65cc;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(43,101,204,0.12);
+}
+.input-shell.is-invalid {
+  border-color: #ef4444;
+  background: #fee2e2;
+}
+.input-shell.is-invalid:focus-within {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.14);
+}
+
+.field-error {
+  margin: 7px 0 0;
+  color: #ef4444;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.field-icon { color: #7a8fae; font-size: 15px; flex-shrink: 0; }
+
+.input-shell input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0; outline: 0;
+  padding: 0 10px;
+  color: #111d35;
+  background: transparent;
+  font-size: 14px;
+  font-family: inherit;
+}
+.input-shell input::placeholder { color: #b5c5dc; }
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border: 0; padding: 0;
+  color: #7a8fae;
+  background: transparent;
+  font-size: 15px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.icon-button:hover { color: #1a4faa; }
+
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: -6px 0 18px;
+}
+
+.remember-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #60718f;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+.remember-row input {
+  width: 14px; height: 14px;
+  margin: 0;
+  accent-color: #2b65cc;
+  cursor: pointer;
+}
+
+.forgot-link {
+  color: #2b65cc;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.forgot-link:hover { opacity: 0.72; }
+
+.login-button {
+  text-align: center;
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 50px;
+  padding: 0 20px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2b65cc 0%, #1a4faa 100%);
+  box-shadow: 0 4px 16px rgba(26,79,170,0.30), inset 0 1px 0 rgba(255,255,255,0.15);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+  font-family: inherit;
+}
+.login-button:hover:not(:disabled) {
+  opacity: 0.93;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 22px rgba(26,79,170,0.36);
+}
+.login-button:active:not(:disabled) { transform: translateY(0); }
+.login-button:disabled { cursor: wait; opacity: 0.62; }
+
+.register-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #edf2fb;
+}
+.register-hint { color: #7a8fae; font-size: 13px; }
+.register-link {
+  color: #2b65cc;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.register-link:hover { opacity: 0.72; }
+
+@media (max-width: 900px) {
+  .login-page { align-items: flex-start; padding: 18px 12px; }
+  .login-wrapper { flex-direction: column; width: min(100%, 760px); border-radius: 20px; }
+}
+
+@media (max-width: 480px) {
+  .login-page { padding: 0; }
+  .login-wrapper { min-height: 100vh; border-radius: 0; }
+  .login-card { padding: 28px 20px 22px; }
+}
+</style>

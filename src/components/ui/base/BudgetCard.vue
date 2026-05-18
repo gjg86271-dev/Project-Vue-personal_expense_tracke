@@ -1,5 +1,6 @@
 <template>
-  <div class="card">
+  <!-- ✅ click card ទាំងមូល → view detail, stop propagation លើ action buttons -->
+  <div class="card" @click="viewBudget">
 
     <!-- Header -->
     <div class="card-header">
@@ -9,11 +10,11 @@
       </div>
 
       <div class="actions">
-        <button @click="editBudget">
+        <button @click.stop="editBudget">
           <i class="bi bi-pencil-square"></i>
-        </button> 
+        </button>
 
-        <button @click="deleteBudget" class="danger">
+        <button @click.stop="deleteBudget" class="danger">
           <i class="bi bi-trash3"></i>
         </button>
       </div>
@@ -58,19 +59,20 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
-import { onMounted } from 'vue'
-
 
 const transactionStore = useTransactionStore()
+
 onMounted(() => {
   transactionStore.fetchTransactions()
 })
 
+// ✅ បន្ថែម 'view-budget'
 const emit = defineEmits([
   'edit-budget',
-  'delete-budget'
+  'delete-budget',
+  'view-budget',
 ])
 
 const props = defineProps({
@@ -80,56 +82,30 @@ const props = defineProps({
   }
 })
 
-/* API Values */
-const spent = computed(() => {
-  return transactionStore.transactions
+/* ─── COMPUTED ────────────────────────────────────────────── */
+const spent = computed(() =>
+  transactionStore.transactions
     .filter(t =>
       t.category?.id === props.budget.category?.id &&
       t.category?.type === 'EXPENSE'
     )
     .reduce((sum, t) => sum + Number(t.amount || 0), 0)
-})
-
-const total = computed(() =>
-  Number(props.budget?.limitAmount ?? 0)
 )
 
-/* Progress */
-const percent = computed(() => {
-  if (!total.value) return 0
+const total   = computed(() => Number(props.budget?.limitAmount ?? 0))
+const percent = computed(() => !total.value ? 0 : Math.min((spent.value / total.value) * 100, 100))
+const left    = computed(() => Math.max(total.value - spent.value, 0))
 
-  return Math.min(
-    (spent.value / total.value) * 100,
-    100
-  )
-})
-
-/* Remaining */
-const left = computed(() =>
-  Math.max(total.value - spent.value, 0)
-)
-
-/* Progress Color */
 const color = computed(() => {
-  if (percent.value >= 80) {
-    return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
-  }
-
-  if (percent.value >= 50) {
-    return 'linear-gradient(90deg, #faad14, #ffd666)'
-  }
-
+  if (percent.value >= 80) return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
+  if (percent.value >= 50) return 'linear-gradient(90deg, #faad14, #ffd666)'
   return 'linear-gradient(90deg, #16c35b, #73d13d)'
 })
 
-/* Events */
-function editBudget() {
-  emit('edit-budget', props.budget)
-}
-
-function deleteBudget() {
-  emit('delete-budget', props.budget)
-}
+/* ─── EVENTS ──────────────────────────────────────────────── */
+function viewBudget()   { emit('view-budget',   props.budget) }  // ✅
+function editBudget()   { emit('edit-budget',   props.budget) }
+function deleteBudget() { emit('delete-budget', props.budget) }
 </script>
 
 <style scoped>
@@ -138,32 +114,13 @@ function deleteBudget() {
 ==================================== */
 
 .card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(14px);
-  border-radius: 28px;
-  padding: 24px;
-  box-shadow:
-    0 10px 35px rgba(0, 0, 0, 0.06),
-    inset 0 1px 1px rgba(255,255,255,0.5);
-  transition: all 0.35s ease;
-  border: 1px solid rgba(255,255,255,0.5);
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: -70px;
-  right: -70px;
-  width: 180px;
-  height: 180px;
-  background: linear-gradient(
-    135deg,
-    rgba(99,102,241,0.12),
-    rgba(139,92,246,0.12)
-  );
-  border-radius: 50%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+  margin-top: 20px;
+  cursor: pointer; /* ✅ បង្ហាញ pointer ដឹងថា clickable */
 }
 
 .card:hover {
@@ -241,7 +198,6 @@ function deleteBudget() {
 
 /* ====================================
    INFO SECTION
-==================================== */
 
 .info {
   position: relative;
@@ -275,13 +231,8 @@ function deleteBudget() {
   font-weight: 800;
 }
 
-.spent {
-  color: #ef4444;
-}
-
-.total {
-  color: #111827;
-}
+.spent { color: #ef4444; font-weight: 600; }
+.total { color: #111827; font-weight: 600; }
 
 /* ====================================
    PROGRESS

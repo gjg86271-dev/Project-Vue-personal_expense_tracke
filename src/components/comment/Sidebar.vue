@@ -1,76 +1,108 @@
 <template>
   <aside :class="['sidebar', { 'sidebar--collapsed': isCollapsed }]">
-    <div class="sidebar-header">
-      <h2 class="title" v-if="!isCollapsed">ម៉ីនុយ</h2>
-      <span class="title-mini title" v-else>ម៉ីនុយ</span>
+
+    <!-- HEADER -->
+    <div class="sidebar__header">
+      <h2 v-show="!isCollapsed" class="sidebar__title sidebar__title--full">ម៉ីនុយ</h2>
+      <span v-show="isCollapsed" class="sidebar__title sidebar__title--mini">ម៉ីនុយ</span>
     </div>
 
-    <nav class="sidebar-nav">
-      <RouterLink to="/dashboard" class="nav-item" active-class="nav-item--active">
-        <i class="bi bi-grid fs-5"></i>
-        <span class="nav-label">ផ្ទាំងគ្រប់គ្រង</span>
+    <!-- NAVIGATION -->
+    <nav class="sidebar__nav">
+
+      <RouterLink to="/dashboard/home" class="sidebar__item" active-class="sidebar__item--active">
+        <i class="bi bi-grid sidebar__icon"></i>
+        <span class="sidebar__label">ផ្ទាំងគ្រប់គ្រង</span>
       </RouterLink>
 
-      <RouterLink to="/transactions" class="nav-item" active-class="nav-item--active">
-        <i class="bi bi-arrow-left-right fs-5"></i>
-        <span class="nav-label">ប្រតិបត្តិការ</span>
+      <RouterLink to="/dashboard/transactions" class="sidebar__item" active-class="sidebar__item--active">
+        <i class="bi bi-arrow-left-right sidebar__icon"></i>
+        <span class="sidebar__label">ប្រតិបត្តិការ</span>
       </RouterLink>
 
-      <RouterLink to="/report" class="nav-item" active-class="nav-item--active">
-        <i class="bi bi-bar-chart fs-5"></i>
-        <span class="nav-label">របាយការណ៍</span>
+      <RouterLink to="/dashboard/category" class="sidebar__item" active-class="sidebar__item--active">
+        <i class="bi bi-grid-3x3-gap-fill sidebar__icon"></i>
+        <span class="sidebar__label">ប្រភេទ</span>
       </RouterLink>
 
-      <RouterLink to="/budget" class="nav-item" active-class="nav-item--active">
-        <i class="bi bi-credit-card-2-front fs-5"></i>
-        <span class="nav-label">ថវិកា</span>
+      <RouterLink to="/dashboard/report" class="sidebar__item" active-class="sidebar__item--active">
+        <i class="bi bi-bar-chart sidebar__icon"></i>
+        <span class="sidebar__label">របាយការណ៍</span>
       </RouterLink>
 
-      <RouterLink to="/goal" class="nav-item" active-class="nav-item--active">
-        <i class="bi bi-bullseye fs-5"></i>
-        <span class="nav-label">គោលដៅ</span>
+      <RouterLink to="/dashboard/budget" class="sidebar__item" active-class="sidebar__item--active">
+        <i class="bi bi-credit-card-2-front sidebar__icon"></i>
+        <span class="sidebar__label">ថវិកា</span>
       </RouterLink>
+
+      <RouterLink to="/dashboard/goal" class="sidebar__item" active-class="sidebar__item--active">
+        <i class="bi bi-bullseye sidebar__icon"></i>
+        <span class="sidebar__label">គោលដៅ</span>
+      </RouterLink>
+
     </nav>
 
-    <hr class="divider" />
+    <hr class="sidebar__divider" />
 
-    <button class="nav-item logout" @click="handleLogout">
-      <i class="bi bi-box-arrow-right fs-5"></i>
-      <span class="nav-label">តាកចេញ</span>
+    <!-- LOGOUT -->
+    <button class="sidebar__item sidebar__logout" @click="handleLogout">
+      <i class="bi bi-box-arrow-right sidebar__icon"></i>
+      <span class="sidebar__label">ចាកចេញ</span>
     </button>
+
   </aside>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+import Swal from 'sweetalert2'
 
-
-const props = defineProps({
-  isCollapsed: { type: Boolean, default: false }
+defineProps({
+  isCollapsed: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const router = useRouter()
+const router    = useRouter()
+const authStore = useAuthStore()
 
-function handleLogout() {
-  router.push('/landing')
+async function handleLogout() {
+  const confirm = await Swal.fire({
+    title:              'ចាកចេញ?',
+    text:               'តើអ្នកពិតជាចង់ចាកចេញមែនទេ?',
+    icon:               'question',
+    showCancelButton:   true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor:  '#6b7280',
+    confirmButtonText:  'ចាកចេញ',
+    cancelButtonText:   'បោះបង់',
+  })
+
+  if (!confirm.isConfirmed) return
+
+  authStore.logout()
+  router.push({ name: 'landing' })  // ✅ landing = guestOnly → redirect ត្រឹមត្រូវ
 }
 </script>
 
 <style scoped>
 .sidebar {
-  width: 300px;
-  min-width: 240px;
+  width: 250px;
+  min-width: 250px;
   height: calc(100vh - 20px);
   margin: 10px;
   padding: 24px 16px;
-  background: #bad7f8;
-  border-right: 1px solid #e5e7eb;
+  background: var(--bg-sidebar);
   border-radius: 20px;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
 }
 
-/* COLLAPSED */
 .sidebar--collapsed {
   width: 80px;
   min-width: 80px;
@@ -78,107 +110,118 @@ function handleLogout() {
   align-items: center;
 }
 
-.sidebar--collapsed .nav-item {
-  justify-content: center;
-  padding: 10px 4px;
-  width: 100%;
-  flex-direction: column;
-  gap: 4px;
-}
+.sidebar__header { width: 100%; overflow: hidden; }
 
-.sidebar--collapsed .nav-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  text-align: center;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 68px;
-}
-
-.sidebar--collapsed .title-mini {
-  font-size: 18px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 20px;
-  display: block;
-}
-
-/* HEADER */
-.sidebar-header {
-  width: 100%;
-}
-
-.title {
+.sidebar__title {
+  margin: 0 0 24px 4px;
   font-size: 22px;
   font-weight: 700;
-  color: #111827;
-  margin: 0 0 24px 4px;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  color: var(--text-white);
+  white-space: nowrap;
+  font-family: var(--font-khmer);
 }
 
-/* NAV */
-.sidebar-nav {
+.sidebar__title--full {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.sidebar--collapsed .sidebar__title--full {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.sidebar__title--mini {
+  opacity: 0;
+  transform: scale(0.8);
+  font-size: 16px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.sidebar--collapsed .sidebar__title--mini {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sidebar__nav {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 100%;
 }
 
-.nav-item {
+.sidebar__item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 13px 16px;
-  border-radius: 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
   font-size: 15px;
   font-weight: 500;
-  color: #374151;
-  text-decoration: none;
-  cursor: pointer;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  transition: background 0.15s, color 0.15s;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
   line-height: 1.6;
+  color: var(--text-white);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-khmer);
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
 }
 
-.nav-item:hover {
-  background: #e8edf7;
-  color: #1d3a8a;
+.sidebar__item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(3px);
 }
 
-.nav-item--active {
-  background: #1e3a8a !important;
-  color: #ffffff !important;
+.sidebar__item--active {
+  background: var(--color-primary) !important;
+  color: var(--text-white) !important;
   font-weight: 600;
 }
 
-.nav-item--active:hover {
-  background: #1e40af !important;
+.sidebar__icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  transition: transform 0.2s ease;
+}
+.sidebar__item:hover .sidebar__icon { transform: scale(1.1); }
+
+.sidebar__label {
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.2s ease, max-width 0.3s ease;
 }
 
-/* DIVIDER */
-.divider {
-  border: none;
-  border-top: 1.5px solid #d1d5db;
-  margin: 20px 0;
+.sidebar--collapsed .sidebar__item {
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 4px;
+}
+.sidebar--collapsed .sidebar__label {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.sidebar__divider {
   width: 100%;
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid var(--border-color);
 }
 
-/* LOGOUT */
-.logout {
-  color: #dc2626;
+.sidebar__logout {
+  color: var(--color-danger-light, #fca5a5);
   font-weight: 600;
-  margin-top: 0;
 }
-
-.logout:hover {
-  background: #fef2f2;
-  color: #b91c1c;
+.sidebar__logout:hover {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--text-white);
+  transform: none;
 }
+.sidebar__logout:hover .sidebar__icon { transform: translateX(4px); }
 </style>

@@ -47,7 +47,6 @@ async function fetchAndBuild() {
     const res = await api.get('/analytics/trends')
     const raw = res.data.data
 
-    // raw = { "2026-04": { income: 480000, expense: 63000 }, ... }
     const labels = Object.keys(raw).map(key => {
       const [year, month] = key.split('-')
       const date = new Date(year, month - 1)
@@ -59,7 +58,7 @@ async function fetchAndBuild() {
 
     loading.value = false
 
-    await new Promise(r => setTimeout(r, 50)) // រង់ចាំ DOM
+    await new Promise(r => setTimeout(r, 50))
 
     if (!chartRef.value) return
     if (chartInstance) chartInstance.destroy()
@@ -136,23 +135,44 @@ onMounted(() => {
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  padding: 0 0 0.75rem 0;
+  flex-shrink: 0;
 }
 
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  margin: 0 0 1rem;
+  margin: 0;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
 }
 
+.card-body {
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .chart-wrapper {
-  height: 260px;
+  flex: 1;
+  min-height: 200px;
   position: relative;
 }
 
 .loading {
-  text-align: center;
-  padding: 2rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #888;
+  font-size: 14px;
 }
 </style>

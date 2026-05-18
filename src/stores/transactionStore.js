@@ -1,90 +1,84 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import api from '@/api/api'
 
 export const useTransactionStore = defineStore('transaction', () => {
-
   const transactions = ref([])
+  const meta         = ref(null)
+  const loading      = ref(false)
 
-  const transactionsitems = ref({
-    totalItems: 0,
+  // ← default value សំខាន់ណាស់
+  const summary = ref({
+    totalIncome:  0,
+    totalExpense: 0,
+    netBalance:   0
   })
 
-  const loading = ref(false)
-  const error = ref(null)
-
-  async function fetchTransactions() {
+  async function fetchTransactions(page = 1, perPage = 10) {
     loading.value = true
-    error.value = null
-
     try {
-      const res = await api.get('/transactions')
-
-      transactions.value = res.data?.data?.items ?? []
-
+      const res = await api.get(
+        `transactions?_page=${page}&_per_page=${perPage}&sortBy=id&sortDir=asc`
+      )
+      transactions.value = res.data.data.items
+      meta.value         = res.data.data.meta
     } catch (err) {
-      console.error('Failed to fetch:', err)
-      error.value = err.message || 'Failed to fetch transactions'
+      console.error('fetchTransactions:', err)
     } finally {
       loading.value = false
     }
   }
 
-  async function fetchTransactionsitems() {
-    loading.value = true
-    error.value = null
-
+  async function fetchSummary() {
     try {
-      const res = await api.get('/transactions')
-
-      transactionsitems.value = res.data?.data?.meta ?? {
-        totalItems: 0,
+      const res = await api.get('analytics/dashboard-summary')
+      const data = res.data?.data || {}
+      summary.value = {
+        totalIncome:  data.totalIncome  || 0,
+        totalExpense: data.totalExpense || 0,
+        netBalance:   data.netBalance   || 0
       }
-      
-
     } catch (err) {
-      console.error('Failed to fetch:', err)
-      error.value = err.message || 'Failed to fetch transactions'
-    } finally {
-      loading.value = false
+      console.error('fetchSummary:', err)
     }
   }
 
-  const spendingByCategory = computed(() => {
+  async function createTransaction(payload) {
+    try {
+      await api.post('transactions', payload)
+    } catch (err) {
+      console.error('createTransaction:', err)
+      throw err
+    }
+  }
 
-    const expenses = transactions.value.filter(
-      t => t.category?.type === 'EXPENSE'
-    )
+  async function updateTransaction(id, payload) {
+    try {
+      await api.put(`transactions/${id}`, payload)
+    } catch (err) {
+      console.error('updateTransaction:', err)
+      throw err
+    }
+  }
 
-    const total = expenses.reduce(
-      (sum, t) => sum + (t.amount ?? 0),
-      0
-    )
-
-    if (total === 0) return []
-
-    const grouped = {}
-
-    expenses.forEach(t => {
-      const name = t.category?.name ?? 'Unknown'
-
-      grouped[name] = (grouped[name] || 0) + (t.amount ?? 0)
-    })
-
-    return Object.entries(grouped).map(([name, amount]) => ({
-      label: name,
-      percentage: Math.round((amount / total) * 100),
-      amount
-    }))
-  })
+  async function deleteTransaction(id) {
+    try {
+      await api.delete(`transactions/${id}`)
+    } catch (err) {
+      console.error('deleteTransaction:', err)
+      throw err
+    }
+  }
 
   return {
     transactions,
-    transactionsitems,
+    meta,
     loading,
-    error,
+    summary,
     fetchTransactions,
-    fetchTransactionsitems,
-    spendingByCategory
+    fetchSummary,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction
   }
 })
