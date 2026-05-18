@@ -340,7 +340,7 @@ function closeDeleteModal() {
   position: absolute;
   width: 120px;
   height: 120px;
-  background: rgba(255,255,255,0.2);
+  
   border-radius: 50%;
   top: -50px;
   right: -40px;
