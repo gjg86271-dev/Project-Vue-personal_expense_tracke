@@ -20,7 +20,7 @@
                                             បង្កើតទម្លាប់សន្សំរសំន្ចៃ និងរំលឹកអ្នករាល់កាលចំណាយលើសកម្រឹតតាមរយៈ
                                             Notifictions មុនពេលដល់កំណត់</p>
                                     </div>
-                                    <a href="#" class="btn btn-primary fs-5 px-5 rounded-5">ចាប់ផ្តើមឥឡូវនេះ</a>
+                                   <RouterLink to="/login" class="btn btn-primary fs-5 px-5 rounded-5">ចាប់ផ្តើមឥឡូវនេះ</RouterLink>
                                 </div>
                             </div>
                         </div>

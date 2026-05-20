@@ -56,11 +56,11 @@
                     <div class="divider-line"></div>
                     <p class="footer-col-title">បើចាំអរម្មណ៏ កុំភ្លេចណាចុះឈ្មោះទាំងអស់គ្នា</p>
                     <div class="app-badges">
-                        <a class="app-badge rounded-5" href="#">
+                         <RouterLink to="/login" class="btn app-badge rounded-5 px-4">
                             <div class="app-badge-text d-flex justify-content-center m-auto ">
                                 <span class="fs-4 ">ចាប់ផ្តើមឥឡូវនេះ</span>
                             </div>
-                        </a>
+                       </RouterLink>
                     </div>
                 </div>
 

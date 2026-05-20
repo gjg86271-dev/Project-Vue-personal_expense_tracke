@@ -65,11 +65,11 @@ const groupedItems = computed(() => {
               <th>ប្រភេទ</th>
               <th>ចំណូល/ចំណាយ</th>
               <th>ចំនួនទឹកប្រាក់</th>
+              <th>ឯកសារ</th>
             </tr>
           </thead>
           <tbody>
             <tr class="text-center" v-for="item in group" :key="item.id">
-
               <td>{{ item.notes }}</td>
               <td>{{ item.category?.name }}</td>
               <td>
@@ -84,6 +84,12 @@ const groupedItems = computed(() => {
                 : 'text-danger fw-semibold'">
                 {{ item.category?.type === 'INCOME' ? '+' : '-' }}${{ item.amount.toLocaleString() }}
               </td>
+              <td>
+                <a v-if="item.attachmentUrl" :href="item.attachmentUrl" target="_blank" class="attachment-link">
+                  <i class="bi bi-paperclip"></i>
+                </a>
+                <span v-else class="text-muted">—</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -93,6 +99,7 @@ const groupedItems = computed(() => {
       <div class="d-md-none">
         <div v-for="item in group" :key="item.id"
           :class="['mobile-card', date === todayKey ? 'mobile-card--today' : '']">
+
           <!-- Left: icon + category -->
           <div class="mobile-card__left">
             <div :class="['mobile-icon', item.category?.type === 'INCOME' ? 'icon--income' : 'icon--expense']">
@@ -101,6 +108,9 @@ const groupedItems = computed(() => {
             <div>
               <div class="mobile-card__category">{{ item.category?.name }}</div>
               <div class="mobile-card__note">{{ item.notes || '—' }}</div>
+              <a v-if="item.attachmentUrl" :href="item.attachmentUrl" target="_blank" class="attachment-link small">
+                <i class="bi bi-paperclip"></i> ឯកសារ
+              </a>
             </div>
           </div>
 
@@ -170,8 +180,6 @@ const groupedItems = computed(() => {
   overflow: hidden;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
-
-
 
 .table {
   border-collapse: collapse;
@@ -261,6 +269,21 @@ const groupedItems = computed(() => {
   font-size: 11px;
   color: #9ca3af;
   margin-top: 2px;
+}
+
+/* ATTACHMENT */
+.attachment-link {
+  font-size: 13px;
+  color: #2563eb;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.attachment-link:hover {
+  text-decoration: underline;
 }
 
 /* EMPTY */

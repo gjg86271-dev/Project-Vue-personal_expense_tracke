@@ -70,8 +70,9 @@ export const useAuthStore = defineStore("auth", () => {
 
   const register = async (data) => {
     try {
-      const res = await api.post("/auth/register", data)
-      user.value = res.data.data
+      const res = await api.post("auth/register", data)
+      user.value = res.data.data ?? null
+
       errorMsg.value = ""
       return res.data
     } catch (err) {

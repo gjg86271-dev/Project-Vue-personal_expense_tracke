@@ -55,7 +55,7 @@ onUnmounted(() => {
       <div :class="['sidebar-wrap', { 'sidebar-drawer': isMobile }]">
         <Transition name="slide">
           <Sidebar
-            v-show="!isMobile || isDrawerOpen"
+            v-if="!isMobile || isDrawerOpen"
             :is-collapsed="!isMobile && isCollapsed"
             :is-mobile="isMobile"
             @close="closeDrawer"
@@ -73,24 +73,24 @@ onUnmounted(() => {
 
 <style>
 .layout {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  display: flex;              /* ← was missing */
+  flex-direction: column;     /* ← was missing */
   background-color: #eaf1fa;
 }
 
-/* ── FIX: navbar-row លើស sidebar ── */
 .navbar-row {
   flex-shrink: 0;
   position: relative;
-  z-index: 1001;
+  z-index: 10;
 }
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: row;
-  overflow: visible;
+  overflow: hidden;           /* ← was "visible", breaks scroll */
   position: relative;
   min-height: 0;
 }
@@ -113,15 +113,14 @@ onUnmounted(() => {
   left: 0 !important;
   height: 100vh !important;
   margin: 0 !important;
-  border-radius: 0 20px 20px 0 !important;
-  z-index: 1000;
+  z-index: 10;              /* ← was 1000, must be above navbar (1001) */
 }
 
 .drawer-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 999;
+  z-index: 1001;              /* ← was 999, must sit above navbar too */
 }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s ease; }

@@ -22,7 +22,8 @@ const form = reactive({
   categoryId:      '',
   amount:          '',
   notes:           '',
-  transactionDate: ''
+  transactionDate: '',
+  file:            null   // ថែម
 })
 
 const categories = computed(() =>
@@ -66,6 +67,7 @@ function openModal(item = null) {
     form.amount          = item.amount          ?? ''
     form.notes           = item.notes           ?? ''
     form.transactionDate = item.transactionDate?.split('T')[0] || ''
+    form.file            = null   // reset file on edit
   } else {
     isEditing.value      = false
     selectedBudget.value = null
@@ -74,21 +76,29 @@ function openModal(item = null) {
     form.amount          = ''
     form.notes           = ''
     form.transactionDate = ''
+    form.file            = null   // reset file on create
   }
 }
 
 function closeModal() { showModal.value = false }
 
+function onFileChange(e) {
+  form.file = e.target.files[0] || null
+}
+
 async function saveBudget() {
   if (!validate()) return
   saveLoading.value = true
   try {
-    const payload = {
-      categoryId:      form.categoryId,
-      amount:          Number(form.amount),
-      notes:           form.notes,
-      transactionDate: form.transactionDate
+    const payload = new FormData()
+    payload.append('categoryId',      form.categoryId)
+    payload.append('amount',          Number(form.amount))
+    payload.append('notes',           form.notes)
+    payload.append('transactionDate', form.transactionDate)
+    if (form.file) {
+      payload.append('file', form.file)   // ថែម
     }
+
     if (isEditing.value && selectedBudget.value?.id) {
       await trstore.updateTransaction(selectedBudget.value.id, payload)
     } else {
@@ -178,12 +188,12 @@ onMounted(async () => {
     <section class="mt-3">
       <div class="container">
         <div class="row g-3 align-items-stretch">
-          <div class="col-md-6 d-flex">
+          <div class="col-md-7 d-flex">
             <div class="card-light w-100">
               <SpendingChart />
             </div>
           </div>
-          <div class="col-md-6 d-flex">
+          <div class="col-md-5 d-flex">
             <div class="card-light w-100">
               <TrendChart />
             </div>
@@ -303,7 +313,7 @@ onMounted(async () => {
       </div>
 
       <!-- DATE -->
-      <div class="form-group">
+      <div class="form-group mb-3">
         <label class="form-label fw-500">
           កាលបរិច្ឆេទ <span class="text-danger">*</span>
         </label>
@@ -316,6 +326,27 @@ onMounted(async () => {
         />
         <div v-if="errors.transactionDate" class="invalid-feedback">
           <i class="bi bi-exclamation-circle"></i> {{ errors.transactionDate }}
+        </div>
+      </div>
+
+      <!-- ATTACHMENT ថែម -->
+      <div class="form-group">
+        <label class="form-label fw-500">ឯកសារភ្ជាប់</label>
+        <input
+          type="file"
+          class="form-control"
+          accept="image/*,.pdf"
+          @change="onFileChange"
+        />
+        <!-- show existing attachment link when editing and no new file selected -->
+        <div v-if="isEditing && selectedBudget?.attachmentUrl && !form.file" class="mt-2">
+          <a :href="selectedBudget.attachmentUrl" target="_blank" class="attachment-link">
+            <i class="bi bi-paperclip"></i> មើលឯកសារបច្ចុប្បន្ន
+          </a>
+        </div>
+        <!-- show selected new file name -->
+        <div v-if="form.file" class="mt-2 selected-file">
+          <i class="bi bi-file-earmark"></i> {{ form.file.name }}
         </div>
       </div>
 
@@ -454,4 +485,26 @@ section {
 }
 
 .fw-500 { font-weight: 500; }
+
+/* ── ATTACHMENT ───────────────────────────────────── */
+.attachment-link {
+  font-size: 13px;
+  color: var(--color-primary, #0d6efd);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.attachment-link:hover {
+  text-decoration: underline;
+}
+
+.selected-file {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
 </style>
