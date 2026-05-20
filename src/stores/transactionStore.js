@@ -1,46 +1,82 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import api from '@/api/api'
 
 export const useTransactionStore = defineStore('transaction', () => {
-
   const transactions = ref([])
-  const loading = ref(false)
-  const error = ref(null) // ← បន្ថែម error state
+  const meta         = ref(null)
+  const loading      = ref(false)
 
-  async function fetchTransactions() {
+  // ← default value សំខាន់ណាស់
+  const summary = ref({
+    totalIncome:  0,
+    totalExpense: 0,
+    netBalance:   0
+  })
+
+  async function fetchTransactions(page = 1, perPage = 10) {
     loading.value = true
-    error.value = null
     try {
-      const res = await api.get('/transactions')
-      transactions.value = res.data?.data?.items ?? [] // ← safe access
+      const res = await api.get(`transactions?_page=${page}&_per_page=${perPage}&sortBy=id&sortDir=asc`)
+      transactions.value = res.data.data.items
+      meta.value         = res.data.data.meta
     } catch (err) {
-      console.error('Failed to fetch:', err)
-      error.value = err.message || 'Failed to fetch transactions'
+      console.error('fetchTransactions:', err)
     } finally {
       loading.value = false
     }
   }
 
-  const spendingByCategory = computed(() => {
-    const expenses = transactions.value.filter(
-      t => t.category?.type === 'EXPENSE' // ← optional chaining
-    )
-    const total = expenses.reduce((sum, t) => sum + (t.amount ?? 0), 0) // ← safe amount
-    if (total === 0) return []
+  async function fetchSummary() {
+    try {
+      const res = await api.get('analytics/dashboard-summary')
+      const data = res.data?.data || {}
+      summary.value = {
+        totalIncome:  data.totalIncome  || 0,
+        totalExpense: data.totalExpense || 0,
+        netBalance:   data.netBalance   || 0
+      }
+    } catch (err) {
+      console.error('fetchSummary:', err)
+    }
+  }
 
-    const grouped = {}
-    expenses.forEach(t => {
-      const name = t.category?.name ?? 'Unknown' // ← fallback name
-      grouped[name] = (grouped[name] || 0) + (t.amount ?? 0)
-    })
+  async function createTransaction(payload) {
+    try {
+      await api.post('transactions', payload)
+    } catch (err) {
+      console.error('createTransaction:', err)
+      throw err
+    }
+  }
 
-    return Object.entries(grouped).map(([name, amount]) => ({
-      label: name,
-      percentage: Math.round((amount / total) * 100),
-      amount
-    }))
-  })
+  async function updateTransaction(id, payload) {
+    try {
+      await api.put(`transactions/${id}`, payload)
+    } catch (err) {
+      console.error('updateTransaction:', err)
+      throw err
+    }
+  }
 
-  return { transactions, loading, error, fetchTransactions, spendingByCategory }
+  async function deleteTransaction(id) {
+    try {
+      await api.delete(`transactions/${id}`)
+    } catch (err) {
+      console.error('deleteTransaction:', err)
+      throw err
+    }
+  }
+
+  return {
+    transactions,
+    meta,
+    loading,
+    summary,
+    fetchTransactions,
+    fetchSummary,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction
+  }
 })

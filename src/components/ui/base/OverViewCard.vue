@@ -63,46 +63,198 @@ const left = computed(() => totalBudget.value - props.totalexpenses);
 </script>
 
 <style scoped>
+/* ===================================
+   WHITE MODERN OVERVIEW CARD UI
+=================================== */
+
 .card {
+  position: relative;
+  overflow: hidden;
   width: 100%;
-  background: #f8f9fb;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  border-radius: 30px;
+  background: #ffffff;
+  border: 1px solid #eef2f7;
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.06),
+    0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
+/* Decorative Background */
+.card::before {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -90px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  bottom: -70px;
+  left: -70px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+/* ===================================
+   TOP
+=================================== */
+
 .top {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.top h3 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.top p {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ===================================
+   AMOUNT
+=================================== */
+
+.amount {
+  text-align: right;
 }
 
 .amount h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 42px;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1;
 }
 
+.amount span {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ===================================
+   PROGRESS
+=================================== */
+
 .progress-bar {
-  margin: 16px 0;
-  height: 10px;
-  background: #ddd;
-  border-radius: 10px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 16px;
+  margin: 26px 0 22px;
+  background: #e5e7eb;
+  border-radius: 999px;
   overflow: hidden;
 }
 
 .progress {
   height: 100%;
-  background: #16c35b;
-  transition: width 0.4s ease;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+  position: relative;
 }
 
+.progress::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 40px;
+  height: 100%;
+  background: rgba(255,255,255,0.4);
+  filter: blur(4px);
+}
+
+/* ===================================
+   BOTTOM
+=================================== */
+
 .bottom {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.bottom span {
   font-size: 14px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 999px;
 }
 
 .percent {
-  color: #16c35b;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.left {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media (max-width: 768px) {
+  .card {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .top {
+    flex-direction: column;
+  }
+
+  .amount {
+    width: 100%;
+    text-align: left;
+  }
+
+  .amount h2 {
+    font-size: 34px;
+  }
+
+  .top h3 {
+    font-size: 24px;
+  }
+
+  .bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bottom span {
+    text-align: center;
+  }
 }
 </style>

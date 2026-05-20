@@ -1,7 +1,5 @@
 <template>
   <div class="app-wrapper">
-
-    <!-- Background layers -->
     <div class="bg-blob bg-blob-left"></div>
     <div class="bg-blob bg-blob-right"></div>
     <div class="bg-blob bg-blob-top"></div>
@@ -9,23 +7,19 @@
     <div class="deco-ring deco-ring-tl"></div>
     <div class="deco-ring deco-ring-br"></div>
 
-    <!-- App content -->
     <Header />
 
     <main class="main-content">
       <RouterView />
-      <div class="deco-ring deco-ring-br"></div>
     </main>
 
-
     <Footerlanding />
-
   </div>
 </template>
 
 <script setup>
 import Header from '@/components/commentlanding/Header.vue'
-import Footerlanding from '@/components/commentlanding/Footerlanding.vue';
+import Footerlanding from '@/components/commentlanding/Footerlanding.vue'
 import { RouterView } from 'vue-router'
 </script>
 
@@ -34,10 +28,8 @@ import { RouterView } from 'vue-router'
   position: relative;
   overflow: hidden;
   min-height: 100vh;
-  background: linear-gradient(135deg,
-      #EEF4FF 0%,
-      #F5F8FF 60%,
-      #E8F0FE 100%);
+  background: var(--bg-body);
+  transition: background var(--transition);
 }
 
 .main-content {
@@ -59,7 +51,7 @@ import { RouterView } from 'vue-router'
   width: 520px;
   height: 460px;
   background: radial-gradient(ellipse,
-      rgba(200, 217, 255, 0.55) 0%,
+      var(--blob-color-a) 0%,
       transparent 70%);
 }
 
@@ -69,7 +61,7 @@ import { RouterView } from 'vue-router'
   width: 480px;
   height: 420px;
   background: radial-gradient(ellipse,
-      rgba(181, 212, 244, 0.45) 0%,
+      var(--blob-color-b) 0%,
       transparent 70%);
 }
 
@@ -80,7 +72,7 @@ import { RouterView } from 'vue-router'
   width: 500px;
   height: 340px;
   background: radial-gradient(ellipse,
-      rgba(221, 232, 255, 0.6) 0%,
+      var(--blob-color-c) 0%,
       transparent 70%);
 }
 
@@ -89,7 +81,7 @@ import { RouterView } from 'vue-router'
   position: absolute;
   inset: 0;
   background-image: radial-gradient(circle,
-      rgba(55, 138, 221, 0.12) 1.5px,
+      var(--dot-color) 1.5px,
       transparent 1.5px);
   background-size: 36px 36px;
   pointer-events: none;
@@ -100,7 +92,7 @@ import { RouterView } from 'vue-router'
 .deco-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(55, 138, 221, 0.1);
+  border: 1px solid var(--ring-border);
   pointer-events: none;
   z-index: 0;
 }
@@ -110,7 +102,7 @@ import { RouterView } from 'vue-router'
   left: -60px;
   width: 280px;
   height: 280px;
-  box-shadow: 0 0 0 50px rgba(55, 138, 221, 0.04);
+  box-shadow: 0 0 0 50px var(--ring-glow-a);
 }
 
 .deco-ring-br {
@@ -118,6 +110,6 @@ import { RouterView } from 'vue-router'
   right: -80px;
   width: 320px;
   height: 320px;
-  box-shadow: 0 0 0 60px rgba(24, 95, 165, 0.04);
+  box-shadow: 0 0 0 60px var(--ring-glow-b);
 }
 </style>

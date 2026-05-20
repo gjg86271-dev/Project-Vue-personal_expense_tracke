@@ -1,19 +1,20 @@
 <template>
-  <div class="card">
+  <!-- ✅ click card ទាំងមូល → view detail, stop propagation លើ action buttons -->
+  <div class="card" @click="viewBudget">
 
     <!-- Header -->
     <div class="card-header">
       <div class="title">
         <h3>{{ budget.category?.name || 'No Category' }}</h3>
-        <p>Monthly Budget</p>
+        <p>ថវិកាប្រចាំខែ</p>
       </div>
 
       <div class="actions">
-        <button @click="editBudget">
+        <button @click.stop="editBudget">
           <i class="bi bi-pencil-square"></i>
-        </button> 
+        </button>
 
-        <button @click="deleteBudget" class="danger">
+        <button @click.stop="deleteBudget" class="danger">
           <i class="bi bi-trash3"></i>
         </button>
       </div>
@@ -45,32 +46,33 @@
 
     <!-- Bottom -->
     <div class="bottom">
-      <span>{{ percent.toFixed(1) }}% used</span>
-      <span class="left">${{ left.toFixed(2) }} left</span>
+      <span>{{ percent.toFixed(1) }}% បានប្រើ</span>
+      <span class="left">${{ left.toFixed(2) }} ប្រាក់នៅសល់</span>
     </div>
 
     <!-- Warning -->
     <div class="warning" v-if="percent >= 80">
-      ⚠️ Budget almost exceeded!
+      ថវិកាជិតលើសកំណត់!
     </div>
 
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
-import { onMounted } from 'vue'
-
 
 const transactionStore = useTransactionStore()
+
 onMounted(() => {
   transactionStore.fetchTransactions()
 })
 
+// ✅ បន្ថែម 'view-budget'
 const emit = defineEmits([
   'edit-budget',
-  'delete-budget'
+  'delete-budget',
+  'view-budget',
 ])
 
 const props = defineProps({
@@ -80,59 +82,37 @@ const props = defineProps({
   }
 })
 
-/* API Values */
-const spent = computed(() => {
-  return transactionStore.transactions
+/* ─── COMPUTED ────────────────────────────────────────────── */
+const spent = computed(() =>
+  transactionStore.transactions
     .filter(t =>
       t.category?.id === props.budget.category?.id &&
       t.category?.type === 'EXPENSE'
     )
     .reduce((sum, t) => sum + Number(t.amount || 0), 0)
-})
-
-const total = computed(() =>
-  Number(props.budget?.limitAmount ?? 0)
 )
 
-/* Progress */
-const percent = computed(() => {
-  if (!total.value) return 0
+const total   = computed(() => Number(props.budget?.limitAmount ?? 0))
+const percent = computed(() => !total.value ? 0 : Math.min((spent.value / total.value) * 100, 100))
+const left    = computed(() => Math.max(total.value - spent.value, 0))
 
-  return Math.min(
-    (spent.value / total.value) * 100,
-    100
-  )
-})
-
-/* Remaining */
-const left = computed(() =>
-  Math.max(total.value - spent.value, 0)
-)
-
-/* Progress Color */
 const color = computed(() => {
-  if (percent.value >= 80) {
-    return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
-  }
-
-  if (percent.value >= 50) {
-    return 'linear-gradient(90deg, #faad14, #ffd666)'
-  }
-
+  if (percent.value >= 80) return 'linear-gradient(90deg, #ff4d4f, #ff7875)'
+  if (percent.value >= 50) return 'linear-gradient(90deg, #faad14, #ffd666)'
   return 'linear-gradient(90deg, #16c35b, #73d13d)'
 })
 
-/* Events */
-function editBudget() {
-  emit('edit-budget', props.budget)
-}
-
-function deleteBudget() {
-  emit('delete-budget', props.budget)
-}
+/* ─── EVENTS ──────────────────────────────────────────────── */
+function viewBudget()   { emit('view-budget',   props.budget) }  // ✅
+function editBudget()   { emit('edit-budget',   props.budget) }
+function deleteBudget() { emit('delete-budget', props.budget) }
 </script>
 
 <style scoped>
+/* ====================================
+   MODERN BUDGET CARD UI
+==================================== */
+
 .card {
   background: #fff;
   border-radius: 16px;
@@ -140,49 +120,75 @@ function deleteBudget() {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   transition: 0.3s;
   margin-top: 20px;
+  cursor: pointer; /* ✅ បង្ហាញ pointer ដឹងថា clickable */
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255,255,255,0.5);
 }
 
-/* Header */
+/* ====================================
+   HEADER
+==================================== */
+
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: flex-start;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 2;
 }
 
 .title h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 23px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 
 .title p {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: #888;
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
 }
 
-/* Actions */
+/* ====================================
+   ACTIONS
+==================================== */
+
 .actions {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
 .actions button {
+  width: 42px;
+  height: 42px;
   border: none;
-  background: #f3f4f6;
-  padding: 6px 8px;
-  border-radius: 8px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #374151;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
 }
 
 .actions button:hover {
-  background: #e5e7eb;
+  transform: scale(1.08);
+  background: #eef2ff;
+  color: #4f46e5;
 }
 
 .actions .danger:hover {
@@ -190,64 +196,179 @@ function deleteBudget() {
   color: #dc2626;
 }
 
-/* Info */
+/* ====================================
+   INFO SECTION
+
 .info {
-  margin-top: 12px;
+  position: relative;
+  z-index: 2;
+  background: #f9fafb;
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 18px;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.row span:first-child {
+  color: #6b7280;
   font-size: 14px;
-}
-
-.spent {
-  color: #ef4444;
   font-weight: 600;
 }
 
+.spent,
 .total {
-  color: #111827;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
 }
 
-/* Progress */
+.spent { color: #ef4444; font-weight: 600; }
+.total { color: #111827; font-weight: 600; }
+
+/* ====================================
+   PROGRESS
+==================================== */
+
 .progress-bar {
-  height: 8px;
+  width: 100%;
+  height: 14px;
   background: #e5e7eb;
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 12px;
+  position: relative;
+  margin-bottom: 16px;
 }
 
 .progress {
   height: 100%;
   border-radius: 999px;
-  transition: width 0.4s ease;
+  transition: width 0.5s ease;
+  position: relative;
 }
 
-/* Bottom */
+.progress::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 100%;
+  background: rgba(255,255,255,0.3);
+  filter: blur(4px);
+}
+
+/* ====================================
+   BOTTOM
+==================================== */
+
 .bottom {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
-  font-size: 12px;
-  color: #6b7280;
+  align-items: center;
+  margin-top: 6px;
+  position: relative;
+  z-index: 2;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bottom span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bottom span:first-child {
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 8px 14px;
+  border-radius: 999px;
 }
 
 .left {
-  font-weight: 600;
   color: #111827;
+  background: #f3f4f6;
+  padding: 8px 14px;
+  border-radius: 999px;
 }
 
-/* Warning */
+/* ====================================
+   WARNING
+==================================== */
+
 .warning {
-  margin-top: 10px;
-  padding: 8px;
-  border-radius: 10px;
-  background: #fff7ed;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    #fff7ed,
+    #ffedd5
+  );
   color: #c2410c;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #fdba74;
+  animation: pulseWarning 1.5s infinite;
+}
+
+.warning::before {
+  content: "⚠";
+  font-size: 18px;
+}
+
+@keyframes pulseWarning {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.01);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ====================================
+   RESPONSIVE
+==================================== */
+
+@media (max-width: 768px) {
+  .card {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .title h3 {
+    font-size: 20px;
+  }
+
+  .bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bottom span {
+    width: 100%;
+    text-align: center;
+  }
+
+  .actions button {
+    width: 38px;
+    height: 38px;
+  }
 }
 </style>

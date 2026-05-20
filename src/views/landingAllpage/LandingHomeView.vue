@@ -16,7 +16,7 @@
                             <p class="card-text text-secondary"> កម្មវិធីតាមដានការចំណាយដ៏ឆ្លាតវៃបំផុត
                                 ដែលជួយឲ្យអ្នកសន្សំបានច្រើន <br>
                                 ប្រើប្រាស់យ៉ាងមានការយល់ដឹង និងឈានទៅរកគោលដៅហិរញ្ញវត្ថុបានលឿនជាងមុន</p>
-                            <a href="#" class="btn btn-primary fs-5 px-5 rounded-5">ចាប់ផ្តើមឥឡូវនេះ</a>
+                            <RouterLink to="/login "class="btn btn-primary fs-5 px-5 rounded-5">ចាប់ផ្តើមឥឡូវនេះ</RouterLink>
                         </div>
                     </div>
                 </div>
