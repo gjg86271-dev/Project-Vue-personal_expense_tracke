@@ -1,63 +1,8 @@
-<template>
-  <main class="auth-centered">
-    <section class="auth-wrapper" aria-label="Forgot password">
-      <AuthTimelineSidebar :steps="sidebarSteps" />
-
-      <div class="auth-card">
-        <div class="icon-circle">
-          <i class="bi bi-lock" aria-hidden="true"></i>
-        </div>
-
-      <h1 class="auth-title" >ភ្លេចពាក្យសម្ងាត់?</h1>
-      <p class="auth-subtitle  fw-semibold">
-        បញ្ចូលអ៊ីមែលរបស់អ្នក ដើម្បីទទួល Token សម្រាប់កំណត់ពាក្យសម្ងាត់ថ្មី
-      </p>
-
-      <form class="auth-form" @submit.prevent="handleForgetPassword" novalidate>
-        <div v-if="apiError" class="api-error-alert" role="alert">
-          {{ apiError }}
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="email">អ៊ីមែល</label>
-          <div class="input-shell" :class="{ 'is-invalid': errors.email }">
-            <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
-            <input
-              id="email"
-              v-model.trim="form.email"
-              type="email"
-              autocomplete="email"
-              placeholder="example@gmail.com"
-              :disabled="loading"
-              @input="errors.email = ''"
-            />
-          </div>
-          <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
-        </div>
-
-        <button type="submit" class="btn-primary-custom" :disabled="loading">
-          <span v-if="loading" class="spinner-border spinner-border-sm" role="status"></span>
-          <span v-else>ផ្ញើសារចូលអុីមែល</span>
-        </button>
-      </form>
-
-      <p class="back-text">
-        <RouterLink :to="{ name: 'login' }" class="back-link">
-          <i class="bi bi-arrow-left" aria-hidden="true"></i>
-          ត្រឡប់ទៅបង្កើតគណនី
-        </RouterLink>
-      </p>
-      </div>
-    </section>
-  </main>
-</template>
-
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import AuthTimelineSidebar from '@/components/auth/AuthTimelineSidebar.vue'
-// import { useAuthStore } from '@/stores/useAuth'
 import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
@@ -113,10 +58,6 @@ const handleForgetPassword = async () => {
       showConfirmButton: false,
     })
 
-    router.push({
-      name: 'reset-password',
-      query: { email: form.email.trim() },
-    })
   } catch (error) {
     apiError.value =
       authStore.errorMsg ||
@@ -128,6 +69,63 @@ const handleForgetPassword = async () => {
   }
 }
 </script>
+
+<template>
+  <main class="auth-centered">
+    <section class="auth-wrapper" aria-label="Forgot password">
+      <AuthTimelineSidebar :steps="sidebarSteps" />
+
+      <div class="auth-card">
+      <div class="icon-circle">
+        <i class="bi bi-envelope-check" aria-hidden="true"></i>
+      </div>
+
+      <h1 class="auth-title">ភ្លេចពាក្យសម្ងាត់?</h1>
+      <p class="auth-subtitle  fw-semibold">
+        បញ្ចូលអ៊ីមែលរបស់អ្នក ដើម្បីទទួល Token សម្រាប់កំណត់ពាក្យសម្ងាត់ថ្មី
+      </p>
+
+      <form class="auth-form" @submit.prevent="handleForgetPassword" novalidate>
+        <div v-if="apiError" class="api-error-alert" role="alert">
+          {{ apiError }}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label-custom" for="email">អ៊ីមែល</label>
+          <div class="input-group" :class="{ 'is-invalid': errors.email }">
+            <span class="input-icon-left">
+              <i class="bi bi-envelope" aria-hidden="true"></i>
+            </span>
+            <input
+              id="email"
+              v-model.trim="form.email"
+              type="email"
+              class="form-control-glass"
+              autocomplete="email"
+              placeholder="example@gmail.com"
+              :disabled="loading"
+              @input="errors.email = ''"
+            />
+          </div>
+          <small v-if="errors.email" class="error-text">{{ errors.email }}</small>
+        </div>
+
+        <button type="submit" class="btn-primary-custom" :disabled="loading">
+          <span v-if="loading" class="spinner-border spinner-border-sm" role="status"></span>
+          <span v-else>ផ្ញើសារចូលអុីមែល</span>
+        </button>
+      </form>
+
+      <p class="back-text">
+        <RouterLink :to="{ name: 'login' }" class="back-link">
+          <i class="bi bi-arrow-left" aria-hidden="true"></i>
+          ត្រឡប់ទៅបង្កើតគណនី
+        </RouterLink>
+      </p>
+      </div>
+    </section>
+  </main>
+</template>
 
 <style scoped>
 
@@ -154,6 +152,7 @@ const handleForgetPassword = async () => {
     0 40px 80px rgba(26, 79, 170, 0.07);
 }
 
+
 .auth-card {
   flex: 1;
   padding: 40px 36px;
@@ -165,55 +164,22 @@ const handleForgetPassword = async () => {
 
 
 .icon-circle {
-  position: relative;
-  width: 68px;
-  height: 68px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 18px;
+  margin: 0 auto 12px;
   border-radius: 50%;
-  color: #ffffff;
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.42), transparent 34%),
-    linear-gradient(135deg, #22c55e 0%, #2b65cc 82%, #1746a2 100%);
-  box-shadow:
-    0 14px 30px rgba(43, 101, 204, 0.28),
-    0 0 0 8px rgba(43, 101, 204, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-
-.icon-circle::before {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border-radius: inherit;
-  border: 1px solid rgba(43, 101, 204, 0.18);
-}
-
-.icon-circle::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 12px;
-  height: 12px;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.35);
-}
-
-.icon-circle .bi {
-  position: relative;
-  z-index: 1;
-  font-size: 29px;
-  line-height: 1;
+  color: #16a34a;
+  background: #eaf8ef;
+  border: 1px solid #bde8cb;
+  font-size: 20px;
 }
 
 .auth-title {
   margin: 0;
-  color: #042C83;
+  color: #151a2d;
   font-size: 24px;
   font-weight: 900;
   line-height: 1.25;
@@ -244,77 +210,69 @@ const handleForgetPassword = async () => {
   line-height: 1.4;
 }
 
-.field-group {
-  margin-bottom: 16px;
-}
-
-.field-label {
+.form-label-custom {
   display: block;
-  margin-bottom: 7px;
-  color: #111d35;
-  font-size: 13px;
-  font-weight: 500;
+  margin: 0 0 7px 2px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 600;
 }
 
-.input-shell {
+.input-group {
   display: flex;
   align-items: center;
-  height: 46px;
-  border: 1.5px solid #d0ddef;
-  border-radius: 50px;
-  padding: 0 16px;
-  background: #f7faff;
+  height: 38px;
+  border: 1.5px solid #657996;
+  border-radius: 999px;
+  padding: 0 13px;
+  background: #ffffff;
   transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
 }
 
-.input-shell:focus-within {
-  border-color: #2b65cc;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(43,101,204,0.12);
+.input-group:focus-within {
+  border-color: #2d57b7;
+  box-shadow: 0 0 0 3px rgba(45, 87, 183, 0.13);
 }
 
-.input-shell.is-invalid {
+.input-group.is-invalid {
   border-color: #ef4444;
-  background: #fee2e2;
+  background: #fff7f7;
 }
 
-.input-shell.is-invalid:focus-within {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.14);
-}
-
-.field-icon {
+.input-icon-left {
   flex-shrink: 0;
-  color: #7a8fae;
-  font-size: 15px;
+  color: #9aacbf;
+  font-size: 13px;
 }
 
-.input-shell input {
+.form-control-glass {
   flex: 1;
   min-width: 0;
+  width: 100%;
   height: 100%;
   border: 0;
   outline: 0;
   padding: 0 10px;
-  color: #111d35;
+  color: #1d2740;
   background: transparent;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 11px;
 }
 
-.input-shell input::placeholder {
-  color: #b5c5dc;
+.form-control-glass::placeholder {
+  color: #b7c3d3;
 }
 
-.input-shell input:disabled {
+.form-control-glass:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.field-error {
-  margin: 7px 0 0;
+.error-text {
+  display: block;
+  margin: 5px 0 0 2px;
   color: #ef4444;
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1.35;
 }
 

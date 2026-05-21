@@ -4,7 +4,6 @@
 
     <div class="font mb-4">
 
-      <!-- HEADER -->
       <!-- HEADER BANNER -->
       <div class="header-banner">
         <div>
@@ -69,8 +68,8 @@
           </div>
           <div class="search-box" :class="{ focused: searchFocused }">
             <i class="bi bi-search"></i>
-            <input v-model="searchQuery" type="search" placeholder="ស្វែងរក..." @focus="searchFocused = true"
-              @blur="searchFocused = false" />
+            <input v-model="searchQuery" type="search" placeholder="ស្វែងរក..."
+              @focus="searchFocused = true" @blur="searchFocused = false" />
             <button v-if="searchQuery" class="clear-btn" @click="searchQuery = ''">
               <i class="bi bi-x"></i>
             </button>
@@ -88,7 +87,7 @@
             <i class="bi bi-x" @click="filterType = ''"></i>
           </span>
           <span v-if="filterCategory" class="filter-badge">
-            {{categories.find(c => c.id === filterCategory)?.name}}
+            {{ categories.find(c => c.id === filterCategory)?.name }}
             <i class="bi bi-x" @click="filterCategory = ''"></i>
           </span>
           <span v-if="searchQuery" class="filter-badge">
@@ -108,6 +107,7 @@
               <th>ប្រភេទទូទៅ</th>
               <th>លក្ខណៈ</th>
               <th>ចំនួនទឹកប្រាក់</th>
+              <th>ឯកសារ</th>
               <th>សកម្មភាព</th>
             </tr>
           </thead>
@@ -127,6 +127,15 @@
                 {{ item.category?.type === 'INCOME' ? '+' : '-' }}${{ item.amount }}
               </td>
               <td>
+                <a v-if="item.attachmentUrl" :href="item.attachmentUrl" target="_blank" class="attachment-link">
+                  <i class="bi bi-paperclip"></i>
+                </a>
+                <span v-else class="text-muted">—</span>
+              </td>
+              <td>
+                <button class="btn text-info btn-sm" @click="openDetailModal(item.id)" title="មើលលម្អិត">
+                  <i class="bi bi-eye"></i>
+                </button>
                 <button class="btn text-dark btn-sm" @click="openModal(item)">
                   <i class="bi bi-pencil-square"></i>
                 </button>
@@ -136,7 +145,7 @@
               </td>
             </tr>
             <tr v-if="filteredItems.length === 0">
-              <td colspan="6" class="text-center py-5 text-muted">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                 គ្មានទិន្នន័យ
               </td>
@@ -152,7 +161,7 @@
           គ្មានទិន្នន័យ
         </div>
         <div v-for="item in filteredItems" :key="item.id" class="mobile-card">
-          <div class="mobile-card__left">
+          <div class="mobile-card__left" @click="openDetailModal(item.id)" style="cursor:pointer">
             <div :class="['mobile-icon', item.category?.type === 'INCOME' ? 'icon--income' : 'icon--expense']">
               <i :class="item.category?.type === 'INCOME' ? 'bi bi-graph-up-arrow' : 'bi bi-graph-down-arrow'"></i>
             </div>
@@ -162,6 +171,10 @@
               <div class="mobile-card__date">
                 {{ new Date(item.transactionDate).toLocaleDateString('en-GB') }}
               </div>
+              <a v-if="item.attachmentUrl" :href="item.attachmentUrl" target="_blank"
+                class="attachment-link small" @click.stop>
+                <i class="bi bi-paperclip"></i> ឯកសារ
+              </a>
             </div>
           </div>
           <div class="mobile-card__right">
@@ -169,6 +182,9 @@
               {{ item.category?.type === 'INCOME' ? '+' : '-' }}${{ item.amount }}
             </div>
             <div class="mobile-card__actions">
+              <button class="btn btn-sm text-info p-1" @click="openDetailModal(item.id)">
+                <i class="bi bi-eye"></i>
+              </button>
               <button class="btn btn-sm text-dark p-1" @click="openModal(item)">
                 <i class="bi bi-pencil-square"></i>
               </button>
@@ -180,14 +196,101 @@
         </div>
       </div>
 
-      <!-- ─── PAGINATION ──────────────────────────────────────────────────── -->
+      <!-- PAGINATION -->
       <div v-if="totalPages > 1" class="d-flex justify-content-center mt-4">
         <Pagination v-model:currentPage="currentPage" :total-pages="totalPages" :sibling-count="1" />
       </div>
 
     </div>
 
-    <!-- CREATE / EDIT MODAL -->
+    <!-- ═══════════════════════════════════════════════
+         DETAIL MODAL
+    ════════════════════════════════════════════════ -->
+    <BaseModal v-if="showDetailModal" title="លម្អិតប្រតិបត្តិការ" @close-modal="closeDetailModal">
+      <template #body>
+
+        <!-- Loading -->
+        <div v-if="detailLoading" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted small">កំពុងទាញទិន្នន័យ...</p>
+        </div>
+
+        <!-- Content -->
+        <div v-else-if="detail" class="detail-wrap">
+
+          <!-- Type badge -->
+          <div class="detail-type-badge mb-3">
+            <span :class="detail.category?.type === 'INCOME'
+              ? 'type-pill type-pill--income'
+              : 'type-pill type-pill--expense'">
+              <i :class="detail.category?.type === 'INCOME'
+                ? 'bi bi-graph-up-arrow'
+                : 'bi bi-graph-down-arrow'"></i>
+              {{ detail.category?.type === 'INCOME' ? 'ចំណូល' : 'ចំណាយ' }}
+            </span>
+          </div>
+
+          <!-- Amount hero -->
+          <div class="detail-amount"
+            :class="detail.category?.type === 'INCOME' ? 'amount--income' : 'amount--expense'">
+            {{ detail.category?.type === 'INCOME' ? '+' : '-' }}${{ Number(detail.amount).toLocaleString() }}
+          </div>
+
+          <hr class="my-3" />
+
+          <!-- Info rows -->
+          <div class="detail-rows">
+            <div class="detail-row">
+              <span class="detail-label"><i class="bi bi-tag me-1"></i>ប្រភេទ</span>
+              <span class="detail-value">{{ detail.category?.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="bi bi-calendar3 me-1"></i>កាលបរិច្ឆេទ</span>
+              <span class="detail-value">
+                {{ new Date(detail.transactionDate).toLocaleDateString('en-GB') }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="bi bi-chat-left-text me-1"></i>កំណត់ចំណាំ</span>
+              <span class="detail-value">{{ detail.notes || '—' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="bi bi-clock-history me-1"></i>បង្កើតនៅ</span>
+              <span class="detail-value">{{ new Date(detail.createdAt).toLocaleString('en-GB') }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="bi bi-pencil me-1"></i>កែប្រែនៅ</span>
+              <span class="detail-value">{{ new Date(detail.updatedAt).toLocaleString('en-GB') }}</span>
+            </div>
+            <div v-if="detail.attachmentUrl" class="detail-row">
+              <span class="detail-label"><i class="bi bi-paperclip me-1"></i>ឯកសារ</span>
+              <span class="detail-value">
+                <a :href="detail.attachmentUrl" target="_blank" class="attachment-link">
+                  <i class="bi bi-box-arrow-up-right me-1"></i>បើកឯកសារ
+                </a>
+              </span>
+            </div>
+          </div>
+
+          <!-- Image preview -->
+          <div v-if="detail.attachmentUrl && isImage(detail.attachmentUrl)" class="mt-3">
+            <img :src="detail.attachmentUrl" alt="attachment" class="detail-img" />
+          </div>
+
+        </div>
+      </template>
+
+      <template #footer>
+        <button class="btn btn-secondary" @click="closeDetailModal">បិទ</button>
+        <button class="btn btn-primary" @click="() => { closeDetailModal(); openModal(detail) }">
+          <i class="bi bi-pencil-square me-1"></i>កែប្រែ
+        </button>
+      </template>
+    </BaseModal>
+
+    <!-- ═══════════════════════════════════════════════
+         CREATE / EDIT MODAL
+    ════════════════════════════════════════════════ -->
     <BaseModal v-if="showModal" :title="isEditing ? 'កែប្រែប្រតិបត្តិការ' : 'បន្ថែមប្រតិបត្តិការ'"
       @close-modal="closeModal">
       <template #body>
@@ -214,17 +317,13 @@
 
         <!-- CATEGORY -->
         <div class="form-group mb-3">
-          <label class="form-label fw-500">
-            ប្រភេទ <span class="text-danger">*</span>
-          </label>
-          <select class="form-select" :class="{ 'is-invalid': errors.categoryId }" v-model="form.categoryId"
-            :disabled="!isEditing && !form.type">
+          <label class="form-label fw-500">ប្រភេទ <span class="text-danger">*</span></label>
+          <select class="form-select" :class="{ 'is-invalid': errors.categoryId }"
+            v-model="form.categoryId" :disabled="!isEditing && !form.type">
             <option value="" disabled>
               {{ !isEditing && !form.type
                 ? 'សូមជ្រើស ចំណូល ឬ ចំណាយ មុន'
-                : filteredCategories.length === 0
-                  ? 'គ្មានប្រភេទ'
-                  : 'ជ្រើសរើសប្រភេទ' }}
+                : filteredCategories.length === 0 ? 'គ្មានប្រភេទ' : 'ជ្រើសរើសប្រភេទ' }}
             </option>
             <option v-for="category in filteredCategories" :key="category.id" :value="category.id">
               {{ category.name }}
@@ -237,13 +336,12 @@
 
         <!-- AMOUNT -->
         <div class="form-group mb-3">
-          <label class="form-label fw-500">
-            ចំនួនទឹកប្រាក់ <span class="text-danger">*</span>
-          </label>
+          <label class="form-label fw-500">ចំនួនទឹកប្រាក់ <span class="text-danger">*</span></label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input v-model="form.amount" type="number" class="form-control" :class="{ 'is-invalid': errors.amount }"
-              placeholder="0.00" min="0" step="0.01" @input="delete errors.amount" />
+            <input v-model="form.amount" type="number" class="form-control"
+              :class="{ 'is-invalid': errors.amount }" placeholder="0.00" min="0" step="0.01"
+              @input="delete errors.amount" />
             <div v-if="errors.amount" class="invalid-feedback">
               <i class="bi bi-exclamation-circle"></i> {{ errors.amount }}
             </div>
@@ -253,27 +351,39 @@
         <!-- NOTES -->
         <div class="form-group mb-3">
           <label class="form-label fw-500">កំណត់ចំណាំ</label>
-          <input v-model="form.notes" type="text" class="form-control" placeholder="បញ្ចូលកំណត់ចំណាំ (ជាជម្រើស)" />
+          <input v-model="form.notes" type="text" class="form-control"
+            placeholder="បញ្ចូលកំណត់ចំណាំ (ជាជម្រើស)" />
         </div>
 
         <!-- DATE -->
-        <div class="form-group">
-          <label class="form-label fw-500">
-            កាលបរិច្ឆេទ <span class="text-danger">*</span>
-          </label>
+        <div class="form-group mb-3">
+          <label class="form-label fw-500">កាលបរិច្ឆេទ <span class="text-danger">*</span></label>
           <input v-model="form.transactionDate" type="date" class="form-control"
-            :class="{ 'is-invalid': errors.transactionDate }" @change="delete errors.transactionDate" />
+            :class="{ 'is-invalid': errors.transactionDate }"
+            @change="delete errors.transactionDate" />
           <div v-if="errors.transactionDate" class="invalid-feedback">
             <i class="bi bi-exclamation-circle"></i> {{ errors.transactionDate }}
+          </div>
+        </div>
+
+        <!-- ATTACHMENT -->
+        <div class="form-group">
+          <label class="form-label fw-500">ឯកសារភ្ជាប់</label>
+          <input type="file" class="form-control" accept="image/*,.pdf" @change="onFileChange" />
+          <div v-if="isEditing && selectedBudget?.attachmentUrl && !form.file" class="mt-2">
+            <a :href="selectedBudget.attachmentUrl" target="_blank" class="attachment-link">
+              <i class="bi bi-paperclip"></i> មើលឯកសារបច្ចុប្បន្ន
+            </a>
+          </div>
+          <div v-if="form.file" class="mt-2 selected-file">
+            <i class="bi bi-file-earmark"></i> {{ form.file.name }}
           </div>
         </div>
 
       </template>
 
       <template #footer>
-        <button class="btn btn-secondary" @click="closeModal" :disabled="saveLoading">
-          បោះបង់
-        </button>
+        <button class="btn btn-secondary" @click="closeModal" :disabled="saveLoading">បោះបង់</button>
         <button class="btn btn-primary" @click="saveBudget" :disabled="saveLoading">
           <span v-if="saveLoading" class="spinner-border spinner-border-sm me-1"></span>
           {{ isEditing ? 'កែប្រែ' : 'រក្សាទុក' }}
@@ -293,9 +403,7 @@
         </div>
       </template>
       <template #footer>
-        <button class="btn btn-secondary" @click="closeDeleteModal" :disabled="deleteLoading">
-          បោះបង់
-        </button>
+        <button class="btn btn-secondary" @click="closeDeleteModal" :disabled="deleteLoading">បោះបង់</button>
         <button class="btn btn-danger" @click="deleteBudget" :disabled="deleteLoading">
           <span v-if="deleteLoading" class="spinner-border spinner-border-sm me-1"></span>
           លុប
@@ -322,20 +430,20 @@ import api from '@/api/api'
 
 // ── STORES ───────────────────────────────────────────
 const categoryStore = useCategoryStore()
-const trstore = useTransactionStore()
+const trstore       = useTransactionStore()
 
 // ── PAGINATION ───────────────────────────────────────
 const currentPage = ref(1)
-const totalPages = computed(() => trstore.meta?.totalPages ?? 1)
+const totalPages  = computed(() => trstore.meta?.totalPages ?? 1)
 
-// ── Watch page change → fetch ─────────────────────────
 watch(currentPage, () => {
   trstore.fetchTransactions(currentPage.value)
 })
 
 // ── LOADING ──────────────────────────────────────────
-const saveLoading = ref(false)
+const saveLoading   = ref(false)
 const deleteLoading = ref(false)
+const detailLoading = ref(false)
 
 // ── ERRORS ───────────────────────────────────────────
 const errors = reactive({})
@@ -348,10 +456,10 @@ const all_total = ref({ totalIncome: 0, totalExpense: 0 })
 
 const fetchAlltotal = async () => {
   try {
-    const res = await api.get('analytics/dashboard-summary')
+    const res  = await api.get('analytics/dashboard-summary')
     const data = res.data?.data
     all_total.value = {
-      totalIncome: data?.totalIncome || 0,
+      totalIncome:  data?.totalIncome  || 0,
       totalExpense: data?.totalExpense || 0,
     }
   } catch (err) {
@@ -376,26 +484,26 @@ const allTransactions = computed(() =>
 )
 
 // ── FILTER ───────────────────────────────────────────
-const filterType = ref('')
+const filterType     = ref('')
 const filterCategory = ref('')
-const searchQuery = ref('')
-const searchFocused = ref(false)
+const searchQuery    = ref('')
+const searchFocused  = ref(false)
 
 const hasFilter = computed(() =>
   filterType.value || filterCategory.value || searchQuery.value
 )
 
 function resetFilters() {
-  filterType.value = ''
+  filterType.value     = ''
   filterCategory.value = ''
-  searchQuery.value = ''
+  searchQuery.value    = ''
 }
 
 const filteredItems = computed(() => {
   return allTransactions.value.filter(item => {
-    const matchType = !filterType.value || item.category?.type === filterType.value
-    const matchCat = !filterCategory.value || item.category?.id === filterCategory.value
-    const matchSearch = !searchQuery.value ||
+    const matchType   = !filterType.value     || item.category?.type === filterType.value
+    const matchCat    = !filterCategory.value || item.category?.id   === filterCategory.value
+    const matchSearch = !searchQuery.value    ||
       item.notes?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       item.category?.name?.toLowerCase().includes(searchQuery.value.toLowerCase())
     return matchType && matchCat && matchSearch
@@ -403,33 +511,65 @@ const filteredItems = computed(() => {
 })
 
 // ── MODAL STATE ──────────────────────────────────────
-const showModal = ref(false)
-const isEditing = ref(false)
+const showModal       = ref(false)
+const isEditing       = ref(false)
 const showDeleteModal = ref(false)
-const selectedBudget = ref(null)
+const selectedBudget  = ref(null)
+
+// ── DETAIL MODAL ─────────────────────────────────────
+const showDetailModal = ref(false)
+const detail          = ref(null)
+
+async function openDetailModal(id) {
+  showDetailModal.value = true
+  detailLoading.value   = true
+  detail.value          = null
+  try {
+    const res    = await api.get(`transactions/${id}`)
+    detail.value = res.data?.data
+  } catch (err) {
+    console.error('Detail error:', err)
+  } finally {
+    detailLoading.value = false
+  }
+}
+
+function closeDetailModal() {
+  showDetailModal.value = false
+  detail.value          = null
+}
+
+function isImage(url) {
+  return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url)
+}
 
 // ── FORM ─────────────────────────────────────────────
 const form = reactive({
-  type: '',
-  categoryId: '',
-  amount: '',
+  type:            '',
+  categoryId:      '',
+  amount:          '',
   transactionDate: '',
-  notes: ''
+  notes:           '',
+  file:            null
 })
+
+function onFileChange(e) {
+  form.file = e.target.files[0] || null
+}
 
 // ── VALIDATION ───────────────────────────────────────
 function validate() {
   Object.keys(errors).forEach(k => delete errors[k])
-  if (!isEditing.value && !form.type) errors.type = 'សូមជ្រើសប្រភេទប្រតិបត្តិការ'
-  if (!form.categoryId) errors.categoryId = 'សូមជ្រើសប្រភេទ'
-  if (!form.amount || form.amount <= 0) errors.amount = 'សូមបញ្ចូលចំនួនទឹកប្រាក់'
-  if (!form.transactionDate) errors.transactionDate = 'សូមជ្រើសកាលបរិច្ឆេទ'
+  if (!isEditing.value && !form.type) errors.type            = 'សូមជ្រើសប្រភេទប្រតិបត្តិការ'
+  if (!form.categoryId)               errors.categoryId      = 'សូមជ្រើសប្រភេទ'
+  if (!form.amount || form.amount <= 0) errors.amount        = 'សូមបញ្ចូលចំនួនទឹកប្រាក់'
+  if (!form.transactionDate)          errors.transactionDate = 'សូមជ្រើសកាលបរិច្ឆេទ'
   return Object.keys(errors).length === 0
 }
 
 // ── TYPE TOGGLE ──────────────────────────────────────
 function selectType(type) {
-  form.type = type
+  form.type       = type
   form.categoryId = ''
   delete errors.type
   delete errors.categoryId
@@ -440,21 +580,23 @@ function openModal(item = null) {
   Object.keys(errors).forEach(k => delete errors[k])
   showModal.value = true
   if (item) {
-    isEditing.value = true
+    isEditing.value      = true
     selectedBudget.value = item
-    form.type = item.category?.type || ''
-    form.categoryId = item.category?.id || ''
-    form.amount = item.amount || ''
-    form.notes = item.notes || ''
+    form.type            = item.category?.type || ''
+    form.categoryId      = item.category?.id   || ''
+    form.amount          = item.amount          || ''
+    form.notes           = item.notes           || ''
     form.transactionDate = item.transactionDate?.split('T')[0] || ''
+    form.file            = null
   } else {
-    isEditing.value = false
+    isEditing.value      = false
     selectedBudget.value = null
-    form.type = ''
-    form.categoryId = ''
-    form.amount = ''
-    form.notes = ''
+    form.type            = ''
+    form.categoryId      = ''
+    form.amount          = ''
+    form.notes           = ''
     form.transactionDate = ''
+    form.file            = null
   }
 }
 
@@ -465,16 +607,21 @@ async function saveBudget() {
   if (!validate()) return
   saveLoading.value = true
   try {
-    const payload = {
-      categoryId: form.categoryId,
-      amount: Number(form.amount),
-      notes: form.notes,
-      transactionDate: form.transactionDate
-    }
+    const payload = new FormData()
+    payload.append('categoryId',      form.categoryId)
+    payload.append('amount',          Number(form.amount))
+    payload.append('notes',           form.notes)
+    payload.append('transactionDate', form.transactionDate)
+    if (form.file) payload.append('file', form.file)
+
     if (isEditing.value && selectedBudget.value?.id) {
-      await api.put(`transactions/${selectedBudget.value.id}`, payload)
+      await api.put(`transactions/${selectedBudget.value.id}`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
     } else {
-      await api.post('transactions', payload)
+      await api.post('transactions', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
     }
     closeModal()
     await trstore.fetchTransactions(currentPage.value)
@@ -488,7 +635,7 @@ async function saveBudget() {
 
 // ── DELETE ───────────────────────────────────────────
 function openDeleteModal(item) {
-  selectedBudget.value = item
+  selectedBudget.value  = item
   showDeleteModal.value = true
 }
 
@@ -518,366 +665,116 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.font {
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
-}
-
-.fw-500 {
-  font-weight: 500;
-}
+.font { font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important; }
+.fw-500 { font-weight: 500; }
 
 .add-btn {
-  height: 46px;
-  padding: 0 20px;
-  font-size: 15px;
-  white-space: nowrap;
+  height: 46px; padding: 0 20px; font-size: 15px; white-space: nowrap;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--text-white);
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
-  backdrop-filter: blur(4px);
-  transition: var(--transition);
+  background: rgba(255,255,255,0.15); color: var(--text-white);
+  border: 1.5px solid rgba(255,255,255,0.4); border-radius: 12px;
+  backdrop-filter: blur(4px); transition: var(--transition);
 }
-
-.add-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
+.add-btn:hover { background: rgba(255,255,255,0.25); }
 
 /* ── HEADER BANNER ────────────────────────────────── */
 .header-banner {
-  background: var(--bg-sidebar);
-  border-radius: var(--radius);
-  padding: 18px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow);
+  background: var(--bg-sidebar); border-radius: var(--radius);
+  padding: 18px 24px; display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 1.5rem; box-shadow: var(--shadow);
 }
-
-.header-banner h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-white);
-  margin: 0 0 2px 0;
-}
-
-.header-banner p {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.65);
-  margin: 0;
-}
+.header-banner h1 { font-size: 20px; font-weight: 700; color: var(--text-white); margin: 0 0 2px 0; }
+.header-banner p  { font-size: 12px; color: rgba(255,255,255,0.65); margin: 0; }
 
 /* ── FILTER CARD ──────────────────────────────────── */
 .filter-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
-  padding: 14px 18px;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+  background: var(--bg-card); border-radius: var(--radius);
+  box-shadow: var(--shadow); border: 1px solid var(--border-color);
+  padding: 14px 18px; font-family: 'Kantumruy Pro','Khmer OS',sans-serif;
 }
-
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.filter-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-}
-
-.filter-label i {
-  color: var(--color-primary);
-  font-size: 16px;
-}
-
-.filter-selects {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.filter-label { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+.filter-label i { color: var(--color-primary); font-size: 16px; }
+.filter-selects { display: flex; gap: 8px; flex-wrap: wrap; }
 .filter-select {
-  border: 1.5px solid var(--border-color);
-  border-radius: 30px;
-  font-size: 13px;
-  padding: 7px 16px;
-  color: var(--text-primary);
-  background: var(--bg-input);
-  cursor: pointer;
-  outline: none;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  transition: border-color 0.15s, background 0.15s;
-  min-width: 130px;
+  border: 1.5px solid var(--border-color); border-radius: 30px; font-size: 13px;
+  padding: 7px 16px; color: var(--text-primary); background: var(--bg-input);
+  cursor: pointer; outline: none; font-family: 'Kantumruy Pro','Khmer OS',sans-serif;
+  transition: border-color 0.15s, background 0.15s; min-width: 130px;
 }
-
-.filter-select:focus,
-.filter-select:hover {
-  border-color: var(--color-primary);
-  background: var(--bg-card);
-}
-
+.filter-select:focus, .filter-select:hover { border-color: var(--color-primary); background: var(--bg-card); }
 .search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 200px;
-  height: 40px;
-  border: 1.5px solid var(--border-color);
-  border-radius: 50px;
-  padding: 0 14px;
-  background: var(--bg-input);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;
+  height: 40px; border: 1.5px solid var(--border-color); border-radius: 50px;
+  padding: 0 14px; background: var(--bg-input); transition: border-color 0.2s, box-shadow 0.2s;
 }
-
-.search-box.focused {
-  border-color: var(--color-primary);
-  background: var(--bg-card);
-  box-shadow: 0 0 0 3px rgba(26, 98, 212, 0.10);
-}
-
-.search-box i {
-  color: var(--text-secondary);
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.search-box input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 14px;
-  width: 100%;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  color: var(--text-primary);
-}
-
-.search-box input::placeholder {
-  color: var(--border-color);
-}
-
-.clear-btn {
-  border: none;
-  background: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0;
-  font-size: 16px;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-
-.clear-btn:hover {
-  color: var(--text-primary);
-}
-
+.search-box.focused { border-color: var(--color-primary); background: var(--bg-card); box-shadow: 0 0 0 3px rgba(26,98,212,0.10); }
+.search-box i { color: var(--text-secondary); font-size: 14px; flex-shrink: 0; }
+.search-box input { border: none; outline: none; background: transparent; font-size: 14px; width: 100%; font-family: 'Kantumruy Pro','Khmer OS',sans-serif; color: var(--text-primary); }
+.search-box input::placeholder { color: var(--border-color); }
+.clear-btn { border: none; background: none; color: var(--text-secondary); cursor: pointer; padding: 0; font-size: 16px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
+.clear-btn:hover { color: var(--text-primary); }
 .reset-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1.5px solid var(--border-color);
-  border-radius: 30px;
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  font-size: 13px;
-  padding: 7px 14px;
-  cursor: pointer;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  transition: var(--transition);
-  white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  border: 1.5px solid var(--border-color); border-radius: 30px;
+  background: var(--bg-card); color: var(--text-secondary); font-size: 13px;
+  padding: 7px 14px; cursor: pointer; font-family: 'Kantumruy Pro','Khmer OS',sans-serif;
+  transition: var(--transition); white-space: nowrap;
 }
-
-.reset-btn:hover {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-  background: var(--color-danger-light);
-}
-
-.active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
-}
-
-.filter-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--color-success-light);
-  color: var(--color-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  font-size: 12px;
-  padding: 3px 10px;
-}
-
-.filter-badge i {
-  cursor: pointer;
-  font-size: 13px;
-  opacity: 0.6;
-  transition: opacity 0.15s;
-}
-
-.filter-badge i:hover {
-  opacity: 1;
-}
+.reset-btn:hover { border-color: var(--color-danger); color: var(--color-danger); background: var(--color-danger-light); }
+.active-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+.filter-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--color-success-light); color: var(--color-primary); border: 1px solid var(--border-color); border-radius: 20px; font-size: 12px; padding: 3px 10px; }
+.filter-badge i { cursor: pointer; font-size: 13px; opacity: 0.6; transition: opacity 0.15s; }
+.filter-badge i:hover { opacity: 1; }
 
 /* ── DESKTOP TABLE ────────────────────────────────── */
-.table-wrap {
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
-}
-
-.table {
-  border-collapse: collapse;
-}
+.table-wrap { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+.table { border-collapse: collapse; }
 
 /* ── MOBILE CARD ──────────────────────────────────── */
-.mobile-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  box-shadow: var(--shadow);
-}
-
-.mobile-card__left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.mobile-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.icon--income {
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.icon--expense {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
-}
-
-.mobile-card__category {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1.3;
-}
-
-.mobile-card__note {
-  font-size: 12px;
-  color: var(--text-secondary);
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mobile-card__date {
-  font-size: 11px;
-  color: var(--border-color);
-  margin-top: 2px;
-}
-
-.mobile-card__right {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.amount--income {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-success);
-}
-
-.amount--expense {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-danger);
-}
-
-.mobile-card__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 2px;
-  margin-top: 4px;
-}
+.mobile-card { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+.mobile-card__left { display: flex; align-items: center; gap: 12px; }
+.mobile-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 16px; flex-shrink: 0; }
+.icon--income  { background: var(--color-success-light); color: var(--color-success); }
+.icon--expense { background: var(--color-danger-light);  color: var(--color-danger);  }
+.mobile-card__category { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.mobile-card__note { font-size: 12px; color: var(--text-secondary); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile-card__date { font-size: 11px; color: var(--border-color); margin-top: 2px; }
+.mobile-card__right { text-align: right; flex-shrink: 0; }
+.amount--income  { font-size: 15px; font-weight: 700; color: var(--color-success); }
+.amount--expense { font-size: 15px; font-weight: 700; color: var(--color-danger);  }
+.mobile-card__actions { display: flex; justify-content: flex-end; gap: 2px; margin-top: 4px; }
 
 /* ── TYPE TOGGLE ──────────────────────────────────── */
-.type-toggle {
-  display: flex;
-  gap: 10px;
-}
+.type-toggle { display: flex; gap: 10px; }
+.type-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-secondary); font-family: 'Kantumruy Pro','Khmer OS',sans-serif; transition: var(--transition); }
+.type-btn:hover { background: var(--bg-body); }
+.type-btn--income.active  { border-color: var(--color-success); background: var(--color-success-light); color: var(--color-success); }
+.type-btn--expense.active { border-color: var(--color-danger);  background: var(--color-danger-light);  color: var(--color-danger);  }
+.form-label { font-weight: 500; color: var(--text-primary); margin-bottom: 6px; font-family: 'Kantumruy Pro','Khmer OS',sans-serif; }
 
-.type-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 2px solid var(--border-color);
-  background: var(--bg-input);
-  color: var(--text-secondary);
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-  transition: var(--transition);
-}
+/* ── ATTACHMENT ───────────────────────────────────── */
+.attachment-link { font-size: 13px; color: var(--color-primary, #0d6efd); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+.attachment-link:hover { text-decoration: underline; }
+.selected-file { font-size: 13px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px; }
 
-.type-btn:hover {
-  background: var(--bg-body);
-}
+/* ── DETAIL MODAL ─────────────────────────────────── */
+.detail-wrap { font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif; }
 
-.type-btn--income.active {
-  border-color: var(--color-success);
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
+.detail-type-badge { display: flex; }
+.type-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.type-pill--income  { background: var(--color-success-light); color: var(--color-success); }
+.type-pill--expense { background: var(--color-danger-light);  color: var(--color-danger);  }
 
-.type-btn--expense.active {
-  border-color: var(--color-danger);
-  background: var(--color-danger-light);
-  color: var(--color-danger);
-}
+.detail-amount { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; text-align: center; padding: 8px 0; }
 
-.form-label {
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+.detail-rows { display: flex; flex-direction: column; gap: 10px; }
+.detail-row {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  padding: 10px 14px; background: var(--bg-input, #f8f9fa); border-radius: 10px; font-size: 14px;
 }
+.detail-label { color: var(--text-secondary); font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+.detail-value { color: var(--text-primary); font-weight: 600; text-align: right; word-break: break-all; }
+
+.detail-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border-color); }
 </style>

@@ -57,17 +57,28 @@ function close() {
 }
 
 /* Modal Box */
+/* Modal Box */
+/* Modal Box */
 .modal-container {
-  width: 450px;
+  width: fit-content;
+  min-width: 300px;
+  max-width: min(500px, 90vw);  /* កុំឲ្យលើស 500px ឬ 90% screen */
+  max-height: 90vh;             /* កុំឲ្យលើស 90% screen height */
   background: white;
   border-radius: 16px;
   overflow: hidden;
-
   box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-
   animation: popup 0.25s ease;
+  display: flex;
+  flex-direction: column;       /* ឲ្យ body scroll បាន */
 }
 
+/* Body */
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;             /* scroll លើ content ខាងក្នុង */
+  flex: 1;
+}
 /* Animation */
 @keyframes popup {
   from {
@@ -112,10 +123,6 @@ function close() {
   transform: rotate(90deg);
 }
 
-/* Body */
-.modal-body {
-  padding: 20px;
-}
 
 /* Footer */
 .modal-footer {

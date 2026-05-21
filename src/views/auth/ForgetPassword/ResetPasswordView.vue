@@ -1,8 +1,7 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
-// import { useAuthStore } from '@/stores/useAuth'
 import { useAuthStore } from '@/stores/authStore'
 import AuthTimelineSidebar from '@/components/auth/AuthTimelineSidebar.vue'
 
@@ -21,7 +20,7 @@ const firstQueryValue = (...values) => {
   return Array.isArray(value) ? value[0] : value
 }
 
-const initialToken = String(
+const token = String(
   firstQueryValue(
     route.query.token,
     route.query.reset_token,
@@ -31,19 +30,20 @@ const initialToken = String(
   ) || ''
 )
 
+
+if (!token) {
+  router.replace({ name: 'forgetPassword' })
+}
+
 const form = reactive({
-  token: initialToken,
   password: '',
   confirmPassword: '',
 })
 
 const errors = reactive({
-  token: '',
   password: '',
   confirmPassword: '',
 })
-
-const hasInitialToken = computed(() => Boolean(initialToken))
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
@@ -54,13 +54,8 @@ const clearError = (field) => {
 }
 
 const validateForm = () => {
-  errors.token = ''
   errors.password = ''
   errors.confirmPassword = ''
-
-  if (!form.token.trim()) {
-    errors.token = 'សូមបញ្ចូល Token របស់អ្នក'
-  }
 
   if (!form.password) {
     errors.password = 'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មី'
@@ -74,7 +69,7 @@ const validateForm = () => {
     errors.confirmPassword = 'ពាក្យសម្ងាត់មិនត្រូវគ្នា'
   }
 
-  return !errors.token && !errors.password && !errors.confirmPassword
+  return !errors.password && !errors.confirmPassword
 }
 
 const submitResetPassword = async () => {
@@ -84,7 +79,7 @@ const submitResetPassword = async () => {
 
   try {
     const resetPayload = {
-      token: form.token.trim(),
+      token,
       newPassword: form.password,
     }
 
@@ -127,27 +122,11 @@ const submitResetPassword = async () => {
         </div>
     
 
-        <h1 style="color:#042C83">ភ្លេចពាក្យសម្ងាត់?</h1>
+        <h1 class="" >ភ្លេចពាក្យសម្ងាត់?</h1>
         <p class="subtitle ​">បង្កើតពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក</p>
 
-        <form class="reset-form" @submit.prevent="submitResetPassword" novalidate>
-          <div class="field-group" v-if="!hasInitialToken">
-            <label class="field-label" for="reset-token">Token</label>
-            <div class="input-shell" :class="{ 'is-invalid': errors.token }">
-              <i class="bi bi-key field-icon" aria-hidden="true"></i>
-              <input
-                id="reset-token"
-                v-model.trim="form.token"
-                type="text"
-                autocomplete="one-time-code"
-                placeholder="បញ្ចូល Token"
-                :disabled="isLoading"
-                @input="clearError('token')"
-              />
-            </div>
-            <p v-if="errors.token" class="field-error">{{ errors.token }}</p>
-          </div>
 
+        <form class="reset-form" @submit.prevent="submitResetPassword" novalidate>
           <div class="field-group">
             <label class="field-label" for="new-password">ពាក្យសម្ងាត់ថ្មី</label>
             <div class="input-shell" :class="{ 'is-invalid': errors.password }">
@@ -157,7 +136,7 @@ const submitResetPassword = async () => {
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="new-password"
-                placeholder="•••••••••"
+                placeholder="***************"
                 :disabled="isLoading"
                 @input="clearError('password')"
               />
@@ -183,7 +162,7 @@ const submitResetPassword = async () => {
                 v-model="form.confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 autocomplete="new-password"
-                placeholder="•••••••••"
+                placeholder="***************"
                 :disabled="isLoading"
                 @input="clearError('confirmPassword')"
               />
@@ -215,8 +194,6 @@ const submitResetPassword = async () => {
 </template>
 
 <style scoped>
-
-
 .reset-page {
   position: relative;
   min-height: 100vh;
@@ -247,6 +224,7 @@ const submitResetPassword = async () => {
   padding: 40px 36px;
   background: #ffffff;
 }
+
 .icon-circle {
   position: relative;
   width: 68px;
@@ -265,6 +243,7 @@ const submitResetPassword = async () => {
     0 0 0 8px rgba(43, 101, 204, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
+
 
 .icon-circle::before {
   content: '';
@@ -307,7 +286,7 @@ h1 {
 .subtitle {
   margin: 7px 0 21px;
   color: #9aa7bb;
-  font-size: 13px;
+  font-size: 9.5px;
   line-height: 1.5;
   text-align: center;
 }
@@ -319,65 +298,59 @@ h1 {
 
 .field-group {
   min-width: 0;
-  margin-bottom: 16px;
 }
 
 .field-label {
   display: block;
-  margin-bottom: 7px;
-  color: #111d35;
-  font-size: 13px;
-  font-weight: 500;
+  margin: 0 0 7px 2px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .input-shell {
   display: flex;
   align-items: center;
-  height: 46px;
-  border: 1.5px solid #d0ddef;
-  border-radius: 50px;
-  padding: 0 16px;
-  background: #f7faff;
+  height: 38px;
+  border: 1.5px solid #657996;
+  border-radius: 999px;
+  padding: 0 13px;
+  background: #ffffff;
   transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
 }
 
 .input-shell:focus-within {
-  border-color: #2b65cc;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(43,101,204,0.12);
+  border-color: #2d57b7;
+  box-shadow: 0 0 0 3px rgba(45, 87, 183, 0.13);
 }
 
 .input-shell.is-invalid {
   border-color: #ef4444;
-  background: #fee2e2;
-}
-
-.input-shell.is-invalid:focus-within {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.14);
+  background: #fff7f7;
 }
 
 .field-icon {
   flex-shrink: 0;
-  color: #7a8fae;
-  font-size: 15px;
+  color: #9aacbf;
+  font-size: 13px;
 }
 
 .input-shell input {
   flex: 1;
   min-width: 0;
+  width: 100%;
   height: 100%;
   border: 0;
   outline: 0;
   padding: 0 10px;
-  color: #111d35;
+  color: #1d2740;
   background: transparent;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .input-shell input::placeholder {
-  color: #b5c5dc;
+  color: #b7c3d3;
 }
 
 .input-shell input:disabled {
@@ -386,23 +359,23 @@ h1 {
 }
 
 .eye-button {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 0;
   padding: 0;
-  color: #7a8fae;
+  color: #9aacbf;
   background: transparent;
-  font-size: 15px;
+  font-size: 13px;
   cursor: pointer;
   transition: color 0.15s;
 }
 
 .eye-button:hover:not(:disabled) {
-  color: #1a4faa;
+  color: #2d57b7;
 }
 
 .eye-button:disabled {
@@ -410,9 +383,9 @@ h1 {
 }
 
 .field-error {
-  margin: 7px 0 0;
+  margin: 5px 0 0 2px;
   color: #ef4444;
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1.35;
 }
 

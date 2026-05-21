@@ -7,14 +7,12 @@
     </div>
 
     <!-- LOADING -->
-    <div v-if="categoryStore.loading" class="spend-card__loading">
+    <div v-if="isLoading" class="spend-card__loading">
       <span class="spinner"></span>
       <span>កំពុងផ្ទុក...</span>
     </div>
 
     <div v-else class="spend-card__body">
-
-      <!-- CHARTS ROW -->
       <div class="charts-row">
 
         <!-- INCOME CHART -->
@@ -45,7 +43,7 @@
               >
                 <span class="legend-dot" :style="{ background: incomeColors[index % incomeColors.length] }"></span>
                 <span class="legend-label">{{ item.label }}</span>
-                <span v-if="item.isSystem" class="legend-badge">System</span>
+                <span class="legend-amount income-amount">{{ formatAmount(item.amount) }}</span>
               </div>
             </div>
           </div>
@@ -79,7 +77,7 @@
               >
                 <span class="legend-dot" :style="{ background: expenseColors[index % expenseColors.length] }"></span>
                 <span class="legend-label">{{ item.label }}</span>
-                <span v-if="item.isSystem" class="legend-badge">System</span>
+                <span class="legend-amount expense-amount">{{ formatAmount(item.amount) }}</span>
               </div>
             </div>
           </div>
@@ -99,19 +97,22 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
-import { useCategoryStore } from '@/stores/categoryStore'
+import { useTransactionStore } from '@/stores/transactionStore'
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend)
 
-const categoryStore = useCategoryStore()
+const txStore = useTransactionStore()
 
-const incomeRef = ref(null)
+const incomeRef  = ref(null)
 const expenseRef = ref(null)
+const isLoading  = ref(false)
 
-let incomeChart = null
+// local copy នៃ transactions ទាំងអស់ (loop pages)
+const allTransactions = ref([])
+
+let incomeChart  = null
 let expenseChart = null
 
-// 🎨 Colors
 const incomeColors = [
   '#1D9E75', '#5DCAA5', '#9FE1CB', '#0F6E56',
   '#3B6D11', '#639922', '#97C459', '#C0DD97'
@@ -121,30 +122,75 @@ const expenseColors = [
   '#BA7517', '#EF9F27', '#FAC775', '#E24B4A'
 ]
 
-// 🔥 Map categories → chart data
-const incomeChartData = computed(() =>
-  categoryStore.incomeCategories.map(c => ({
-    label: c.name,
-    value: 1,
-    isSystem: c.isSystem ?? false,
-  }))
-)
+// ✅ Fetch ALL pages — loop រហូតដល់ hasNextPage = false
+async function fetchAllTransactions() {
+  isLoading.value = true
+  allTransactions.value = []
+  try {
+    let page = 1
+    const perPage = 10
 
-const expenseChartData = computed(() =>
-  categoryStore.expenseCategories.map(c => ({
-    label: c.name,
-    value: 1,
-    isSystem: c.isSystem ?? false,
-  }))
-)
+    while (true) {
+      await txStore.fetchTransactions(page, perPage)
+      const items = txStore.transactions ?? []
+      allTransactions.value.push(...items)
 
-// 🔥 Destroy safely
+      const hasNext = txStore.meta?.hasNextPage ?? false
+      if (!hasNext) break
+      page++
+    }
+  } catch (err) {
+    console.error('fetchAllTransactions:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// ✅ Format amount
+const formatAmount = (amount) => {
+  const num = parseFloat(amount) || 0
+  if (num >= 1000) {
+    return '$' + (num / 1000).toFixed(1) + 'k'
+  }
+  return '$' + num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+// ✅ Group INCOME
+const incomeChartData = computed(() => {
+  const grouped = {}
+  for (const tx of allTransactions.value) {
+    if (tx.category?.type !== 'INCOME') continue
+    const name = tx.category?.name ?? 'មិនស្គាល់'
+    if (!grouped[name]) grouped[name] = 0
+    grouped[name] += parseFloat(tx.amount) || 0
+  }
+  return Object.entries(grouped)
+    .filter(([, amount]) => amount > 0)
+    .map(([label, amount]) => ({ label, amount }))
+})
+
+// ✅ Group EXPENSE
+const expenseChartData = computed(() => {
+  const grouped = {}
+  for (const tx of allTransactions.value) {
+    if (tx.category?.type !== 'EXPENSE') continue
+    const name = tx.category?.name ?? 'មិនស្គាល់'
+    if (!grouped[name]) grouped[name] = 0
+    grouped[name] += parseFloat(tx.amount) || 0
+  }
+  return Object.entries(grouped)
+    .filter(([, amount]) => amount > 0)
+    .map(([label, amount]) => ({ label, amount }))
+})
+
 function destroyCharts() {
-  if (incomeChart) { incomeChart.destroy(); incomeChart = null }
+  if (incomeChart)  { incomeChart.destroy();  incomeChart  = null }
   if (expenseChart) { expenseChart.destroy(); expenseChart = null }
 }
 
-// 🔥 Build chart
 function buildChart(canvas, data, colors) {
   if (!canvas || !data.length) return null
   return new Chart(canvas, {
@@ -152,7 +198,7 @@ function buildChart(canvas, data, colors) {
     data: {
       labels: data.map(i => i.label),
       datasets: [{
-        data: data.map(() => 1),
+        data: data.map(i => i.amount),
         backgroundColor: colors.slice(0, data.length),
         borderWidth: 3,
         borderColor: '#ffffff',
@@ -165,7 +211,16 @@ function buildChart(canvas, data, colors) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => ` ${ctx.label}`
+            label: (ctx) => {
+              const item = data[ctx.dataIndex]
+              const total = data.reduce((s, i) => s + i.amount, 0)
+              const pct = ((item.amount / total) * 100).toFixed(1)
+              return [
+                ` ប្រភេទ: ${ctx.label}`,
+                ` ចំនួន: ${formatAmount(item.amount)}`,
+                ` សមាមាត្រ: ${pct}%`,
+              ]
+            }
           }
         }
       }
@@ -185,12 +240,12 @@ async function renderCharts() {
 }
 
 onMounted(async () => {
-  await categoryStore.fetchAllCategories()
+  await fetchAllTransactions()  // ✅ loop pages ជំនួស fetchTransactions(1, 1000)
   await renderCharts()
 })
 
 watch(
-  () => [categoryStore.incomeCategories, categoryStore.expenseCategories],
+  () => allTransactions.value,
   () => renderCharts(),
   { deep: true }
 )
@@ -199,7 +254,6 @@ onBeforeUnmount(() => destroyCharts())
 </script>
 
 <style scoped>
-/* CARD */
 .spend-card {
   background: #fff;
   border-radius: 16px;
@@ -224,7 +278,6 @@ onBeforeUnmount(() => destroyCharts())
   padding: 0 24px 24px;
 }
 
-/* LOADING */
 .spend-card__loading {
   display: flex;
   align-items: center;
@@ -248,16 +301,15 @@ onBeforeUnmount(() => destroyCharts())
   to { transform: rotate(360deg); }
 }
 
-/* CHARTS ROW — equal flex children */
 .charts-row {
   display: flex;
   gap: 20px;
-  align-items: stretch; /* make both boxes same height */
+  align-items: stretch;
 }
 
 .chart-box {
-  flex: 1 1 0;          /* equal width, no shrink bias */
-  min-width: 0;         /* allow shrinking below content */
+  flex: 1 1 0;
+  min-width: 0;
   background: #f9fafb;
   border: 1px solid #f0f0f0;
   border-radius: 14px;
@@ -267,7 +319,6 @@ onBeforeUnmount(() => destroyCharts())
   box-sizing: border-box;
 }
 
-/* CHART BOX HEADER */
 .chart-box__header {
   display: flex;
   align-items: center;
@@ -285,24 +336,17 @@ onBeforeUnmount(() => destroyCharts())
   flex-shrink: 0;
 }
 
-.chart-box__icon--income {
-  background: #E1F5EE;
-  color: #0F6E56;
-}
-.chart-box__icon--expense {
-  background: #FAECE7;
-  color: #993C1D;
-}
+.chart-box__icon--income  { background: #E1F5EE; color: #0F6E56; }
+.chart-box__icon--expense { background: #FAECE7; color: #993C1D; }
 
 .chart-box__title {
   font-size: 14px;
   font-weight: 600;
   margin: 0;
 }
-.chart-box__title--income { color: #0F6E56; }
+.chart-box__title--income  { color: #0F6E56; }
 .chart-box__title--expense { color: #993C1D; }
 
-/* CHART CONTENT */
 .chart-content {
   display: flex;
   align-items: center;
@@ -310,7 +354,6 @@ onBeforeUnmount(() => destroyCharts())
   flex: 1;
 }
 
-/* Donut — larger size */
 .chart-donut-wrap {
   position: relative;
   width: 160px;
@@ -346,13 +389,11 @@ onBeforeUnmount(() => destroyCharts())
   margin-top: 4px;
 }
 
-/* LEGEND */
 .legend {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 9px;
-  overflow: hidden;
   min-width: 0;
 }
 
@@ -379,16 +420,15 @@ onBeforeUnmount(() => destroyCharts())
   text-overflow: ellipsis;
 }
 
-.legend-badge {
-  font-size: 10px;
-  background: #f3f4f6;
-  color: #6b7280;
-  border-radius: 4px;
-  padding: 2px 6px;
+.legend-amount {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
   flex-shrink: 0;
 }
+.income-amount  { color: #1D9E75; }
+.expense-amount { color: #D85A30; }
 
-/* EMPTY */
 .chart-empty {
   display: flex;
   align-items: center;
@@ -399,13 +439,8 @@ onBeforeUnmount(() => destroyCharts())
   font-size: 13px;
 }
 
-/* RESPONSIVE */
 @media (max-width: 640px) {
-  .charts-row {
-    flex-direction: column;
-  }
-  .chart-box {
-    width: 100%;
-  }
+  .charts-row { flex-direction: column; }
+  .chart-box  { width: 100%; }
 }
 </style>

@@ -20,9 +20,9 @@
                                         </p>
                                     </div>
                                     <div class="d-flex align-items-center gap-3">
-                                        <a href="#" class="btn btn-primary px-4 py-2 rounded-5">
+                                      <RouterLink to="/login" class="btn btn-primary px-4 py-2 rounded-5">
                                             ចាប់ផ្ដើមឥឡូវនេះ
-                                        </a>
+                                      </RouterLink>
                                         <a href="#" class=" btn px-4 py-2 rounded-5 btn-outline-primary">
                                             ▶ វីដេអូការបង្ហាញ
                                         </a>

@@ -8,15 +8,15 @@ export const useBudgetStore = defineStore('budget', () => {
   const totalexpenses  = ref(0)
   const loading        = ref(false)
   const meta           = ref(null)
-  const selectedBudget = ref(null)   // ✅ stores /budgets/:id result
+  const selectedBudget = ref(null)
 
   /* ─── FETCH ALL ─────────────────────────────────────────── */
   const fetchBudgets = async (page = 1) => {
     try {
       loading.value = true
-      const response    = await api.get(`/budgets?_page=${page}&_per_page=10`)
-      budgets.value     = response.data.data.items
-      meta.value        = response.data.data.meta
+      const response = await api.get(`/budgets?_page=${page}&_per_page=10`)
+      budgets.value  = response.data.data.items
+      meta.value     = response.data.data.meta
     } catch (error) {
       console.error('Error fetching budgets:', error)
     } finally {
@@ -25,11 +25,10 @@ export const useBudgetStore = defineStore('budget', () => {
   }
 
   /* ─── FETCH BY ID ───────────────────────────────────────── */
-  // ✅ GET /budgets/:id  →  saves into selectedBudget
   const fetchBudgetById = async (id) => {
     try {
-      const response      = await api.get(`/budgets/${id}`)
-      selectedBudget.value = response.data.data   // { id, limitAmount, month, year, category, ... }
+      const response       = await api.get(`/budgets/${id}`)
+      selectedBudget.value = response.data.data
       console.log('Budget detail:', selectedBudget.value)
     } catch (error) {
       console.error('Error fetching budget detail:', error)
@@ -37,13 +36,25 @@ export const useBudgetStore = defineStore('budget', () => {
     }
   }
 
-  /* ─── FETCH OVERVIEW ────────────────────────────────────── */
+  /* ─── FETCH CATEGORY BREAKDOWN ──────────────────────────── */
   const fetchCategoryBreakdown = async () => {
     try {
-      const response      = await api.get('/analytics/category-breakdown?month=4&year=2026')
-      totalexpenses.value = response.data.data[0].total
+      const now   = new Date()
+      const month = now.getMonth() + 1  // ✅ dynamic — ខែបច្ចុប្បន្ន
+      const year  = now.getFullYear()   // ✅ dynamic — ឆ្នាំបច្ចុប្បន្ន
+
+      const response = await api.get(`analytics/category-breakdown?month=${month}&year=${year}`)
+      const data = response.data?.data
+
+      if (Array.isArray(data) && data.length > 0) {
+        // ✅ sum total ទាំងអស់ — safe check រាល់ item
+        totalexpenses.value = data.reduce((sum, item) => sum + (item.total ?? 0), 0)
+      } else {
+        totalexpenses.value = 0
+      }
     } catch (error) {
       console.error('Error fetching category breakdown:', error)
+      totalexpenses.value = 0  // ✅ reset — កុំ crash UI
     }
   }
 
@@ -55,6 +66,7 @@ export const useBudgetStore = defineStore('budget', () => {
     } catch (error) {
       console.error('BACKEND ERROR:', error.response?.data)
       console.log('DETAILS:', error.response?.data?.details)
+      throw error
     }
   }
 
@@ -85,10 +97,10 @@ export const useBudgetStore = defineStore('budget', () => {
     totalexpenses,
     loading,
     meta,
-    selectedBudget,      
+    selectedBudget,
 
     fetchBudgets,
-    fetchBudgetById,     
+    fetchBudgetById,
     fetchCategoryBreakdown,
     createBudget,
     updateBudget,

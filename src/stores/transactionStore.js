@@ -17,9 +17,7 @@ export const useTransactionStore = defineStore('transaction', () => {
   async function fetchTransactions(page = 1, perPage = 10) {
     loading.value = true
     try {
-      const res = await api.get(
-        `transactions?_page=${page}&_per_page=${perPage}&sortBy=id&sortDir=asc`
-      )
+      const res = await api.get(`transactions?_page=${page}&_per_page=${perPage}&sortBy=id&sortDir=asc`)
       transactions.value = res.data.data.items
       meta.value         = res.data.data.meta
     } catch (err) {
