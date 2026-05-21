@@ -26,18 +26,17 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
 
   routes: [
-    // ✅ Root "/" — guard នឹង redirect ដោយ automatic
     {
       path: '/',
       redirect: '/landing/homelanding',
     },
 
-    // Landing — guestOnly (login ហើយ → dashboard)
+    // Landing — guestOnly
     {
       path: '/landing',
       component: LandingView,
       redirect: '/landing/homelanding',
-      meta: { guestOnly: true },   // ✅ login ហើយ មកទីនេះ → redirect dashboard
+      meta: { guestOnly: true },
       children: [
         {
           path: 'homelanding',
@@ -124,6 +123,13 @@ const router = createRouter({
           meta: { title: 'Transactions', requiresAuth: true },
         },
         {
+          path: 'transactions/detail/:id',
+          name: 'transaction-detail',
+          component: () => import('@/views/Transactions/TransactionDetailView.vue'),
+          meta: { title: 'Transaction Detail', requiresAuth: true },
+        },
+
+        {
           path: 'goal',
           name: 'goal',
           component: GoalsView,
@@ -164,12 +170,10 @@ router.beforeEach((to) => {
   const isAuthenticated =
     !!localStorage.getItem('token') || !!sessionStorage.getItem('token')
 
-  // មិនទាន់ login + ទៅ page requiresAuth → landing
   if (to.meta.requiresAuth && !isAuthenticated) {
     return { name: 'landing' }
   }
 
-  // login ហើយ + ទៅ page guestOnly (landing/login/register...) → dashboard
   if (to.meta.guestOnly && isAuthenticated) {
     return { name: 'dashboard' }
   }

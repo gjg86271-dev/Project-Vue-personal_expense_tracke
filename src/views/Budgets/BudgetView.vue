@@ -28,7 +28,7 @@
       />
     </div>
 
-    <!-- ✅ Pagination -->
+    <!-- Pagination -->
     <div v-if="totalPages > 1" class="d-flex justify-content-center mt-4">
       <Pagination
         v-model:currentPage="currentPage"
@@ -38,7 +38,7 @@
     </div>
 
     <!-- ════════════════════════════════════════
-         ✅ DETAIL MODAL
+         DETAIL MODAL
     ════════════════════════════════════════ -->
     <BaseModal
       v-if="showDetailModal"
@@ -46,77 +46,63 @@
       @close-modal="closeDetailModal"
     >
       <template #body>
-        <!-- Loading detail -->
         <div v-if="detailLoading" class="detail-loading">
           កំពុងទាញទិន្នន័យ...
         </div>
 
-        <!-- Detail content -->
         <div v-else-if="budgetDetail" class="detail-body">
-
-          <!-- Category badge -->
           <div class="detail-category-badge">
             <span class="badge-type" :class="budgetDetail.category.type === 'INCOME' ? 'badge-income' : 'badge-expense'">
               {{ budgetDetail.category.type }}
             </span>
           </div>
 
-          <!-- Category name -->
           <h3 class="detail-cat-name">{{ budgetDetail.category.name }}</h3>
 
-          <!-- Info rows -->
           <div class="detail-rows">
-
             <div class="detail-row">
               <span class="detail-label">💰 ថវិកា</span>
               <span class="detail-value amount">${{ budgetDetail.limitAmount.toLocaleString() }}</span>
             </div>
-
             <div class="detail-row">
               <span class="detail-label">📅 ខែ / ឆ្នាំ</span>
               <span class="detail-value">{{ budgetDetail.month }} / {{ budgetDetail.year }}</span>
             </div>
-
             <div class="detail-row">
               <span class="detail-label">🏷️ ប្រភេទ</span>
               <span class="detail-value">{{ budgetDetail.category.type }}</span>
             </div>
-
             <div class="detail-row">
               <span class="detail-label">🔖 System</span>
               <span class="detail-value">{{ budgetDetail.category.isSystem ? 'Yes' : 'No' }}</span>
             </div>
-
             <div class="detail-row">
               <span class="detail-label">🕐 បានបង្កើត</span>
               <span class="detail-value">{{ formatDate(budgetDetail.createdAt) }}</span>
             </div>
-
             <div class="detail-row">
               <span class="detail-label">🔄 បានកែ</span>
               <span class="detail-value">{{ formatDate(budgetDetail.updatedAt) }}</span>
             </div>
-
           </div>
         </div>
       </template>
 
       <template #footer>
         <button class="cancel-btn" @click="closeDetailModal">បិទ</button>
-        <button class="save-btn" @click="openEditFromDetail">កែសម្រួល</button>
+        <button class="save-btn-modal" @click="openEditFromDetail">កែសម្រួល</button>
       </template>
     </BaseModal>
 
-    <!-- ADD / EDIT MODAL -->
+    <!-- ════════════════════════════════════════
+         ADD / EDIT MODAL
+    ════════════════════════════════════════ -->
     <BaseModal
       v-if="showModal"
       :title="isEditing ? 'កែសម្រួលថវិកា' : 'បន្ថែមថវិកា'"
       @close-modal="closeModal"
     >
       <template #body>
-        <div v-if="errorMessage" class="error-box">{{ errorMessage }}</div>
-        <div v-if="successMessage" class="success-box">{{ successMessage }}</div>
-
         <div class="form-group">
           <label>ឈ្មោះប្រភេទ</label>
           <select class="form-select" v-model="form.categoryId">
@@ -134,17 +120,20 @@
       </template>
 
       <template #footer>
-        <button class="cancel-btn" @click="closeModal">បោះបង់</button>
-        <button class="save-btn" @click="saveBudget">
-          {{ isEditing ? "Update" : "Save" }}
+        <button class="cancel-btn" @click="closeModal" :disabled="saveLoading">បោះបង់</button>
+        <button class="save-btn-modal" @click="saveBudget" :disabled="saveLoading">
+          <span v-if="saveLoading" class="spinner-border spinner-border-sm me-1"></span>
+          {{ isEditing ? 'កែសម្រួល' : 'រក្សាទុក' }}
         </button>
       </template>
     </BaseModal>
 
-    <!-- DELETE MODAL -->
+    <!-- ════════════════════════════════════════
+         DELETE MODAL
+    ════════════════════════════════════════ -->
     <BaseModal
       v-if="showDeleteModal"
-      title="Delete Budget"
+      title="លុបថវិកា"
       @close-modal="closeDeleteModal"
     >
       <template #body>
@@ -152,17 +141,35 @@
           <div class="delete-icon">🗑️</div>
           <h3>លុបថវិកា?</h3>
           <p>
-            តើអ្នកប្រាកដថាចង់លុប
+            តើអ្នកពិតជាចង់លុប
             <strong>{{ selectedBudget?.category?.name }}</strong>?
           </p>
         </div>
       </template>
 
       <template #footer>
-        <button class="cancel-btn" @click="closeDeleteModal">បោះបង់</button>
-        <button class="delete-btn" @click="deleteBudget">លុប</button>
+        <button class="cancel-btn" @click="closeDeleteModal" :disabled="deleteLoading">បោះបង់</button>
+        <button class="delete-btn" @click="deleteBudget" :disabled="deleteLoading">
+          <span v-if="deleteLoading" class="spinner-border spinner-border-sm me-1"></span>
+          លុប
+        </button>
       </template>
     </BaseModal>
+
+    <!-- ════════════════════════════════════════
+         MESSAGE MODAL
+    ════════════════════════════════════════ -->
+    <div v-if="showMessageModal" class="message-modal-overlay">
+      <div class="message-modal-box">
+        <div class="message-icon" :class="messageType">
+          <i v-if="messageType === 'success'" class="bi bi-check-circle-fill"></i>
+          <i v-if="messageType === 'error'"   class="bi bi-x-circle-fill"></i>
+        </div>
+        <h2 class="message-title">{{ messageTitle }}</h2>
+        <p  class="message-text">{{ messageText }}</p>
+        <button class="message-btn" @click="closeMessageModal">យល់ព្រម</button>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -192,7 +199,28 @@ watch(currentPage, (page) => {
   budgetStore.fetchBudgets(page)
 })
 
-/* ─── DETAIL MODAL STATE ──────────────────────────────────── */
+/* ─── LOADING ─────────────────────────────────────────────── */
+const saveLoading   = ref(false)
+const deleteLoading = ref(false)
+
+/* ─── MESSAGE MODAL ───────────────────────────────────────── */
+const showMessageModal = ref(false)
+const messageTitle     = ref('')
+const messageText      = ref('')
+const messageType      = ref('success')
+
+function openMessageModal(title, text, type = 'success') {
+  showMessageModal.value = true
+  messageTitle.value     = title
+  messageText.value      = text
+  messageType.value      = type
+}
+
+function closeMessageModal() {
+  showMessageModal.value = false
+}
+
+/* ─── DETAIL MODAL ────────────────────────────────────────── */
 const showDetailModal = ref(false)
 const budgetDetail    = ref(null)
 const detailLoading   = ref(false)
@@ -202,7 +230,7 @@ async function openDetailModal(budget) {
   detailLoading.value   = true
   budgetDetail.value    = null
 
-  await budgetStore.fetchBudgetById(budget.id)   // ✅ fetch /budgets/:id
+  await budgetStore.fetchBudgetById(budget.id)
   budgetDetail.value  = budgetStore.selectedBudget
   detailLoading.value = false
 }
@@ -212,48 +240,25 @@ function closeDetailModal() {
   budgetDetail.value    = null
 }
 
-// ✅ Edit ចេញពី detail modal
 function openEditFromDetail() {
+  const target = budgetDetail.value ?? budgetStore.selectedBudget
   closeDetailModal()
-  openEditModal(budgetDetail.value ?? budgetStore.selectedBudget)
+  openEditModal(target)
 }
 
 /* ─── MODALS ──────────────────────────────────────────────── */
 const showModal       = ref(false)
 const showDeleteModal = ref(false)
 const isEditing       = ref(false)
-const errorMessage    = ref('')
-const successMessage  = ref('')
 const selectedBudget  = ref(null)
 
 const form = ref({
-  id: null,
-  categoryId: '',
+  id:          null,
+  categoryId:  '',
   limitAmount: 0,
 })
 
-/* TOAST */
-const toast = ref({
-  show: false,
-  message: "",
-  type: "success",
-});
-
-function showToast(message, type = "success") {
-  toast.value.show = false;
-
-  setTimeout(() => {
-    toast.value.message = message;
-    toast.value.type = type;
-    toast.value.show = true;
-
-    setTimeout(() => {
-      toast.value.show = false;
-    }, 3000);
-  }, 100);
-}
-
-/* FETCH */
+/* ─── LIFECYCLE ───────────────────────────────────────────── */
 onMounted(async () => {
   await budgetStore.fetchBudgets(currentPage.value)
   await budgetStore.fetchCategoryBreakdown()
@@ -278,22 +283,22 @@ function formatDate(dateStr) {
 /* ─── MODAL HANDLERS ──────────────────────────────────────── */
 function openAddModal() {
   isEditing.value = false
-  form.value = { id: null, categoryId: '', limitAmount: 0 }
+  form.value      = { id: null, categoryId: '', limitAmount: 0 }
   showModal.value = true
 }
 
 function openEditModal(budget) {
   isEditing.value = true
   form.value = {
-    id: budget.id,
-    categoryId: budget.category?.id,
+    id:          budget.id,
+    categoryId:  budget.category?.id,
     limitAmount: budget.limitAmount,
   }
   showModal.value = true
 }
 
 function openDeleteModal(budget) {
-  selectedBudget.value = budget
+  selectedBudget.value  = budget
   showDeleteModal.value = true
 }
 
@@ -303,19 +308,30 @@ function closeDeleteModal() { showDeleteModal.value = false; selectedBudget.valu
 /* ─── DELETE ──────────────────────────────────────────────── */
 async function deleteBudget() {
   if (!selectedBudget.value) return
-  await budgetStore.deleteBudget(selectedBudget.value.id)
-  await budgetStore.fetchBudgets(currentPage.value)
-  closeDeleteModal()
+  deleteLoading.value = true
+  try {
+    await budgetStore.deleteBudget(selectedBudget.value.id)
+    await budgetStore.fetchBudgets(currentPage.value)
+    closeDeleteModal()
+    openMessageModal('ជោគជ័យ', 'លុបថវិកាជោគជ័យ', 'success')
+  } catch {
+    openMessageModal('បរាជ័យ', 'លុបថវិកាបរាជ័យ', 'error')
+  } finally {
+    deleteLoading.value = false
+  }
 }
 
 /* ─── SAVE ────────────────────────────────────────────────── */
 async function saveBudget() {
-  errorMessage.value   = ''
-  successMessage.value = ''
-
   if (!isEditing.value) {
-    if (!form.value.categoryId) { errorMessage.value = 'សូមជ្រើសរើសប្រភេទ'; return }
-    if (!form.value.limitAmount || form.value.limitAmount <= 0) { errorMessage.value = 'សូមបញ្ចូលចំនួនថវិកា'; return }
+    if (!form.value.categoryId) {
+      openMessageModal('កំហុស', 'សូមជ្រើសរើសប្រភេទ', 'error')
+      return
+    }
+    if (!form.value.limitAmount || form.value.limitAmount <= 0) {
+      openMessageModal('កំហុស', 'សូមបញ្ចូលចំនួនថវិកា', 'error')
+      return
+    }
   }
 
   const payload = {
@@ -325,33 +341,27 @@ async function saveBudget() {
     year:        new Date().getFullYear(),
   }
 
+  saveLoading.value = true
   try {
     if (isEditing.value) {
       await budgetStore.updateBudget(form.value.id, payload)
-      successMessage.value = 'កែសម្រួលថវិកាជោគជ័យ'
+      openMessageModal('ជោគជ័យ', 'កែសម្រួលថវិកាជោគជ័យ', 'success')
     } else {
       await budgetStore.createBudget(payload)
-      successMessage.value = 'បន្ថែមថវិកាជោគជ័យ'
+      openMessageModal('ជោគជ័យ', 'បន្ថែមថវិកាជោគជ័យ', 'success')
     }
     await budgetStore.fetchBudgets(currentPage.value)
-    setTimeout(() => { closeModal(); successMessage.value = '' }, 1000)
-  } catch (error) {
-    console.error(error)
-    errorMessage.value = 'មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ'
+    closeModal()
+  } catch {
+    openMessageModal('បរាជ័យ', 'មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ', 'error')
+  } finally {
+    saveLoading.value = false
   }
 }
 </script>
 
 <style scoped>
-/* =========================================
-   MODERN BUDGET DASHBOARD UI
-========================================= */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 .container {
   min-height: 100vh;
@@ -360,10 +370,11 @@ async function saveBudget() {
     radial-gradient(circle at top left, #eef2ff 0%, transparent 30%),
     radial-gradient(circle at bottom right, #ede9fe 0%, transparent 30%),
     linear-gradient(135deg, #f8fafc, #eef2ff);
-  font-family: "Kantumruy Pro", sans-serif;
+  font-family: 'Kantumruy Pro', sans-serif;
   position: relative;
   overflow-x: hidden;
 }
+
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -372,116 +383,105 @@ async function saveBudget() {
   gap: 20px;
   flex-wrap: wrap;
 }
+
 .title { font-size: 28px; font-weight: 700; }
-.grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 
-/* buttons */
-.add-btn, .save-btn, .cancel-btn, .delete-btn {
-  border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600;
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+/* ── Buttons ── */
+.add-btn {
+  border: none; background: #1677ff; color: white;
+  padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600;
 }
-.add-btn, .save-btn { background: #1677ff; color: white; }
-.cancel-btn          { background: #e5e7eb; }
-.delete-btn          { background: #ff4d4f; color: white; }
+.save-btn-modal { border: none; background: #1677ff; color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+.cancel-btn     { border: none; background: #e5e7eb; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+.delete-btn     { border: none; background: #ff4d4f; color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
 
-/* form */
-.form-group       { margin-bottom: 18px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+/* ── Form ── */
+.form-group             { margin-bottom: 18px; }
+.form-group label       { display: block; margin-bottom: 6px; font-weight: 600; }
 .form-group input,
-.form-select      { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
+.form-select            { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
 
-/* delete */
+/* ── Delete ── */
 .delete-body { text-align: center; }
 .delete-icon { font-size: 50px; margin-bottom: 10px; }
 
-/* messages */
-.error-box {
-  background: #ffeaea; color: #d90429;
-  padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: 600;
-}
-.success-box {
-  background: #e8fff1; color: #15803d;
-  padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: 600;
-}
-
-/* pagination */
-.mt-4                   { margin-top: 1.5rem; }
-.d-flex                 { display: flex; }
-.justify-content-center { justify-content: center; }
+/* ── Pagination ── */
+.mt-4                    { margin-top: 1.5rem; }
+.d-flex                  { display: flex; }
+.justify-content-center  { justify-content: center; }
 
 /* ── Detail Modal ── */
-.detail-loading {
+.detail-loading  { text-align: center; padding: 24px; color: #888; }
+.detail-body     { display: flex; flex-direction: column; gap: 16px; }
+.detail-category-badge { display: flex; justify-content: center; }
+.badge-type      { padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.badge-income    { background: #e8fff1; color: #15803d; }
+.badge-expense   { background: #ffeaea; color: #d90429; }
+.detail-cat-name { text-align: center; font-size: 22px; font-weight: 700; margin: 0; color: #1a1a2e; }
+.detail-rows     { display: flex; flex-direction: column; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+.detail-row      { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #fff; }
+.detail-row:last-child       { border-bottom: none; }
+.detail-row:nth-child(even)  { background: #fafafa; }
+.detail-label    { font-size: 13px; color: #888; font-weight: 500; }
+.detail-value    { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+.detail-value.amount { font-size: 18px; color: #1677ff; font-weight: 700; }
+
+/* ── Message Modal ── */
+.message-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.message-modal-box {
+  width: 100%;
+  max-width: 380px;
+  background: white;
+  border-radius: 30px;
+  padding: 30px 24px;
   text-align: center;
-  padding: 24px;
-  color: #888;
+  animation: modalPop 0.3s ease;
 }
 
-.detail-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1);   }
 }
 
-.detail-category-badge {
+.message-icon {
+  width: 90px; height: 90px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  font-size: 42px;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.badge-type {
-  padding: 4px 16px;
-  border-radius: 20px;
-  font-size: 12px;
+.message-icon.success { background: #dcfce7; color: #16a34a; }
+.message-icon.error   { background: #fee2e2; color: #dc2626; }
+
+.message-title { font-size: 26px; font-weight: 700; margin-bottom: 10px; color: #111827; }
+.message-text  { color: #6b7280; margin-bottom: 24px; line-height: 1.6; }
+
+.message-btn {
+  border: none;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  padding: 14px 26px;
+  border-radius: 16px;
+  cursor: pointer;
   font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-family: 'Kantumruy Pro', sans-serif;
+  transition: 0.3s;
 }
 
-.badge-income  { background: #e8fff1; color: #15803d; }
-.badge-expense { background: #ffeaea; color: #d90429; }
-
-.detail-cat-name {
-  text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
-  color: #1a1a2e;
-}
-
-.detail-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
-}
-
-.detail-row:last-child { border-bottom: none; }
-.detail-row:nth-child(even) { background: #fafafa; }
-
-.detail-label {
-  font-size: 13px;
-  color: #888;
-  font-weight: 500;
-}
-
-.detail-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.detail-value.amount {
-  font-size: 18px;
-  color: #1677ff;
-  font-weight: 700;
-}
+.message-btn:hover { transform: translateY(-2px); }
 </style>

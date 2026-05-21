@@ -23,7 +23,7 @@ const form = reactive({
   amount:          '',
   notes:           '',
   transactionDate: '',
-  file:            null   // ថែម
+  file:            null,
 })
 
 const categories = computed(() =>
@@ -42,10 +42,10 @@ function clearErrors() {
 
 function validate() {
   clearErrors()
-  if (!form.type && !isEditing.value) errors.type            = 'សូមជ្រើសប្រភេទ'
-  if (!form.categoryId)               errors.categoryId      = 'សូមជ្រើសប្រភេទ'
-  if (!form.amount || Number(form.amount) <= 0) errors.amount = 'សូមបញ្ចូលចំនួនត្រឹមត្រូវ'
-  if (!form.transactionDate)          errors.transactionDate = 'សូមជ្រើសកាលបរិច្ឆេទ'
+  if (!form.type && !isEditing.value)           errors.type            = 'សូមជ្រើសប្រភេទ'
+  if (!form.categoryId)                         errors.categoryId      = 'សូមជ្រើសប្រភេទ'
+  if (!form.amount || Number(form.amount) <= 0) errors.amount          = 'សូមបញ្ចូលចំនួនត្រឹមត្រូវ'
+  if (!form.transactionDate)                    errors.transactionDate = 'សូមជ្រើសកាលបរិច្ឆេទ'
   return Object.keys(errors).length === 0
 }
 
@@ -67,7 +67,7 @@ function openModal(item = null) {
     form.amount          = item.amount          ?? ''
     form.notes           = item.notes           ?? ''
     form.transactionDate = item.transactionDate?.split('T')[0] || ''
-    form.file            = null   // reset file on edit
+    form.file            = null
   } else {
     isEditing.value      = false
     selectedBudget.value = null
@@ -76,7 +76,7 @@ function openModal(item = null) {
     form.amount          = ''
     form.notes           = ''
     form.transactionDate = ''
-    form.file            = null   // reset file on create
+    form.file            = null
   }
 }
 
@@ -90,25 +90,26 @@ async function saveBudget() {
   if (!validate()) return
   saveLoading.value = true
   try {
+    // ← ប្រើ FormData តែមួយ (API ទទួល form-data)
+    // ← categoryId មិនត្រូវ Number() ព្រោះវា UUID string
     const payload = new FormData()
-    payload.append('categoryId',      form.categoryId)
-    payload.append('amount',          Number(form.amount))
-    payload.append('notes',           form.notes)
+    payload.append('categoryId',      form.categoryId)        // ← UUID string ដូចគ្នា
+    payload.append('amount',          Number(form.amount))    // ← amount ទើបជា number
+    payload.append('notes',           form.notes || '')
     payload.append('transactionDate', form.transactionDate)
-    if (form.file) {
-      payload.append('file', form.file)   // ថែម
-    }
+    if (form.file) payload.append('file', form.file)
 
     if (isEditing.value && selectedBudget.value?.id) {
       await trstore.updateTransaction(selectedBudget.value.id, payload)
     } else {
       await trstore.createTransaction(payload)
     }
+
     closeModal()
     await trstore.fetchTransactions()
     await trstore.fetchSummary()
   } catch (err) {
-    console.error('Save error:', err)
+    console.error('Save error:', JSON.stringify(err.response?.data, null, 2))
   } finally {
     saveLoading.value = false
   }
@@ -206,8 +207,8 @@ onMounted(async () => {
     <section class="mt-3">
       <div class="container">
         <div class="row">
-          <div class="col">
-            <div class="card-light">
+          <div class="col-12">
+            <div class="card border-0 bg-transparent">
               <TransactionTable2 :transactions="trstore.transactions" />
             </div>
           </div>
@@ -329,7 +330,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- ATTACHMENT ថែម -->
+      <!-- ATTACHMENT -->
       <div class="form-group">
         <label class="form-label fw-500">ឯកសារភ្ជាប់</label>
         <input
@@ -338,13 +339,11 @@ onMounted(async () => {
           accept="image/*,.pdf"
           @change="onFileChange"
         />
-        <!-- show existing attachment link when editing and no new file selected -->
         <div v-if="isEditing && selectedBudget?.attachmentUrl && !form.file" class="mt-2">
           <a :href="selectedBudget.attachmentUrl" target="_blank" class="attachment-link">
             <i class="bi bi-paperclip"></i> មើលឯកសារបច្ចុប្បន្ន
           </a>
         </div>
-        <!-- show selected new file name -->
         <div v-if="form.file" class="mt-2 selected-file">
           <i class="bi bi-file-earmark"></i> {{ form.file.name }}
         </div>
@@ -369,7 +368,6 @@ onMounted(async () => {
   font-family: 'Kantumruy Pro', sans-serif;
 }
 
-/* ── HEADER CARD ──────────────────────────────────── */
 .header-card {
   background: var(--bg-sidebar);
   border: 1px solid var(--border-color);
@@ -394,7 +392,6 @@ onMounted(async () => {
   color: rgba(255, 255, 255, 0.65);
 }
 
-/* ── ADD BUTTON ───────────────────────────────────── */
 .add-btn {
   height: 46px;
   padding: 0 20px;
@@ -413,7 +410,6 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* ── TOTAL CARD ICONS ─────────────────────────────── */
 .icon-wrap {
   padding: 8px 14px;
   border-radius: 10px;
@@ -424,7 +420,6 @@ onMounted(async () => {
 .icon-wrap--expense { background: var(--color-danger);  }
 .icon-wrap--neutral { background: var(--text-secondary); }
 
-/* ── LIGHT CARD ───────────────────────────────────── */
 .card-light {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -436,21 +431,14 @@ onMounted(async () => {
   flex-direction: column;
 }
 
-.card-light:hover {
-  transform: translateY(-2px);
-}
-
-.card-light > * {
-  flex: 1;
-  min-height: 0;
-}
+.card-light:hover { transform: translateY(-2px); }
+.card-light > * { flex: 1; min-height: 0; }
 
 section {
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
   background-color: transparent !important;
 }
 
-/* ── TYPE TOGGLE ──────────────────────────────────── */
 .type-toggle { display: flex; gap: 10px; }
 
 .type-btn {
@@ -472,11 +460,9 @@ section {
 }
 
 .type-btn:hover { background: var(--bg-body); }
-
 .type-btn--income.active  { border-color: var(--color-success); background: var(--color-success-light); color: var(--color-success); }
 .type-btn--expense.active { border-color: var(--color-danger);  background: var(--color-danger-light);  color: var(--color-danger);  }
 
-/* ── FORM LABEL ───────────────────────────────────── */
 .form-label {
   font-weight: 500;
   color: var(--text-primary);
@@ -486,7 +472,6 @@ section {
 
 .fw-500 { font-weight: 500; }
 
-/* ── ATTACHMENT ───────────────────────────────────── */
 .attachment-link {
   font-size: 13px;
   color: var(--color-primary, #0d6efd);
@@ -496,9 +481,7 @@ section {
   gap: 4px;
 }
 
-.attachment-link:hover {
-  text-decoration: underline;
-}
+.attachment-link:hover { text-decoration: underline; }
 
 .selected-file {
   font-size: 13px;

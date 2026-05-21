@@ -177,7 +177,7 @@
           </div>
           <h5 class="fw-bold">PDF Report</h5>
           <p class="text-muted small mb-0">{{ downloadingPDF ? 'កំពុងបង្កើត PDF...' : 'បង្កើតរបាយការណ៍ហិរញ្ញវត្ថុលម្អិត'
-            }}</p>
+          }}</p>
         </div>
       </div>
       <div class="col-md-4 col-12">
@@ -375,33 +375,39 @@ const fetchReport = async () => {
 // ── Fetch budgets ──────────────────────────────────────
 const fetchBudgets = async () => {
   loadingBudget.value = true
+
   try {
     const txRes = await api.get('/transactions', {
-      params: { _page: 1, _per_page: 100, ...getPeriodParams() }
+      params: {
+        _page: 1,
+        _per_page: 100
+      }
     })
+
     const transactions = txRes.data?.data?.items ?? []
 
     const grouped = {}
+
     transactions.forEach(tx => {
       const catType = tx.category?.type?.toUpperCase()
       if (catType !== 'EXPENSE') return
+
       const cat = tx.category?.name?.trim() ?? 'មិនស្គាល់'
-      if (!grouped[cat]) grouped[cat] = 0
-      grouped[cat] += Math.abs(parseFloat(tx.amount) || 0)
+      grouped[cat] = (grouped[cat] || 0) + Math.abs(Number(tx.amount) || 0)
     })
 
     const total = Object.values(grouped).reduce((s, a) => s + a, 0)
 
     budgets.value = Object.entries(grouped)
-      .filter(([, amount]) => amount > 0)
       .map(([name, amount]) => ({
         name,
         amount,
-        percent: total > 0 ? Math.round((amount / total) * 100) : 0,
+        percent: total ? Math.round((amount / total) * 100) : 0
       }))
       .sort((a, b) => b.amount - a.amount)
+
   } catch (err) {
-    console.error('fetchBudgets:', err)
+    console.error('fetchBudgets:', err?.response?.data || err)
   } finally {
     loadingBudget.value = false
   }

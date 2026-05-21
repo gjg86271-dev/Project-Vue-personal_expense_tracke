@@ -61,8 +61,8 @@ function close() {
 /* Modal Box */
 .modal-container {
   width: fit-content;
-  min-width: 300px;
-  max-width: min(500px, 90vw);  /* កុំឲ្យលើស 500px ឬ 90% screen */
+  min-width: 400px;
+  max-width: 500px;             /* កុំឲ្យលើស 500px ឬ 90% screen */
   max-height: 90vh;             /* កុំឲ្យលើស 90% screen height */
   background: white;
   border-radius: 16px;
