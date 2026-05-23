@@ -1,16 +1,17 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import TotalCard from '@/components/ui/base/Totalcard.vue'
-import SpendingChart from '@/components/ui/base/SpendingChart.vue'
-import TrendChart from '@/components/ui/base/TrendChart.vue'
+import TotalCard         from '@/components/ui/base/Totalcard.vue'
+import SpendingChart     from '@/components/ui/base/SpendingChart.vue'
+import TrendChart        from '@/components/ui/base/TrendChart.vue'
 import TransactionTable2 from '@/components/ui/base/transactionTable-2.vue'
-import BaseModal from '@/components/ui/base/BaseModal.vue'
+import BaseModal         from '@/components/ui/base/BaseModal.vue'
 import { useTransactionStore } from '@/stores/transactionStore'
-import { useCategoryStore } from '@/stores/categoryStore'
+import { useCategoryStore }    from '@/stores/categoryStore'
 
 const trstore       = useTransactionStore()
 const categoryStore = useCategoryStore()
 
+const pageLoading    = ref(true) // ✅ page loading state
 const showModal      = ref(false)
 const isEditing      = ref(false)
 const selectedBudget = ref(null)
@@ -90,11 +91,9 @@ async function saveBudget() {
   if (!validate()) return
   saveLoading.value = true
   try {
-    // ← ប្រើ FormData តែមួយ (API ទទួល form-data)
-    // ← categoryId មិនត្រូវ Number() ព្រោះវា UUID string
     const payload = new FormData()
-    payload.append('categoryId',      form.categoryId)        // ← UUID string ដូចគ្នា
-    payload.append('amount',          Number(form.amount))    // ← amount ទើបជា number
+    payload.append('categoryId',      form.categoryId)
+    payload.append('amount',          Number(form.amount))
     payload.append('notes',           form.notes || '')
     payload.append('transactionDate', form.transactionDate)
     if (form.file) payload.append('file', form.file)
@@ -116,18 +115,62 @@ async function saveBudget() {
 }
 
 onMounted(async () => {
-  await trstore.fetchSummary()
-  await categoryStore.fetchAllCategories()
-  await trstore.fetchTransactions()
+  try {
+    await Promise.all([
+      trstore.fetchSummary(),
+      categoryStore.fetchAllCategories(),
+      trstore.fetchTransactions(),
+    ])
+  } finally {
+    pageLoading.value = false 
+  }
 })
 </script>
 
 <template>
   <main class="dashboard">
 
-    <!-- HEADER -->
-    <section>
-      <div class="container">
+    <!-- ✅ PAGE LOADING SKELETON -->
+    <template v-if="pageLoading">
+
+      <!-- Header skeleton -->
+      <section>
+        <div class="skeleton skeleton-header"></div>
+      </section>
+
+      <!-- Summary skeleton -->
+      <section class="mt-3">
+        <div class="row g-3">
+          <div class="col-md-4" v-for="n in 3" :key="n">
+            <div class="skeleton skeleton-card"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts skeleton -->
+      <section class="mt-3">
+        <div class="row g-3">
+          <div class="col-md-7">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+          <div class="col-md-5">
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Table skeleton -->
+      <section class="mt-3">
+        <div class="skeleton skeleton-table"></div>
+      </section>
+
+    </template>
+
+    <!-- ✅ REAL CONTENT -->
+    <template v-else>
+
+      <!-- HEADER -->
+      <section>
         <div class="row">
           <div class="col">
             <div class="header-card">
@@ -141,12 +184,10 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- SUMMARY -->
-    <section class="mt-3">
-      <div class="container">
+      <!-- SUMMARY -->
+      <section class="mt-3">
         <div class="row g-3">
           <div class="col-md-4">
             <div class="card-light">
@@ -182,12 +223,10 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- CHARTS -->
-    <section class="mt-3">
-      <div class="container">
+      <!-- CHARTS -->
+      <section class="mt-3">
         <div class="row g-3 align-items-stretch">
           <div class="col-md-7 d-flex">
             <div class="card-light w-100">
@@ -200,21 +239,20 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- TABLE -->
-    <section class="mt-3">
-      <div class="container">
+      <!-- TABLE -->
+      <section class="mt-3">
         <div class="row">
           <div class="col-12">
             <div class="card border-0 bg-transparent">
-              <TransactionTable2 :transactions="trstore.transactions" />
+              <TransactionTable2 />
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+    </template>
 
   </main>
 
@@ -226,7 +264,6 @@ onMounted(async () => {
   >
     <template #body>
 
-      <!-- TYPE TOGGLE (create only) -->
       <div v-if="!isEditing" class="mb-4">
         <label class="form-label fw-500">
           ប្រភេទប្រតិបត្តិការ <span class="text-danger">*</span>
@@ -252,11 +289,8 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- CATEGORY -->
       <div class="form-group mb-3">
-        <label class="form-label fw-500">
-          ប្រភេទ <span class="text-danger">*</span>
-        </label>
+        <label class="form-label fw-500">ប្រភេទ <span class="text-danger">*</span></label>
         <select
           class="form-select"
           :class="{ 'is-invalid': errors.categoryId }"
@@ -279,11 +313,8 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- AMOUNT -->
       <div class="form-group mb-3">
-        <label class="form-label fw-500">
-          ចំនួនទឹកប្រាក់ <span class="text-danger">*</span>
-        </label>
+        <label class="form-label fw-500">ចំនួនទឹកប្រាក់ <span class="text-danger">*</span></label>
         <div class="input-group">
           <span class="input-group-text">$</span>
           <input
@@ -302,7 +333,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- NOTES -->
       <div class="form-group mb-3">
         <label class="form-label fw-500">កំណត់ចំណាំ</label>
         <input
@@ -313,11 +343,8 @@ onMounted(async () => {
         />
       </div>
 
-      <!-- DATE -->
       <div class="form-group mb-3">
-        <label class="form-label fw-500">
-          កាលបរិច្ឆេទ <span class="text-danger">*</span>
-        </label>
+        <label class="form-label fw-500">កាលបរិច្ឆេទ <span class="text-danger">*</span></label>
         <input
           v-model="form.transactionDate"
           type="date"
@@ -330,7 +357,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- ATTACHMENT -->
       <div class="form-group">
         <label class="form-label fw-500">ឯកសារភ្ជាប់</label>
         <input
@@ -364,9 +390,27 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.dashboard {
-  font-family: 'Kantumruy Pro', sans-serif;
+  .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-input) 25%,
+    var(--border-color) 50%,
+    var(--bg-input) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: var(--radius);
 }
+@keyframes shimmer {
+  0%   { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
+}
+.skeleton-header { height: 80px; }
+.skeleton-card   { height: 110px; }
+.skeleton-chart  { height: 320px; }
+.skeleton-table  { height: 280px; }
+
+.dashboard { font-family: 'Kantumruy Pro', sans-serif; }
 
 .header-card {
   background: var(--bg-sidebar);
@@ -379,50 +423,25 @@ onMounted(async () => {
   box-shadow: var(--shadow);
 }
 
-.header-card h1 {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0 0 2px 0;
-  color: var(--text-white);
-}
-
-.header-card p {
-  font-size: 12px;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.65);
-}
+.header-card h1 { font-size: 20px; font-weight: 700; margin: 0 0 2px 0; color: var(--text-white); }
+.header-card p  { font-size: 12px; margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .add-btn {
-  height: 46px;
-  padding: 0 20px;
-  font-size: 15px;
-  white-space: nowrap;
+  height: 46px; padding: 0 20px; font-size: 15px; white-space: nowrap;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--text-white);
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: var(--transition);
+  background: rgba(255, 255, 255, 0.15); color: var(--text-white);
+  border: 1.5px solid rgba(255, 255, 255, 0.4); border-radius: 12px;
+  cursor: pointer; transition: var(--transition);
 }
+.add-btn:hover { background: rgba(255, 255, 255, 0.25); }
 
-.add-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.icon-wrap {
-  padding: 8px 14px;
-  border-radius: 10px;
-  color: var(--text-white);
-}
-
+.icon-wrap { padding: 8px 14px; border-radius: 10px; color: var(--text-white); }
 .icon-wrap--income  { background: var(--color-success); }
 .icon-wrap--expense { background: var(--color-danger);  }
 .icon-wrap--neutral { background: var(--text-secondary); }
 
 .card-light {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   transition: var(--transition);
@@ -430,7 +449,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
 }
-
 .card-light:hover { transform: translateY(-2px); }
 .card-light > * { flex: 1; min-height: 0; }
 
@@ -440,54 +458,29 @@ section {
 }
 
 .type-toggle { display: flex; gap: 10px; }
-
 .type-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 2px solid var(--border-color);
-  background: var(--bg-input);
-  color: var(--text-secondary);
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 600;
+  cursor: pointer; border: 2px solid var(--border-color);
+  background: var(--bg-input); color: var(--text-secondary);
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
   transition: var(--transition);
 }
-
 .type-btn:hover { background: var(--bg-body); }
 .type-btn--income.active  { border-color: var(--color-success); background: var(--color-success-light); color: var(--color-success); }
 .type-btn--expense.active { border-color: var(--color-danger);  background: var(--color-danger-light);  color: var(--color-danger);  }
 
-.form-label {
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-}
-
+.form-label { font-weight: 500; color: var(--text-primary); margin-bottom: 6px; font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif; }
 .fw-500 { font-weight: 500; }
 
 .attachment-link {
-  font-size: 13px;
-  color: var(--color-primary, #0d6efd);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  font-size: 13px; color: var(--color-primary, #0d6efd);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
 }
-
 .attachment-link:hover { text-decoration: underline; }
 
 .selected-file {
-  font-size: 13px;
-  color: var(--text-secondary);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  font-size: 13px; color: var(--text-secondary);
+  display: inline-flex; align-items: center; gap: 4px;
 }
 </style>

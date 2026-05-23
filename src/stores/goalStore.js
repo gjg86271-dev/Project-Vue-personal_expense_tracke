@@ -19,10 +19,6 @@ export const useGoalsStore =
         goals.value =
           response.data.data.items;
 
-        console.log(
-          "Fetched goals:",
-          goals.value
-        );
       } catch (error) {
         console.log(error);
       }

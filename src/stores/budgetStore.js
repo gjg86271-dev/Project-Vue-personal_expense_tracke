@@ -11,10 +11,10 @@ export const useBudgetStore = defineStore('budget', () => {
   const selectedBudget = ref(null)
 
   /* ─── FETCH ALL ─────────────────────────────────────────── */
-  const fetchBudgets = async (page = 1) => {
+  const fetchBudgets = async (page = 1, perPage = 6) => { // ✅ add perPage
     try {
       loading.value = true
-      const response = await api.get(`/budgets?_page=${page}&_per_page=10`)
+      const response = await api.get(`/budgets?_page=${page}&_per_page=${perPage}`) // ✅
       budgets.value  = response.data.data.items
       meta.value     = response.data.data.meta
     } catch (error) {
@@ -29,7 +29,6 @@ export const useBudgetStore = defineStore('budget', () => {
     try {
       const response       = await api.get(`/budgets/${id}`)
       selectedBudget.value = response.data.data
-      console.log('Budget detail:', selectedBudget.value)
     } catch (error) {
       console.error('Error fetching budget detail:', error)
       selectedBudget.value = null
@@ -40,21 +39,20 @@ export const useBudgetStore = defineStore('budget', () => {
   const fetchCategoryBreakdown = async () => {
     try {
       const now   = new Date()
-      const month = now.getMonth() + 1  // ✅ dynamic — ខែបច្ចុប្បន្ន
-      const year  = now.getFullYear()   // ✅ dynamic — ឆ្នាំបច្ចុប្បន្ន
+      const month = now.getMonth() + 1
+      const year  = now.getFullYear()
 
       const response = await api.get(`analytics/category-breakdown?month=${month}&year=${year}`)
       const data = response.data?.data
 
       if (Array.isArray(data) && data.length > 0) {
-        // ✅ sum total ទាំងអស់ — safe check រាល់ item
         totalexpenses.value = data.reduce((sum, item) => sum + (item.total ?? 0), 0)
       } else {
         totalexpenses.value = 0
       }
     } catch (error) {
       console.error('Error fetching category breakdown:', error)
-      totalexpenses.value = 0  // ✅ reset — កុំ crash UI
+      totalexpenses.value = 0
     }
   }
 
@@ -65,7 +63,6 @@ export const useBudgetStore = defineStore('budget', () => {
       console.log('Created:', response.data)
     } catch (error) {
       console.error('BACKEND ERROR:', error.response?.data)
-      console.log('DETAILS:', error.response?.data?.details)
       throw error
     }
   }
@@ -98,7 +95,6 @@ export const useBudgetStore = defineStore('budget', () => {
     loading,
     meta,
     selectedBudget,
-
     fetchBudgets,
     fetchBudgetById,
     fetchCategoryBreakdown,

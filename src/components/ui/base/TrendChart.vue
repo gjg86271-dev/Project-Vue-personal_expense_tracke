@@ -1,6 +1,6 @@
 <template>
   <div class="card border-0 shadow">
-    <div class="card-header bg-white border-0">
+    <div class="card-header border-0">
       <h3 class="card-title">និន្នាការប្រចាំខែ</h3>
     </div>
 
@@ -8,7 +8,7 @@
 
     <div v-else class="card-body">
       <div class="chart-wrapper">
-        <canvas ref="chartRef"></canvas>
+        <canvas ref="chartRef" class="chart-canvas"></canvas>
       </div>
     </div>
   </div>
@@ -131,7 +131,7 @@ onMounted(() => {
 
 <style scoped>
 .card {
-  background: white;
+  background-color: var(--bg-card);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -139,6 +139,11 @@ onMounted(() => {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  color: var(--text-primary);
+}
+
+.chart-canvas{
+  color: var(--text-primary) !important ;
 }
 
 .card-header {
@@ -146,10 +151,12 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+
 .card-title {
   font-size: 16px;
   font-weight: 600;
   margin: 0;
+  color: var(--text-primary);
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
 }
 
@@ -159,12 +166,15 @@ onMounted(() => {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  color: var(--text-secondary);
 }
 
 .chart-wrapper {
   flex: 1;
   min-height: 200px;
   position: relative;
+  color: var(--text-primary);
+  
 }
 
 .loading {
@@ -172,7 +182,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #888;
+  color: var(--text-primary);
   font-size: 14px;
 }
 </style>

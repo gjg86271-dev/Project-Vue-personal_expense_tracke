@@ -6,9 +6,9 @@ const { VITE_API_URL } = import.meta.env
 const api = axios.create({
   baseURL: VITE_API_URL,
   headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  }
+    Accept: "application/json",
+
+  },
 })
 
 api.interceptors.request.use((config) => {
@@ -18,7 +18,16 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${auth.token}`
   }
 
+
+  if (
+    config.data &&
+    !(config.data instanceof FormData) &&
+    !config.headers["Content-Type"]
+  ) {
+    config.headers["Content-Type"] = "application/json"
+  }
+
   return config
 })
 
-export default api 
+export default api

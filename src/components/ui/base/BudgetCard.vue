@@ -114,13 +114,13 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 ==================================== */
 
 .card {
-  background: #fff;
+  background-color:var(--bg-card);
   border-radius: 16px;
   padding: 18px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   transition: 0.3s;
   margin-top: 20px;
-  cursor: pointer; /* ✅ បង្ហាញ pointer ដឹងថា clickable */
+  cursor: pointer;
 }
 
 .card:hover {
@@ -147,7 +147,7 @@ function deleteBudget() { emit('delete-budget', props.budget) }
   margin: 0;
   font-size: 23px;
   font-weight: 800;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 6px;
   letter-spacing: -0.5px;
 }
@@ -155,7 +155,7 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 .title p {
   margin: 0;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -174,8 +174,8 @@ function deleteBudget() { emit('delete-budget', props.budget) }
   height: 42px;
   border: none;
   border-radius: 14px;
-  background: #f8fafc;
-  color: #374151;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.25s ease;
   display: flex;
@@ -187,7 +187,7 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 
 .actions button:hover {
   transform: scale(1.08);
-  background: #eef2ff;
+  background-color: var(--bg-card);
   color: #4f46e5;
 }
 
@@ -197,12 +197,13 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 }
 
 /* ====================================
-   INFO SECTION
+   INFO SECTION (FIXED + CLOSED BRACKET)
+==================================== */
 
 .info {
   position: relative;
   z-index: 2;
-  background: #f9fafb;
+  background-color: var(--bg-card);
   border-radius: 20px;
   padding: 18px;
   margin-bottom: 18px;
@@ -220,7 +221,7 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 }
 
 .row span:first-child {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 600;
 }
@@ -228,11 +229,13 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 .spent,
 .total {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.spent { color: #ef4444; font-weight: 600; }
-.total { color: #111827; font-weight: 600; }
+.spent {
+  color: #ef4444;
+}
 
 /* ====================================
    PROGRESS
@@ -253,17 +256,6 @@ function deleteBudget() { emit('delete-budget', props.budget) }
   border-radius: 999px;
   transition: width 0.5s ease;
   position: relative;
-}
-
-.progress::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 30px;
-  height: 100%;
-  background: rgba(255,255,255,0.3);
-  filter: blur(4px);
 }
 
 /* ====================================
@@ -288,14 +280,14 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 
 .bottom span:first-child {
   color: #6366f1;
-  background: #eef2ff;
+  background-color: var;
   padding: 8px 14px;
   border-radius: 999px;
 }
 
 .left {
-  color: #111827;
-  background: #f3f4f6;
+  color: var(--text-primary);
+  background-color: var(--blob-color-c);
   padding: 8px 14px;
   border-radius: 999px;
 }
@@ -308,11 +300,7 @@ function deleteBudget() { emit('delete-budget', props.budget) }
   margin-top: 18px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: linear-gradient(
-    135deg,
-    #fff7ed,
-    #ffedd5
-  );
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
   color: #c2410c;
   font-size: 13px;
   font-weight: 700;
@@ -326,20 +314,6 @@ function deleteBudget() { emit('delete-budget', props.budget) }
 .warning::before {
   content: "⚠";
   font-size: 18px;
-}
-
-@keyframes pulseWarning {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.01);
-  }
-
-  100% {
-    transform: scale(1);
-  }
 }
 
 /* ====================================

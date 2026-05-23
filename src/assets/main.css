@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@100..700&display=swap');
+@import url('cropperjs/dist/cropper.css');
 
 :root {
   /* font */
@@ -74,7 +75,7 @@
   /* ខ្មៅជ្រៅ navy ស្អាតជាង slate */
   --bg-sidebar: #0f1c2e;
   /* navy ងងឹត */
-  --bg-card: #1e293b;
+  --bg-card: #0f1c2e;
   --bg-input: #1a2840;
   /* ស្រមោល navy */
 

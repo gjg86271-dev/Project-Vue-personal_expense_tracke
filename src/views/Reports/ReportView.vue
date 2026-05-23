@@ -508,7 +508,7 @@ onMounted(() => {
 <style scoped>
 /* ── HEADER ───────────────────────────────────────── */
 .header-card {
-  background: var(--bg-sidebar);
+  background-color: var(--bg-sidebar);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 18px 24px;
@@ -528,7 +528,7 @@ onMounted(() => {
 .header-card p {
   font-size: 12px;
   margin: 0;
-  color: rgba(255, 255, 255, 0.65);
+  color:var(--text-white);
 }
 
 
@@ -538,17 +538,18 @@ onMounted(() => {
   font-size: 15px;
   white-space: nowrap;
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--bg-sidebar);
   color: var(--text-white);
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border: 1.5px solid var(--border-color);
   border-radius: 12px;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .add-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--bg-card);
 }
+
 
 /* ── DROPDOWN MENU ────────────────────────────────── */
 .dropdown-menu {
@@ -558,9 +559,14 @@ onMounted(() => {
   animation: fadeDown 0.15s ease;
 }
 
+.card {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
 .dropdown-item {
   font-size: 14px;
-  color: #333;
+  color: var(--text-primary);
   border-radius: 8px;
   margin: 2px 8px;
   width: calc(100% - 16px);
@@ -568,12 +574,12 @@ onMounted(() => {
 }
 
 .dropdown-item:hover {
-  background: #f0f4ff;
+  background-color: var(--bg-card);
   color: #2f80ed;
 }
 
 .dropdown-item.active {
-  background: #e8f0fe;
+  background-color:var(--bg-card) ;
   color: #2f80ed;
   font-weight: 600;
 }
@@ -607,19 +613,19 @@ onMounted(() => {
   padding: 16px;
   transition: all 0.3s ease;
   cursor: pointer;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border-radius: 16px;
 }
 
 .card_edit:hover {
   transform: translateY(-6px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  background: linear-gradient(135deg, #ffffff, #f3f8ff);
+  /* background: linear-gradient(135deg, #ffffff, #f3f8ff); */
 }
 
 /* ── CHART ────────────────────────────────────────── */
 .chart-container {
-  background: #f8f9fa;
+  background-color: var(--bg-card);
   width: 100%;
   border-radius: 16px;
   padding: 24px;
@@ -638,7 +644,7 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   margin-right: 12px;
-  color: #666;
+  color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
 }
@@ -649,8 +655,8 @@ onMounted(() => {
   display: flex;
   align-items: flex-end;
   justify-content: space-evenly;
-  border-left: 2px solid #d1d5db;
-  border-bottom: 2px solid #d1d5db;
+  border-left: 2px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
   padding: 10px 10px 0;
   gap: 20px;
 }
@@ -663,6 +669,9 @@ onMounted(() => {
   position: relative;
   min-width: 70px;
   padding-bottom: 30px;
+}
+.text-muted{
+  color: var(--text-primary) !important;
 }
 
 .bar {
@@ -698,7 +707,7 @@ onMounted(() => {
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  color: #555;
+  color: var(--text-primary);
 }
 
 .legend {
@@ -726,7 +735,7 @@ onMounted(() => {
 /* ── BUDGET ───────────────────────────────────────── */
 .budget-card {
   width: 100%;
-  background: #f5f5f5;
+  background-color: var(--bg-card);
   padding: 24px;
   border-radius: 12px;
 }
@@ -741,13 +750,13 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 8px;
   font-size: 15px;
-  color: #444;
+  color: var(--text-primary);
 }
 
 .progress-bar {
   width: 100%;
   height: 10px;
-  background: #d9d9d9;
+  background: var(--bg-input);
   border-radius: 20px;
   overflow: hidden;
 }
@@ -763,7 +772,7 @@ onMounted(() => {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--bg-modal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -772,7 +781,7 @@ onMounted(() => {
 }
 
 .modal-box {
-  background: #fff;
+  background: var(--bg-card);
   width: 100%;
   max-width: 560px;
   max-height: 85vh;
@@ -808,7 +817,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   font-weight: 600;
-  background: #f8f9fa;
+  background: var(--bg-input);
   padding: 8px 10px;
   border-radius: 8px;
   margin-bottom: 4px;
@@ -819,7 +828,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   padding: 7px 10px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color)  ;
 }
 
 .tax-month-row:last-child {

@@ -38,7 +38,7 @@ const formattedValue = computed(() => {
 /* ================= MAIN CARD ================= */
 .card {
   border-radius: 16px;
-  background: #ffffff;
+  background-color: var(--bg-card);
   border: 1px solid #e5e7eb;
 
   /* 👇 RESPONSIVE WIDTH BASED ON SIDEBAR */
@@ -78,7 +78,7 @@ body.sidebar-collapsed .card {
 .card-title {
   font-size: 16px;
   font-weight: 500;
-  color: #9ca3af;
+  color: var(--text-primary);
   font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
 }
 
@@ -109,14 +109,14 @@ body.sidebar-collapsed .card {
 .card-subtitle {
   font-size: 28px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   line-height: 1.1;
 }
 
 /* TEXT (optional trend or subtitle) */
 .card-text {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 4px;

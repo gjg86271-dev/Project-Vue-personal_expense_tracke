@@ -47,7 +47,7 @@
     <!-- LOGOUT -->
     <button class="sidebar__item sidebar__logout" @click="handleLogout">
       <i class="bi bi-box-arrow-right sidebar__icon"></i>
-      <span class="sidebar__label">ចាកចេញ</span>
+      <span class="sidebar__label text-denger">ចាកចេញ</span>
     </button>
 
   </aside>
@@ -101,6 +101,7 @@ async function handleLogout() {
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
+  z-index: 9 !important;
 }
 
 .sidebar--collapsed {
