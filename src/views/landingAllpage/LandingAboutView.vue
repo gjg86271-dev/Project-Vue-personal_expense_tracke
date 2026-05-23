@@ -2,10 +2,13 @@
     <section class="my-5">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6"
+                    data-aos="fade-right"
+                    data-aos-duration="900"
+                    data-aos-delay="100">
                     <div class="card border-0 bg-transparent">
-                        <small class="p-2 bg-primary-subtle rounded-5 text-primary  text-center"
-                            style="width: 180px ;">ជំនួយការរៀបចំកាលចំណាយ</small>
+                        <small class="p-2 bg-primary-subtle rounded-5 text-primary text-center animate__animated animate__fadeInDown"
+                            style="width: 180px;">ជំនួយការរៀបចំកាលចំណាយ</small>
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div class="card-title">
@@ -20,10 +23,10 @@
                                         </p>
                                     </div>
                                     <div class="d-flex align-items-center gap-3">
-                                      <RouterLink to="/login" class="btn btn-primary px-4 py-2 rounded-5">
+                                        <RouterLink to="/login" class="btn btn-primary px-4 py-2 rounded-5">
                                             ចាប់ផ្ដើមឥឡូវនេះ
-                                      </RouterLink>
-                                        <a href="#" class=" btn px-4 py-2 rounded-5 btn-outline-primary">
+                                        </RouterLink>
+                                        <a href="#" class="btn px-4 py-2 rounded-5 btn-outline-primary">
                                             ▶ វីដេអូការបង្ហាញ
                                         </a>
                                     </div>
@@ -32,12 +35,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6"
+                    data-aos="fade-left"
+                    data-aos-duration="900"
+                    data-aos-delay="200">
                     <div class="card border-0 position-relative">
                         <img src="/src/assets/img/hero-img-inAt.jpg" alt="img-landingPage" class="rounded-5">
                         <div class="bg-success-subtle rounded-5 text-success d-flex p-3 position-absolute flex-column box me-md-3"
-                            style="width: 260px; height: 80px; top: 380px; left: -30px   ;">
-                            <div class="d-flex   justify-content-center">
+                            style="width: 260px; height: 80px; top: 380px; left: -30px;">
+                            <div class="d-flex justify-content-center">
                                 <i class="bi bi-check2-circle fs-2 me-2"></i>
                                 <div class="">
                                     <span>ភារកិច្ចសម្រេចបាន</span>
@@ -46,9 +52,9 @@
                             </div>
                         </div>
                         <div class="bg-primary-subtle rounded-5 text-primary d-flex p-3 position-absolute flex-column box ms-md-3"
-                            style="width: 260px; height: 80px; top: 60px; right: -30px   ;">
-                            <div class="d-flex   justify-content-center">
-                                <i class="bi bi-clipboard-data  fs-2 me-2"></i>
+                            style="width: 260px; height: 80px; top: 60px; right: -30px;">
+                            <div class="d-flex justify-content-center">
+                                <i class="bi bi-clipboard-data fs-2 me-2"></i>
                                 <div class="d-flex flex-column justify-content-center">
                                     <span>មានអ្នកប្រើរហូតដល់<small class="fw-bold text-success"> +5000
                                         </small></span>
@@ -60,13 +66,16 @@
             </div>
         </div>
     </section>
+
     <section class="section-2 p-5">
         <div class="container">
             <div class="row">
-                <div class="col-12">
+                <div class="col-12"
+                    data-aos="fade-up"
+                    data-aos-duration="800">
                     <div class="card border-0 p-5 rounded-5 bg-transparent">
                         <img src="/src/assets/img/logo.png" alt="" width="160px"
-                            class=" m-auto mb-3 rounded-5 shadow-lg">
+                            class="m-auto mb-3 rounded-5 shadow-lg">
                         <div class="card-title">
                             <h1 class="text-center text-primary fw-bold" style="font-size: 54px;">ចក្ខុវិស័យរបស់យើង
                                 <span class="text-success fw-bold">កាក់សេន</span>
@@ -75,7 +84,7 @@
                                 <p class="text-secondary text-center">យើងចង់ឃើញមនុស្សគ្រប់រូបអាចគ្រប់គ្រងហិរញ្ញវត្ថុ
                                     និងជីវិតហិរញ្ញវត្ថុរបស់ខ្លួនបានយ៉ាងមានប្រសិទ្ធភាព។<br> <span
                                         class="text-success fw-bold">កាក់សេន</span> ត្រូវបានបង្កើតឡើងដើម្បីក្លាយជា
-                                    “ជំនួយការហិរញ្ញវត្ថុឌីជីថល” ដែលជួយអ្នកតាមដានចំណូល-ចំណាយ<br>
+                                    "ជំនួយការហិរញ្ញវត្ថុឌីជីថល" ដែលជួយអ្នកតាមដានចំណូល-ចំណាយ<br>
                                     និងគ្រប់គ្រងប្រាក់បានយ៉ាងឆ្លាតវៃ។</p>
                             </div>
                         </div>
@@ -83,7 +92,10 @@
                 </div>
             </div>
             <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-4"
+                    data-aos="fade-up"
+                    data-aos-duration="700"
+                    data-aos-delay="100">
                     <div class="card border-0 shadow-sm rounded-4 p-4 h-100 feature-box">
                         <div class="mb-4 p-3 rounded-3" style="background-color: #f0f4ff; width: 56px; height: 56px;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-primary">
@@ -102,7 +114,10 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4"
+                    data-aos="fade-up"
+                    data-aos-duration="700"
+                    data-aos-delay="200">
                     <div class="card border-0 shadow-sm rounded-4 p-4 h-100 feature-box">
                         <div class="mb-4 p-3 rounded-3" style="background-color: #f0f4ff; width: 56px; height: 56px;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-primary">
@@ -120,10 +135,12 @@
                             ដូចជា ការចែកចាយចំណាយ ការតាមដានទម្លាប់ចំណាយ និងនិន្នាការហិរញ្ញវត្ថុ។
                             វាជួយអ្នកធ្វើការសម្រេចចិត្តបានល្អ និងគ្រប់គ្រងប្រាក់បានមានប្រសិទ្ធភាពជាងមុន។
                         </p>
-
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4"
+                    data-aos="fade-up"
+                    data-aos-duration="700"
+                    data-aos-delay="300">
                     <div class="card border-0 shadow-sm rounded-4 p-4 h-100 feature-box">
                         <div class="mb-4 p-3 rounded-3" style="background-color: #f0f4ff; width: 56px; height: 56px;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-primary">
@@ -142,10 +159,12 @@
             </div>
         </div>
     </section>
+
     <section class="section-4 py-5">
         <div class="container">
-            <!-- Title -->
-            <div class="text-center mb-5">
+            <div class="text-center mb-5"
+                data-aos="fade-up"
+                data-aos-duration="800">
                 <span class="badge bg-light text-primary px-3 py-2 mb-2">
                     ដំណើរការប្រើប្រាស់
                 </span>
@@ -157,10 +176,11 @@
                 </p>
             </div>
 
-            <!-- Steps -->
             <div class="row g-4">
-                <!-- Step 01 -->
-                <div class="col-md-4">
+                <div class="col-md-4"
+                    data-aos="fade-up"
+                    data-aos-duration="700"
+                    data-aos-delay="100">
                     <div class="card border-0 shadow-sm p-4 h-100 rounded-4 feature-box">
                         <div class="mb-3">
                             <span class="badge bg-primary rounded-3 px-3 py-2 fs-6">01</span>
@@ -173,9 +193,10 @@
                         </p>
                     </div>
                 </div>
-
-                <!-- Step 02 -->
-                <div class="col-md-4">
+                <div class="col-md-4"
+                    data-aos="fade-up"
+                    data-aos-duration="700"
+                    data-aos-delay="200">
                     <div class="card border-0 shadow-sm p-4 h-100 rounded-4 feature-box">
                         <div class="mb-3">
                             <span class="badge bg-primary rounded-3 px-3 py-2 fs-6">02</span>
@@ -188,9 +209,10 @@
                         </p>
                     </div>
                 </div>
-
-                <!-- Step 03 -->
-                <div class="col-md-4">
+                <div class="col-md-4"
+                    data-aos="fade-up"
+                    data-aos-duration="700"
+                    data-aos-delay="300">
                     <div class="card border-0 shadow-sm p-4 h-100 rounded-4 feature-box">
                         <div class="mb-3">
                             <span class="badge bg-primary rounded-3 px-3 py-2 fs-6">03</span>
@@ -206,10 +228,12 @@
             </div>
         </div>
     </section>
-    <section class="section-5 py-5 ">
+
+    <section class="section-5 py-5">
         <div class="container">
-            <!-- Title -->
-            <div class="text-center mb-5">
+            <div class="text-center mb-5"
+                data-aos="fade-up"
+                data-aos-duration="800">
                 <h2 class="fw-bold">
                     ជួបជាមួយ <span class="text-primary">សមាជិកក្រុមរបស់យើង</span>
                 </h2>
@@ -218,9 +242,11 @@
                 </p>
             </div>
 
-            <!-- Row 1 - 3 members -->
-            <div class="row g-4 justify-content-center mt-4 ">
-                <div class="col-md-3">
+            <div class="row g-4 justify-content-center mt-4">
+                <div class="col-md-3"
+                    data-aos="zoom-in"
+                    data-aos-duration="600"
+                    data-aos-delay="100">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
                         <img src="/src/assets/img/team-1.jpg" alt="member4" class="rounded-circle mx-auto mb-3"
                             style="width: 100px; height: 100px; object-fit: cover;">
@@ -236,8 +262,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Member 1 -->
-                <div class="col-md-3">
+                <div class="col-md-3"
+                    data-aos="zoom-in"
+                    data-aos-duration="600"
+                    data-aos-delay="200">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
                         <img src="/src/assets/img/Maphotos.jpg" alt="member1" class="rounded-circle mx-auto mb-3"
                             style="width: 100px; height: 100px; object-fit: cover;">
@@ -253,8 +281,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Member 2 -->
-                <div class="col-md-3">
+                <div class="col-md-3"
+                    data-aos="zoom-in"
+                    data-aos-duration="600"
+                    data-aos-delay="300">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
                         <img src="/src/assets/img/photo_2026-05-11_14-11-43.jpg" alt="member2"
                             class="rounded-circle mx-auto mb-3" style="width: 100px; height: 100px; object-fit: cover;">
@@ -270,8 +300,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Member 3 -->
-                <div class="col-md-3">
+                <div class="col-md-3"
+                    data-aos="zoom-in"
+                    data-aos-duration="600"
+                    data-aos-delay="400">
                     <div class="card border-0 shadow-sm rounded-4 p-4 text-center feature-box">
                         <img src="/src/assets/img/photo_1_2025-04-01_15-00-40 copy.JPG" alt="member3"
                             class="rounded-circle mx-auto mb-3" style="width: 100px; height: 100px; object-fit: cover;">
@@ -290,22 +322,24 @@
             </div>
         </div>
     </section>
+
     <section class="section-6 mb-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card border-0  bg-transparent ">
+                    <div class="card border-0 bg-transparent">
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="card border-0 p-5  ">
-                                    <img src="/src/assets/img/ANT logo HD-QyOYtqJc.png"  width="160px" class=" m-auto mb-3 ">
+                            <div class="col-md-12"
+                                data-aos="fade-up"
+                                data-aos-duration="800">
+                                <div class="card border-0 p-5">
+                                    <img src="/src/assets/img/ANT logo HD-QyOYtqJc.png" width="160px" class="m-auto mb-3">
                                     <div class="card-title text-center">
                                         <h1 class="text-success">សេចក្តីថ្លែងអំណរគុណចំពោះ</h1>
                                         <div class="catd-text text-center mt-4" style="padding: 0 200px;">
                                             <p>
-                                                ថ្នាក់បណ្តុះបណ្តាលបច្ចេកវិទ្យាអាន ANT ព្រមទាំងលោកគ្រូ  <span
-                                                    class="text-primary">...</span>
-                                                និងអ្នកគ្រូ <span class="text-primary">យឹម ស្រីយ៉ឺ</span> ។
+                                                ថ្នាក់បណ្តុះបណ្តាលបច្ចេកវិទ្យាអាន ANT ព្រមទាំងអ្នកគ្រូ​ <span class="text-primary">យឹម ស្រីយ៉ឺ</span>
+                                                និងលោកគ្រូ <span class="text-primary">មិត​​ ចិត្រ​​</span>។
                                                 ក្រុមរបស់យើងមានអារម្មណ៍សោមនស្សរីករាយយ៉ាងខ្លាំងដែលទទួលបានអាហារូបករណ៍លើជំនាញការអភិវឌ្ឍន៍គេហទំព័រនេះ។
                                                 អាហារូបករណ៍នេះពិតជាបានជួយសម្រាលបន្ទុកហិរញ្ញវត្ថុសម្រាប់ការសិក្សាដល់ក្រុមយើងខ្ញុំទាំងអស់គ្នា។
                                                 ក្រោមការណែនាំពីលោកគ្រូអ្នកគ្រូ
@@ -323,6 +357,22 @@
     </section>
 </template>
 
+<script setup>
+import { RouterLink } from 'vue-router'
+import { onMounted } from 'vue'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import 'animate.css'
+
+onMounted(() => {
+    AOS.init({
+        once: true,
+        offset: 80,
+        easing: 'ease-out-cubic',
+    })
+})
+</script>
+
 <style scoped>
 .image-hover-wrapper .hover-img {
     opacity: 0;
@@ -337,7 +387,6 @@
 
 section {
     font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
-    /* margin: 100px 0px; */
 }
 
 .feature-box {
@@ -350,13 +399,13 @@ section {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
 }
 
-.feature-box {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
+@keyframes upDown {
+    0%   { transform: translateY(-5px); }
+    50%  { transform: translateY(5px); }
+    100% { transform: translateY(-5px); }
 }
 
-.feature-box:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+.box {
+    animation: upDown 3s ease-in-out infinite;
 }
 </style>

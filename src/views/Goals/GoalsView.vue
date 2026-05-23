@@ -591,9 +591,6 @@ function formatDate(date) {
 
 /* DASHBOARD */
 .dashboard {
-  min-height: 100vh;
-  padding: 32px;
-  background: var(--bg-body);
   font-family: "Kantumruy Pro", sans-serif;
 }
 

@@ -27,23 +27,35 @@
           <div v-if="incomeChartData.length === 0" class="chart-empty">
             <p>មិនមានទិន្នន័យ</p>
           </div>
+
           <div v-else class="chart-content">
             <div class="chart-donut-wrap">
               <canvas ref="incomeRef"></canvas>
+
               <div class="chart-center">
                 <span class="chart-center__count">{{ incomeChartData.length }}</span>
                 <span class="chart-center__label">ប្រភេទ</span>
               </div>
             </div>
+
             <div class="legend">
               <div
                 v-for="(item, index) in incomeChartData"
                 :key="'inc-' + item.label"
                 class="legend-item"
               >
-                <span class="legend-dot" :style="{ background: incomeColors[index % incomeColors.length] }"></span>
-                <span class="legend-label">{{ item.label }}</span>
-                <span class="legend-amount income-amount">{{ formatAmount(item.amount) }}</span>
+                <span
+                  class="legend-dot"
+                  :style="{ background: incomeColors[index % incomeColors.length] }"
+                ></span>
+
+                <span class="legend-label">
+                  {{ item.label }}
+                </span>
+
+                <span class="legend-amount income-amount">
+                  {{ formatAmount(item.amount) }}
+                </span>
               </div>
             </div>
           </div>
@@ -55,29 +67,49 @@
             <span class="chart-box__icon chart-box__icon--expense">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
             </span>
-            <h5 class="chart-box__title chart-box__title--expense">ចំណាយ</h5>
+
+            <h5 class="chart-box__title chart-box__title--expense">
+              ចំណាយ
+            </h5>
           </div>
 
           <div v-if="expenseChartData.length === 0" class="chart-empty">
             <p>មិនមានទិន្នន័យ</p>
           </div>
+
           <div v-else class="chart-content">
             <div class="chart-donut-wrap">
               <canvas ref="expenseRef"></canvas>
+
               <div class="chart-center">
-                <span class="chart-center__count">{{ expenseChartData.length }}</span>
-                <span class="chart-center__label">ប្រភេទ</span>
+                <span class="chart-center__count">
+                  {{ expenseChartData.length }}
+                </span>
+
+                <span class="chart-center__label">
+                  ប្រភេទ
+                </span>
               </div>
             </div>
+
             <div class="legend">
               <div
                 v-for="(item, index) in expenseChartData"
                 :key="'exp-' + item.label"
                 class="legend-item"
               >
-                <span class="legend-dot" :style="{ background: expenseColors[index % expenseColors.length] }"></span>
-                <span class="legend-label">{{ item.label }}</span>
-                <span class="legend-amount expense-amount">{{ formatAmount(item.amount) }}</span>
+                <span
+                  class="legend-dot"
+                  :style="{ background: expenseColors[index % expenseColors.length] }"
+                ></span>
+
+                <span class="legend-label">
+                  {{ item.label }}
+                </span>
+
+                <span class="legend-amount expense-amount">
+                  {{ formatAmount(item.amount) }}
+                </span>
               </div>
             </div>
           </div>
@@ -103,12 +135,11 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend)
 
 const txStore = useTransactionStore()
 
+// ✅ FIX: derive isLoading from the store directly — no prop needed
+const isLoading = computed(() => txStore.isLoading ?? false)
+
 const incomeRef  = ref(null)
 const expenseRef = ref(null)
-const isLoading  = ref(false)
-
-// local copy នៃ transactions ទាំងអស់ (loop pages)
-const allTransactions = ref([])
 
 let incomeChart  = null
 let expenseChart = null
@@ -122,46 +153,18 @@ const expenseColors = [
   '#BA7517', '#EF9F27', '#FAC775', '#E24B4A'
 ]
 
-// ✅ Fetch ALL pages — loop រហូតដល់ hasNextPage = false
-async function fetchAllTransactions() {
-  isLoading.value = true
-  allTransactions.value = []
-  try {
-    let page = 1
-    const perPage = 10
-
-    while (true) {
-      await txStore.fetchTransactions(page, perPage)
-      const items = txStore.transactions ?? []
-      allTransactions.value.push(...items)
-
-      const hasNext = txStore.meta?.hasNextPage ?? false
-      if (!hasNext) break
-      page++
-    }
-  } catch (err) {
-    console.error('fetchAllTransactions:', err)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-// ✅ Format amount
 const formatAmount = (amount) => {
   const num = parseFloat(amount) || 0
-  if (num >= 1000) {
-    return '$' + (num / 1000).toFixed(1) + 'k'
-  }
+  if (num >= 1000) return '$' + (num / 1000).toFixed(1) + 'k'
   return '$' + num.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })
 }
 
-// ✅ Group INCOME
 const incomeChartData = computed(() => {
   const grouped = {}
-  for (const tx of allTransactions.value) {
+  for (const tx of (txStore.transactions ?? [])) {
     if (tx.category?.type !== 'INCOME') continue
     const name = tx.category?.name ?? 'មិនស្គាល់'
     if (!grouped[name]) grouped[name] = 0
@@ -172,10 +175,9 @@ const incomeChartData = computed(() => {
     .map(([label, amount]) => ({ label, amount }))
 })
 
-// ✅ Group EXPENSE
 const expenseChartData = computed(() => {
   const grouped = {}
-  for (const tx of allTransactions.value) {
+  for (const tx of (txStore.transactions ?? [])) {
     if (tx.category?.type !== 'EXPENSE') continue
     const name = tx.category?.name ?? 'មិនស្គាល់'
     if (!grouped[name]) grouped[name] = 0
@@ -212,9 +214,9 @@ function buildChart(canvas, data, colors) {
         tooltip: {
           callbacks: {
             label: (ctx) => {
-              const item = data[ctx.dataIndex]
+              const item  = data[ctx.dataIndex]
               const total = data.reduce((s, i) => s + i.amount, 0)
-              const pct = ((item.amount / total) * 100).toFixed(1)
+              const pct   = ((item.amount / total) * 100).toFixed(1)
               return [
                 ` ប្រភេទ: ${ctx.label}`,
                 ` ចំនួន: ${formatAmount(item.amount)}`,
@@ -239,25 +241,21 @@ async function renderCharts() {
   }
 }
 
-onMounted(async () => {
-  await fetchAllTransactions()  // ✅ loop pages ជំនួស fetchTransactions(1, 1000)
-  await renderCharts()
-})
-
 watch(
-  () => allTransactions.value,
+  () => txStore.transactions,
   () => renderCharts(),
   { deep: true }
 )
+
+onMounted(() => renderCharts())
 
 onBeforeUnmount(() => destroyCharts())
 </script>
 
 <style scoped>
 .spend-card {
-  background: #fff;
+  background-color: var(--bg-card);
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   overflow: hidden;
   width: 100%;
@@ -270,7 +268,7 @@ onBeforeUnmount(() => destroyCharts())
 .spend-card__title {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 20px;
 }
 
@@ -284,7 +282,7 @@ onBeforeUnmount(() => destroyCharts())
   gap: 10px;
   justify-content: center;
   padding: 60px 24px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -298,7 +296,9 @@ onBeforeUnmount(() => destroyCharts())
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .charts-row {
@@ -310,8 +310,7 @@ onBeforeUnmount(() => destroyCharts())
 .chart-box {
   flex: 1 1 0;
   min-width: 0;
-  background: #f9fafb;
-  border: 1px solid #f0f0f0;
+  background-color: var(--bg-card);
   border-radius: 14px;
   padding: 20px;
   display: flex;
@@ -336,16 +335,29 @@ onBeforeUnmount(() => destroyCharts())
   flex-shrink: 0;
 }
 
-.chart-box__icon--income  { background: #E1F5EE; color: #0F6E56; }
-.chart-box__icon--expense { background: #FAECE7; color: #993C1D; }
+.chart-box__icon--income {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.chart-box__icon--expense {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
 
 .chart-box__title {
   font-size: 14px;
   font-weight: 600;
   margin: 0;
 }
-.chart-box__title--income  { color: #0F6E56; }
-.chart-box__title--expense { color: #993C1D; }
+
+.chart-box__title--income {
+  color: var(--color-success);
+}
+
+.chart-box__title--expense {
+  color: var(--color-danger);
+}
 
 .chart-content {
   display: flex;
@@ -379,13 +391,13 @@ onBeforeUnmount(() => destroyCharts())
 .chart-center__count {
   font-size: 26px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .chart-center__label {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 
@@ -395,6 +407,27 @@ onBeforeUnmount(() => destroyCharts())
   flex-direction: column;
   gap: 9px;
   min-width: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.legend::-webkit-scrollbar {
+  width: 6px;
+}
+
+.legend::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.legend::-webkit-scrollbar-thumb {
+  background: #c7c7c7;
+  border-radius: 10px;
+}
+
+.legend::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .legend-item {
@@ -414,7 +447,7 @@ onBeforeUnmount(() => destroyCharts())
 
 .legend-label {
   flex: 1;
-  color: #374151;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -426,8 +459,14 @@ onBeforeUnmount(() => destroyCharts())
   white-space: nowrap;
   flex-shrink: 0;
 }
-.income-amount  { color: #1D9E75; }
-.expense-amount { color: #D85A30; }
+
+.income-amount {
+  color: #1D9E75;
+}
+
+.expense-amount {
+  color: #D85A30;
+}
 
 .chart-empty {
   display: flex;
@@ -440,7 +479,16 @@ onBeforeUnmount(() => destroyCharts())
 }
 
 @media (max-width: 640px) {
-  .charts-row { flex-direction: column; }
-  .chart-box  { width: 100%; }
+  .charts-row {
+    flex-direction: column;
+  }
+
+  .chart-box {
+    width: 100%;
+  }
+
+  .legend {
+    max-height: 180px;
+  }
 }
 </style>

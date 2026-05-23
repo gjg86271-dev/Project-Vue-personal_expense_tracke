@@ -15,10 +15,9 @@
                         ប្រើប្រាស់យ៉ាងមានការយល់ដឹង និងឈានទៅរកគោលដៅហិរញ្ញវត្ថុបានលឿនជាងមុន។
                     </p>
                     <div class="social-row">
-                        <a class="social-btn" href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                        <a class="social-btn" href="#" aria-label="Telegram"><i class="bi bi-telegram"></i></a>
-                        <a class="social-btn" href="#" aria-label="Youtube"><i class="bi bi-youtube"></i></a>
-                        <a class="social-btn" href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+                        <a class="social-btn" href="https://www.facebook.com/ant.com.kh" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a class="social-btn" href="https://t.me/AntTechnologyTrainingCenter" aria-label="Telegram"><i class="bi bi-telegram"></i></a>
+                        <a class="social-btn" href="https://www.youtube.com/@ANTTechnologyTrainingCenter" aria-label="Youtube"><i class="bi bi-youtube"></i></a>
                     </div>
                 </div>
 
@@ -39,11 +38,11 @@
                     <p class="footer-col-title">ទំនាក់ទំនង</p>
                     <div class="contact-item">
                         <i class="bi bi-envelope-fill"></i>
-                        <span>support@kaksen.com</span>
+                        <span>sengsidomanatt@gmail.com</span>
                     </div>
                     <div class="contact-item">
                         <i class="bi bi-telephone-fill"></i>
-                        <span>+855 12 345 678</span>
+                        <span>+855 712 622 758</span>
                     </div>
                     <div class="contact-item">
                         <i class="bi bi-geo-alt-fill"></i>
@@ -116,7 +115,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .footer-inner {
-    max-width: 1100px;
+    max-width: 1440px;
     margin: 0 auto;
     padding: 0 2rem;
     position: relative;
@@ -141,7 +140,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .brand-desc {
-    font-size: 13.5px;
+    font-size: 18;
     color: rgba(0, 0, 0, 0.55);
     line-height: 1.8;
     margin-bottom: 20px;
@@ -163,7 +162,7 @@ import { RouterLink } from 'vue-router'
     align-items: center;
     justify-content: center;
     color: #2563eb;
-    font-size: 16px;
+    font-size: 18px;
     cursor: pointer;
     transition: background 0.2s;
     text-decoration: none;
@@ -183,7 +182,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .footer-col-title {
-    font-size: 13px;
+    font-size: 24px;
     font-weight: 600;
     color: #1a1a2e;
     text-transform: uppercase;
@@ -200,7 +199,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .footer-links li a {
-    font-size: 13.5px;
+    font-size: 18px;
     color: rgba(0, 0, 0, 0.5);
     text-decoration: none;
     transition: color 0.2s;
@@ -218,14 +217,14 @@ import { RouterLink } from 'vue-router'
 }
 
 .contact-item i {
-    font-size: 16px;
+    font-size: 18px;
     color: #2563eb;
     margin-top: 2px;
     flex-shrink: 0;
 }
 
 .contact-item span {
-    font-size: 13px;
+    font-size: 16px;
     color: rgba(0, 0, 0, 0.55);
     line-height: 1.6;
 }
@@ -255,7 +254,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .app-badge i {
-    font-size: 20px;
+    font-size: 24px;
     color: #2563eb;
 }
 
@@ -265,12 +264,12 @@ import { RouterLink } from 'vue-router'
 }
 
 .app-badge-text small {
-    font-size: 10px;
+    font-size: 18px;
     color: rgba(0, 0, 0, 0.4);
 }
 
 .app-badge-text span {
-    font-size: 13px;
+    font-size: 18px;
     font-weight: 500;
     color: #1a1a2e;
 }
@@ -286,7 +285,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .footer-bottom p {
-    font-size: 12px;
+    font-size: 16px;
     color: rgba(0, 0, 0, 0.35);
 }
 
@@ -296,7 +295,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .footer-bottom-links a {
-    font-size: 12px;
+    font-size: 16px;
     color: rgba(0, 0, 0, 0.35);
     text-decoration: none;
     transition: color 0.2s;

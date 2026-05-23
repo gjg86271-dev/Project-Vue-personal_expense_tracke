@@ -29,11 +29,17 @@
                 ទំព័រដើម
               </RouterLink>
             </li>
+
             <li class="nav-item">
-              <RouterLink class="nav-link nav-item-link" to="function">មុខងារ</RouterLink>
+              <RouterLink class="nav-link nav-item-link" to="function">
+                មុខងារ
+              </RouterLink>
             </li>
+
             <li class="nav-item">
-              <RouterLink class="nav-link nav-item-link" to="about">អំពីយើង</RouterLink>
+              <RouterLink class="nav-link nav-item-link" to="about">
+                អំពីយើង
+              </RouterLink>
             </li>
           </ul>
 
@@ -42,7 +48,8 @@
             <RouterLink to="/login" class="btn btn-outline-primary rounded-5 px-4">
               ចូលប្រើ
             </RouterLink>
-            <RouterLink to="/dashboard" class="btn btn-primary rounded-5 px-5">
+
+            <RouterLink to="/register" class="btn btn-primary rounded-5 px-5">
               ចុះឈ្មោះ
             </RouterLink>
           </div>
@@ -58,29 +65,57 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <style scoped>
+
 /* ===== NAVBAR BASE ===== */
 .navbar {
-  height: 68px;
+  width: 100%;
+  min-height: 78px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
   padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+
+.container {
+  max-width: 1320px;
+}
+
+/* ===== LEFT ===== */
+.navbar-left {
+  display: flex;
+  align-items: center;
 }
 
 .brand-icon {
-  width: 160px;
-  height: 60px;
+  width: 220px;
+  height: 72px;
   object-fit: contain;
 }
 
+/* ===== COLLAPSE ===== */
+.nav-collapse-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /* ===== NAV LINKS ===== */
+.navbar-nav {
+  align-items: center;
+}
+
 .nav-item-link {
-  font-size: 15px;
+  font-size: 18px;
   color: #374151;
   font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 8px;
-  transition: background 0.2s, color 0.2s;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
 }
 
 .nav-item-link:hover,
@@ -93,94 +128,146 @@ import { RouterLink } from 'vue-router'
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  margin-left: 20px;
+}
+
+.navbar-right .btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .btn-outline-primary {
   border-color: #1565D8;
   color: #1565D8;
-  font-size: 14px;
+  background: transparent;
 }
 
 .btn-outline-primary:hover {
   background: #EEF4FF;
   border-color: #1565D8;
   color: #1565D8;
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
 }
 
 .btn-primary {
   background: #1565D8;
   border-color: #1565D8;
-  font-size: 14px;
   color: #ffffff;
 }
 
 .btn-primary:hover {
   background: #1251b5;
   border-color: #1251b5;
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
 }
 
-/* ===== MOBILE (md and below) ===== */
-@media (max-width: 991.98px) {
-  .navbar {
-    height: auto;
-    padding: 12px 16px;
+/* ===== LARGE SCREEN FIX ===== */
+@media (min-width: 992px) {
+  .navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
   }
 
-  .nav-collapse-box {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
-    padding: 16px;
-    margin-top: 12px;
+  .navbar-collapse {
+    flex-grow: 1;
   }
 
   .navbar-nav {
-    flex-direction: column;
-    gap: 4px !important;
-    margin-bottom: 12px !important;
+    margin-left: auto;
+    margin-right: auto;
   }
+}
 
-  .nav-item-link {
-    display: block;
+/* ===== MOBILE ===== */
+/* ===== MOBILE FIX ===== */
+@media (max-width: 991.98px) {
+
+  .navbar {
     padding: 10px 14px;
+    min-height: auto;
   }
 
-  .navbar-right {
-    flex-direction: column;
+  /* FIX logo + toggle */
+  .navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand-icon {
+    width: 150px;
+    height: 50px;
+    object-fit: contain;
+  }
+
+  /* FIX dropdown box */
+  .nav-collapse-box {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+    padding: 18px;
+    margin-top: 14px;
+  }
+
+  /* FIX nav menu vertical */
+  .navbar-nav {
     width: 100%;
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px !important;
+    margin-bottom: 18px !important;
   }
 
+  .nav-item {
+    width: 100%;
+  }
+
+  /* FIX active menu */
+  .nav-item-link {
+    width: 100%;
+    display: block;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 18px;
+  }
+
+  /* FIX button section */
+  .navbar-right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-left: 0;
+  }
+
+  /* FIX full width buttons */
   .navbar-right .btn {
     width: 100%;
+    padding: 12px;
+    font-size: 18px;
     text-align: center;
-    padding: 10px;
+    border-radius: 999px;
   }
-}
-.navbar-right .btn {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
 
-.navbar-right .btn:hover {
-    transform: scale(1.08);
-}
-.navbar-right .btn {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+  /* FIX toggle icon */
+  .navbar-toggler {
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: 2px solid #666 !important;
+    box-shadow: none !important;
+  }
 
-.navbar-right .btn-outline-primary:hover {
-    transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
-}
-
-.navbar-right .btn-primary:hover {
-    transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
-}
-.navbar-right .btn {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    will-change: transform;
+  .navbar-toggler:focus {
+    box-shadow: none;
+  }
 }
 </style>

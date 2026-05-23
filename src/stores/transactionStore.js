@@ -7,29 +7,41 @@ export const useTransactionStore = defineStore('transaction', () => {
   const transactions = ref([])
   const meta         = ref(null)
   const loading      = ref(false)
-  const summary      = ref({
+
+  const summary = ref({
     totalIncome:  0,
     totalExpense: 0,
     netBalance:   0,
   })
 
-  // ── FETCH ALL ─────────────────────────────────────────
-  async function fetchTransactions(page = 1, perPage = 100) {
+  // ── FETCH ALL ─────────────────────────────
+  async function fetchTransactions(page = 1, filters = {}) {
     loading.value = true
     try {
-      const res = await api.get(
-        `transactions?_page=${page}&_per_page=${perPage}&sortBy=transactionDate&sortDir=desc`
-      )
-      transactions.value = res.data.data.items
-      meta.value         = res.data.data.meta
+      const params = new URLSearchParams()
+      params.set('_page',     page)
+      params.set('_per_page', 10)               // ✅ 10 per page for pagination to work
+      params.set('sortBy',    'transactionDate')
+      params.set('sortDir',   'desc')
+
+      if (filters.type)            params.set('type',       filters.type)
+      if (filters.categoryId)      params.set('categoryId', filters.categoryId)
+      if (filters.search?.trim())  params.set('search',     filters.search.trim())
+
+      const res = await api.get(`transactions?${params.toString()}`)
+
+      transactions.value = res.data.data.items ?? []
+      meta.value         = res.data.data.meta  ?? null
+
     } catch (err) {
       console.error('fetchTransactions:', err.response?.data || err)
+      transactions.value = []
     } finally {
       loading.value = false
     }
   }
 
-  // ── FETCH SUMMARY ─────────────────────────────────────
+  // ── SUMMARY ───────────────────────────────
   async function fetchSummary() {
     try {
       const res  = await api.get('analytics/dashboard-summary')
@@ -44,32 +56,20 @@ export const useTransactionStore = defineStore('transaction', () => {
     }
   }
 
-  // ── CREATE ────────────────────────────────────────────
-async function createTransaction(payload) {
-  try {
-    const res = await api.post('transactions', payload, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    return res.data
-  } catch (err) {
-    console.error('createTransaction error:', JSON.stringify(err.response?.data, null, 2))
-    throw err
+  // ── CREATE ────────────────────────────────
+  async function createTransaction(payload) {
+    try {
+      const res = await api.post('transactions', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      return res.data
+    } catch (err) {
+      console.error('createTransaction:', err.response?.data)
+      throw err
+    }
   }
-}
 
-async function updateTransaction(id, payload) {
-  try {
-    const res = await api.put(`transactions/${id}`, payload, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    return res.data
-  } catch (err) {
-    console.error('updateTransaction error:', JSON.stringify(err.response?.data, null, 2))
-    throw err
-  }
-}
-
-  // ── UPDATE ────────────────────────────────────────────
+  // ── UPDATE ────────────────────────────────
   async function updateTransaction(id, payload) {
     try {
       const isFormData = payload instanceof FormData
@@ -80,17 +80,17 @@ async function updateTransaction(id, payload) {
       })
       return res.data
     } catch (err) {
-      console.error('updateTransaction error:', err.response?.data)
+      console.error('updateTransaction:', err.response?.data)
       throw err
     }
   }
 
-  // ── DELETE ────────────────────────────────────────────
+  // ── DELETE ────────────────────────────────
   async function deleteTransaction(id) {
     try {
       await api.delete(`transactions/${id}`)
     } catch (err) {
-      console.error('deleteTransaction error:', err.response?.data)
+      console.error('deleteTransaction:', err.response?.data)
       throw err
     }
   }

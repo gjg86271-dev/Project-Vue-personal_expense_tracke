@@ -12,6 +12,22 @@ const getApiErrorMessage = (error, fallback) => {
   return fallback
 }
 
+// ✅ decode JWT payload ដោយមិនចាំបាច់ library
+const decodeJwtRole = (jwtToken) => {
+  try {
+    const payload = JSON.parse(atob(jwtToken.split(".")[1]))
+    // common fields: role, roles, authorities, scope
+    return (
+      payload.role ??
+      payload.roles?.[0] ??
+      payload.authorities?.[0]?.replace("ROLE_", "") ??
+      null
+    )
+  } catch {
+    return null
+  }
+}
+
 export const useAuthStore = defineStore("auth", () => {
 
   // ── State ──────────────────────────────────────────────
@@ -19,26 +35,48 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.getItem("token") || sessionStorage.getItem("token") || null
   )
   const user = ref(null)
+  const role = ref(
+    localStorage.getItem("role") || sessionStorage.getItem("role") || null
+  )
   const errorMsg = ref("")
   const resetToken = ref("")
   const resetEmail = ref(sessionStorage.getItem("resetEmail") || "")
 
   // ── Computed ───────────────────────────────────────────
   const isLogin = computed(() => !!token.value)
+  const isAdmin = computed(() => role.value === "ADMIN")
+  const isUser  = computed(() => role.value === "USER")
+
+  // ── Helpers ────────────────────────────────────────────
+  const saveToken = (tokenValue) => {
+    token.value = tokenValue
+    localStorage.setItem("token", tokenValue)
+    sessionStorage.removeItem("token")
+  }
+
+  const saveRole = (roleValue) => {
+    role.value = roleValue ?? null
+    if (!roleValue) return
+    localStorage.setItem("role", roleValue)
+    sessionStorage.removeItem("role")
+  }
 
   // ── Actions ────────────────────────────────────────────
   const setAuth = (data) => {
-    user.value = data.user
-    token.value = data.token
-    localStorage.setItem("token", data.token)
+    user.value = data.user ?? null
+    saveToken(data.token)
+    saveRole(data.role ?? null)
   }
 
   const logout = () => {
-    user.value = null
-    token.value = null
+    user.value     = null
+    token.value    = null
+    role.value     = null
     errorMsg.value = ""
     localStorage.removeItem("token")
+    localStorage.removeItem("role")
     sessionStorage.removeItem("token")
+    sessionStorage.removeItem("role")
     sessionStorage.removeItem("resetEmail")
   }
 
@@ -46,24 +84,39 @@ export const useAuthStore = defineStore("auth", () => {
     const { rememberMe, ...loginData } = data
     try {
       const res = await api.post("/auth/login", loginData)
-      token.value = res.data.data.token
-      user.value = res.data.data.user ?? null
+      const resData = res.data.data
 
-      if (rememberMe) {
-        localStorage.setItem("token", res.data.data.token)
-        sessionStorage.removeItem("token")
-      } else {
-        sessionStorage.setItem("token", res.data.data.token)
-        localStorage.removeItem("token")
+      saveToken(resData.token)
+      user.value = resData.user ?? null
+
+     
+      let resolvedRole =
+        resData.role ??
+        resData.user?.role ??
+        resData.user?.role?.name ??
+        decodeJwtRole(resData.token) ??
+        null
+
+      if (resolvedRole) {
+        saveRole(resolvedRole)
+      }
+
+      // ✅ Block ADMIN
+      if (resolvedRole === "ADMIN") {
+        logout()
+        errorMsg.value = "អ្នកគ្រប់គ្រងមិនអាចចូលប្រើប្រព័ន្ធនេះបានទេ"
+        throw new Error("ADMIN_NOT_ALLOWED")
       }
 
       errorMsg.value = ""
       return res.data
     } catch (error) {
-      errorMsg.value = getApiErrorMessage(
-        error,
-        "បញ្ចូលបរាជ័យ សូមពិនិត្យមើលអុីមែល និងពាក្យសម្ងាត់ម្ដងទៀត"
-      )
+      if (error.message !== "ADMIN_NOT_ALLOWED") {
+        errorMsg.value = getApiErrorMessage(
+          error,
+          "បញ្ចូលបរាជ័យ សូមពិនិត្យមើលអុីមែល និងពាក្យសម្ងាត់ម្ដងទៀត"
+        )
+      }
       throw error
     }
   }
@@ -72,7 +125,6 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const res = await api.post("auth/register", data)
       user.value = res.data.data ?? null
-
       errorMsg.value = ""
       return res.data
     } catch (err) {
@@ -151,7 +203,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   // ── Exports ────────────────────────────────────────────
   return {
-    token, user, errorMsg, resetToken, resetEmail, isLogin,
+    token, user, role, errorMsg, resetToken, resetEmail,
+    isLogin, isAdmin, isUser,
     setAuth, logout,
     login, register,
     requestOtp, sentOtp, resendOtp, verifyOtp,

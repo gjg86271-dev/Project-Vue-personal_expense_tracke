@@ -487,40 +487,37 @@ onMounted(async () => {
 })
 </script>
 
-<style>
+<style scoped>
 /* ───────────────── PAGE ───────────────── */
 .detail-page {
   padding: 24px;
-  background: #f6f8fb;
+  background: var(--bg-body);
   min-height: 100vh;
 }
 
 .font {
-  font-family: 'Kantumruy Pro', sans-serif;
+  font-family: var(--font-khmer);
 }
 
 /* ───────────────── BACK BUTTON ───────────────── */
 .back-btn {
   border: none;
-  background: white;
+  background: var(--bg-card);
   padding: 10px 18px;
-  border-radius: 14px;
-
+  border-radius: var(--radius);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   font-size: 14px;
   font-weight: 600;
-
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  transition: 0.25s;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
 }
 
 .back-btn:hover {
   transform: translateY(-2px);
-  background: #f0f4ff;
-  color: #0d6efd;
+  background: var(--bg-body);
+  color: var(--color-primary);
 }
 
 /* ───────────────── LAYOUT ───────────────── */
@@ -539,16 +536,12 @@ onMounted(async () => {
 
 /* ───────────────── HERO CARD ───────────────── */
 .hero-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 24px;
   padding: 28px;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05);
-
+  box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -560,25 +553,16 @@ onMounted(async () => {
   position: absolute;
   top: 0;
   left: 0;
-
   width: 100%;
   height: 5px;
 }
 
 .hero--income::before {
-  background: linear-gradient(
-    90deg,
-    #16c47f,
-    #65d6a6
-  );
+  background: linear-gradient(90deg, var(--color-success), #65d6a6);
 }
 
 .hero--expense::before {
-  background: linear-gradient(
-    90deg,
-    #ff4d6d,
-    #ff758f
-  );
+  background: linear-gradient(90deg, var(--color-danger), #ff758f);
 }
 
 /* ───────────────── ICON ───────────────── */
@@ -586,44 +570,40 @@ onMounted(async () => {
   width: 80px;
   height: 80px;
   border-radius: 24px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 32px;
   margin-bottom: 18px;
 }
 
 .hero--income .hero-icon {
-  background: rgba(22,196,127,0.12);
-  color: #16c47f;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .hero--expense .hero-icon {
-  background: rgba(255,77,109,0.12);
-  color: #ff4d6d;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 /* ───────────────── BADGE ───────────────── */
 .hero-badge {
   padding: 6px 16px;
   border-radius: 999px;
-
   font-size: 13px;
   font-weight: 700;
-
   margin-bottom: 14px;
 }
 
 .badge--income {
-  background: rgba(22,196,127,0.12);
-  color: #16c47f;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .badge--expense {
-  background: rgba(255,77,109,0.12);
-  color: #ff4d6d;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 /* ───────────────── AMOUNT ───────────────── */
@@ -634,11 +614,11 @@ onMounted(async () => {
 }
 
 .amount--income {
-  color: #16c47f;
+  color: var(--color-success);
 }
 
 .amount--expense {
-  color: #ff4d6d;
+  color: var(--color-danger);
 }
 
 .hero-category {
@@ -648,9 +628,8 @@ onMounted(async () => {
 }
 
 .hero-date {
-  color: #6c757d;
+  color: var(--text-secondary);
   font-size: 14px;
-
   display: flex;
   align-items: center;
   gap: 6px;
@@ -660,23 +639,18 @@ onMounted(async () => {
 .hero-preview {
   width: 100%;
   height: 220px;
-
   object-fit: cover;
-
   border-radius: 18px;
   margin-top: 18px;
-
-  border: 1px solid #eee;
+  border: 1px solid var(--border-color);
 }
 
 /* ───────────────── RIGHT CARD ───────────────── */
 .detail-right {
-  background: white;
+  background: var(--bg-card);
   border-radius: 24px;
   padding: 28px;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow);
 }
 
 /* ───────────────── HEADER ───────────────── */
@@ -684,7 +658,6 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   margin-bottom: 24px;
 }
 
@@ -692,10 +665,11 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 800;
   margin: 0;
+  color: var(--text-primary);
 }
 
 .detail-subtitle {
-  color: #6c757d;
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 
@@ -705,68 +679,63 @@ onMounted(async () => {
   gap: 10px;
 }
 
+/* ───────────────── ACTION BUTTON ───────────────── */
 .action-btn {
   width: 42px;
   height: 42px;
-
   border: none;
-  border-radius: 14px;
-
-  background: #f5f7fb;
-
+  border-radius: var(--radius);
+  background: var(--bg-input);        /* #1a2840 dark */
   display: flex;
   align-items: center;
   justify-content: center;
-
-  transition: 0.25s;
+  transition: var(--transition);
+  cursor: pointer;
 }
 
 .action-btn i {
   font-size: 18px;
+  color: var(--text-secondary);       /* #94a3b8 dark */
 }
 
 .action-btn--edit:hover {
-  background: #e7f1ff;
-  color: #0d6efd;
+  background: rgba(26, 98, 212, 0.15);
+  color: var(--color-primary);
 }
 
 .action-btn--delete:hover {
-  background: #ffe5ea;
-  color: #ff4d6d;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
-
 /* ───────────────── INFO GRID ───────────────── */
 .info-grid {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
 }
 
 .info-row {
   display: flex;
   gap: 24px;
-
   padding: 18px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .info-label {
   width: 180px;
   flex-shrink: 0;
-
   font-weight: 700;
-  color: #495057;
-
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .info-label i {
-  color: #0d6efd;
+  color: var(--color-primary);
 }
 
 .info-value {
   flex: 1;
-  color: #212529;
+  color: var(--text-primary);
 }
 
 .notes-value {
@@ -778,41 +747,34 @@ onMounted(async () => {
 .type-chip {
   padding: 6px 14px;
   border-radius: 999px;
-
   font-size: 13px;
   font-weight: 700;
-
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 .chip--income {
-  background: rgba(22,196,127,0.12);
-  color: #16c47f;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .chip--expense {
-  background: rgba(255,77,109,0.12);
-  color: #ff4d6d;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 /* ───────────────── ATTACHMENT PREVIEW ───────────────── */
 .attachment-preview {
   width: 240px;
   height: 170px;
-
   object-fit: cover;
-
   border-radius: 18px;
-  border: 1px solid #e9ecef;
-
-  background: white;
-
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
   display: block;
   margin-top: 10px;
-
-  transition: 0.3s;
+  transition: var(--transition);
 }
 
 .attachment-preview:hover {
@@ -823,21 +785,15 @@ onMounted(async () => {
 .empty-image {
   width: 240px;
   height: 170px;
-
-  border: 2px dashed #d6dbe3;
+  border: 2px dashed var(--border-color);
   border-radius: 18px;
-
-  background: #fafcff;
-
+  background: var(--bg-input);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
   gap: 10px;
-
-  color: #8a94a6;
-
+  color: var(--text-secondary);
   margin-top: 10px;
 }
 
@@ -849,29 +805,22 @@ onMounted(async () => {
 .pdf-preview {
   width: 240px;
   height: 170px;
-
   border-radius: 18px;
-  border: 1px solid #eee;
-
-  background: white;
-
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
   gap: 12px;
-
   margin-top: 10px;
-
-  color: #dc3545;
+  color: var(--color-danger);
   font-weight: 700;
-
-  transition: 0.25s;
+  transition: var(--transition);
 }
 
 .pdf-preview:hover {
-  background: #fff5f5;
+  background: var(--color-danger-light);
 }
 
 .pdf-preview i {
@@ -886,21 +835,22 @@ onMounted(async () => {
 
 .form-control,
 .form-select {
-  border-radius: 14px;
+  border-radius: var(--radius);
   min-height: 48px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .form-control:focus,
 .form-select:focus {
-  box-shadow: 0 0 0 4px rgba(13,110,253,0.12);
-  border-color: #0d6efd;
+  box-shadow: 0 0 0 4px rgba(26, 98, 212, 0.12);
+  border-color: var(--color-primary);
 }
 
 /* ───────────────── STATE BOX ───────────────── */
 .state-box {
   min-height: 60vh;
-
   display: flex;
   align-items: center;
   justify-content: center;
