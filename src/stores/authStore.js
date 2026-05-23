@@ -12,7 +12,6 @@ const getApiErrorMessage = (error, fallback) => {
   return fallback
 }
 
-// ✅ decode JWT payload ដោយមិនចាំបាច់ library
 const decodeJwtRole = (jwtToken) => {
   try {
     const payload = JSON.parse(atob(jwtToken.split(".")[1]))
@@ -27,24 +26,50 @@ const decodeJwtRole = (jwtToken) => {
   }
 }
 
+// ── Extract role name from ANY format ─────────────────────────────────────────
+// API may return: "ADMIN" | { name: "ADMIN" } | { id:1, name:"ADMIN" }
+const extractRoleName = (r) => {
+  if (!r) return null
+  if (typeof r === "string") return r.trim().toUpperCase()
+  if (typeof r === "object") {
+    const name = r.name ?? r.roleName ?? r.role ?? null
+    return name ? String(name).trim().toUpperCase() : null
+  }
+  return null
+}
+
+// ── Check ADMIN regardless of format ──────────────────────────────────────────
+const isAdminRole = (r) => extractRoleName(r) === "ADMIN"
+
+const clearStorage = () => {
+  localStorage.removeItem("token")
+  localStorage.removeItem("role")
+  sessionStorage.removeItem("token")
+  sessionStorage.removeItem("role")
+  sessionStorage.removeItem("resetEmail")
+}
+
 export const useAuthStore = defineStore("auth", () => {
 
   // ── State ──────────────────────────────────────────────
   const token = ref(
     localStorage.getItem("token") || sessionStorage.getItem("token") || null
   )
-  const user = ref(null)
+  const user  = ref(null)
+
+  // role stored as plain string e.g. "USER" or "ADMIN"
   const role = ref(
     localStorage.getItem("role") || sessionStorage.getItem("role") || null
   )
-  const errorMsg = ref("")
+
+  const errorMsg   = ref("")
   const resetToken = ref("")
   const resetEmail = ref(sessionStorage.getItem("resetEmail") || "")
 
   // ── Computed ───────────────────────────────────────────
   const isLogin = computed(() => !!token.value)
-  const isAdmin = computed(() => role.value?.toUpperCase() === "ADMIN")
-  const isUser  = computed(() => role.value?.toUpperCase() === "USER")
+  const isAdmin = computed(() => isAdminRole(role.value))
+  const isUser  = computed(() => extractRoleName(role.value) === "USER")
 
   // ── Helpers ────────────────────────────────────────────
   const saveToken = (tokenValue) => {
@@ -53,10 +78,12 @@ export const useAuthStore = defineStore("auth", () => {
     sessionStorage.removeItem("token")
   }
 
+  // Always save role as a plain UPPERCASE string — never as [object Object]
   const saveRole = (roleValue) => {
-    role.value = roleValue ?? null
-    if (!roleValue) return
-    localStorage.setItem("role", roleValue)
+    const name = extractRoleName(roleValue)
+    role.value = name
+    if (!name) return
+    localStorage.setItem("role", name)
     sessionStorage.removeItem("role")
   }
 
@@ -72,42 +99,46 @@ export const useAuthStore = defineStore("auth", () => {
     token.value    = null
     role.value     = null
     errorMsg.value = ""
-    localStorage.removeItem("token")
-    localStorage.removeItem("role")
-    sessionStorage.removeItem("token")
-    sessionStorage.removeItem("role")
-    sessionStorage.removeItem("resetEmail")
+    clearStorage()
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // LOGIN — USER only, block ADMIN
+  // ─────────────────────────────────────────────────────────────────────────────
   const login = async (data) => {
     const { rememberMe, ...loginData } = data
     try {
-      const res = await api.post("/auth/login", loginData)
+      const res     = await api.post("/auth/login", loginData)
       const resData = res.data.data
 
-      saveToken(resData.token)
-      user.value = resData.user ?? null
-
-      let resolvedRole =
+      // Extract role — may be string OR object like { id:1, name:"ADMIN" }
+      const rawRole =
         resData.role ??
         resData.user?.role ??
-        resData.user?.role?.name ??
+        resData.user?.roleName ??
         decodeJwtRole(resData.token) ??
         null
 
-      if (resolvedRole) {
-        saveRole(resolvedRole)
-      }
+      const resolvedRole = extractRoleName(rawRole)
 
-      // ✅ Block ADMIN (case-insensitive: "admin", "Admin", "ADMIN" ទាំងអស់ block)
-      if (resolvedRole?.toUpperCase() === "ADMIN") {
-        logout()
+      // ❌ Block ADMIN — clear everything, never save token
+      if (resolvedRole === "ADMIN") {
+        clearStorage()
+        token.value    = null
+        role.value     = null
+        user.value     = null
         errorMsg.value = "អ្នកគ្រប់គ្រងមិនអាចចូលប្រើប្រព័ន្ធនេះបានទេ"
         throw new Error("ADMIN_NOT_ALLOWED")
       }
 
+      // ✅ USER — save token & role as plain string
+      saveToken(resData.token)
+      user.value = resData.user ?? null
+      if (resolvedRole) saveRole(resolvedRole)
+
       errorMsg.value = ""
       return res.data
+
     } catch (error) {
       if (error.message !== "ADMIN_NOT_ALLOWED") {
         errorMsg.value = getApiErrorMessage(
@@ -122,14 +153,11 @@ export const useAuthStore = defineStore("auth", () => {
   const register = async (data) => {
     try {
       const res = await api.post("auth/register", data)
-      user.value = res.data.data ?? null
+      user.value     = res.data.data ?? null
       errorMsg.value = ""
       return res.data
     } catch (err) {
-      errorMsg.value = getApiErrorMessage(
-        err,
-        "បង្កើតបរាជ័យ សូមពិនិត្យព័ត៏មានម្ដងទៀត"
-      )
+      errorMsg.value = getApiErrorMessage(err, "បង្កើតបរាជ័យ សូមពិនិត្យព័ត៏មានម្ដងទៀត")
       throw err
     }
   }
@@ -161,7 +189,7 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const res = await api.post("/otp/verify", data)
       resetToken.value = res.data?.data?.token ?? res.data?.token ?? ""
-      errorMsg.value = ""
+      errorMsg.value   = ""
       return res.data
     } catch (error) {
       errorMsg.value = getApiErrorMessage(error, "លេខកូដ OTP មិនត្រឹមត្រូវ ឬផុតកំណត់")
@@ -197,6 +225,16 @@ export const useAuthStore = defineStore("auth", () => {
       )
       throw error
     }
+  }
+
+  // ── Boot-time guard ────────────────────────────────────
+  // Clear any leftover ADMIN token (including [object Object] role from old bug)
+  const storedRole = localStorage.getItem("role") || sessionStorage.getItem("role") || ""
+  if (isAdminRole(storedRole) || storedRole === "[object Object]") {
+    clearStorage()
+    token.value = null
+    role.value  = null
+    user.value  = null
   }
 
   // ── Exports ────────────────────────────────────────────
