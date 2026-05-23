@@ -16,7 +16,6 @@ const getApiErrorMessage = (error, fallback) => {
 const decodeJwtRole = (jwtToken) => {
   try {
     const payload = JSON.parse(atob(jwtToken.split(".")[1]))
-    // common fields: role, roles, authorities, scope
     return (
       payload.role ??
       payload.roles?.[0] ??
@@ -44,8 +43,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   // ── Computed ───────────────────────────────────────────
   const isLogin = computed(() => !!token.value)
-  const isAdmin = computed(() => role.value === "ADMIN")
-  const isUser  = computed(() => role.value === "USER")
+  const isAdmin = computed(() => role.value?.toUpperCase() === "ADMIN")
+  const isUser  = computed(() => role.value?.toUpperCase() === "USER")
 
   // ── Helpers ────────────────────────────────────────────
   const saveToken = (tokenValue) => {
@@ -89,7 +88,6 @@ export const useAuthStore = defineStore("auth", () => {
       saveToken(resData.token)
       user.value = resData.user ?? null
 
-     
       let resolvedRole =
         resData.role ??
         resData.user?.role ??
@@ -101,8 +99,8 @@ export const useAuthStore = defineStore("auth", () => {
         saveRole(resolvedRole)
       }
 
-      // ✅ Block ADMIN
-      if (resolvedRole === "ADMIN") {
+      // ✅ Block ADMIN (case-insensitive: "admin", "Admin", "ADMIN" ទាំងអស់ block)
+      if (resolvedRole?.toUpperCase() === "ADMIN") {
         logout()
         errorMsg.value = "អ្នកគ្រប់គ្រងមិនអាចចូលប្រើប្រព័ន្ធនេះបានទេ"
         throw new Error("ADMIN_NOT_ALLOWED")
