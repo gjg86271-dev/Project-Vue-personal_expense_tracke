@@ -137,7 +137,8 @@
   <!-- Profile dropdown panel -->
   <Teleport to="body">
     <Transition name="panel">
-      <div v-if="profileOpen" ref="profileMenuRef" class="profile-panel" :style="profileStyle" @click.stop>
+      <div v-if="profileOpen" ref="profileMenuRef"
+        class="profile-panel" :style="profileStyle" @click.stop>
 
         <div class="profile-head">
           <div class="avatar avatar--lg">
@@ -212,46 +213,26 @@ const avatarInitials = computed(() => {
   return name.trim().charAt(0).toUpperCase() || 'U'
 })
 
-/**
- * Extract user object from any API response shape:
- *   { data: { data: { name, email, ... } } }   ← Laravel Resource nested
- *   { data: { name, email, ... } }              ← standard wrapper
- *   { name, email, ... }                        ← flat response
- *
- * Also normalises common field aliases so user.name always has a value:
- *   full_name | username | first_name + last_name → name
- */
 function extractUser(responseData) {
-  // Unwrap one or two levels of "data"
   const raw =
     responseData?.data?.data ??
     responseData?.data ??
     responseData ??
     null
-
   if (!raw) return null
-
-  // Build a normalised copy so downstream code always reads `user.name`
   const normalised = { ...raw }
-
   if (!normalised.name) {
-    if (raw.fullName) {
-      normalised.name = raw.fullName
-    } else if (raw.full_name) {
-      normalised.name = raw.full_name
-    } else if (raw.firstName || raw.first_name) {
+    if (raw.fullName)                    normalised.name = raw.fullName
+    else if (raw.full_name)              normalised.name = raw.full_name
+    else if (raw.firstName || raw.first_name) {
       const first = raw.firstName || raw.first_name || ''
       const last  = raw.lastName  || raw.last_name  || ''
       normalised.name = `${first} ${last}`.trim()
-    } else if (raw.username) {
-      normalised.name = raw.username
-    }
+    } else if (raw.username)             normalised.name = raw.username
   }
-
   return normalised
 }
 
-// ── Fetch user ─────────────────────────────────────────────────────────────
 const fetchUser = async () => {
   try {
     const res = await api.get('auth/profile')
@@ -271,7 +252,7 @@ function positionProfile() {
   const el = profileTriggerRef.value
   if (!el) return
   const r          = el.getBoundingClientRect()
-  const panelWidth = 220
+  const panelWidth = 240
   const viewportW  = window.innerWidth
   let left = r.right - panelWidth
   if (left < 8) left = 8
@@ -505,7 +486,7 @@ onUnmounted(() => {
 .notif-badge {
   position: absolute; top: 2px; right: 2px;
   min-width: 16px; height: 16px; padding: 0 3px;
-  background: var(--color-danger); color: #fff;
+  background: var(--color-danger); color: var(--text-white);
   font-size: 9px; font-weight: 700; border-radius: 999px;
   display: flex; align-items: center; justify-content: center;
   border: 1.5px solid var(--bg-sidebar); pointer-events: none; line-height: 1;
@@ -612,28 +593,29 @@ onUnmounted(() => {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
+  background: rgba(26, 98, 212, 0.2);
+  color: var(--text-white);
   display: grid;
   place-items: center;
   font-size: 12px;
   font-weight: 700;
-  color: #fff;
   flex-shrink: 0;
   overflow: hidden;
 }
-.avatar--lg { width: 38px; height: 38px; font-size: 15px; }
+.avatar--lg { width: 42px; height: 42px; font-size: 15px; }
 .avatar-img { width: 100%; height: 100%; object-fit: cover; }
 
 .profile-name {
   font-size: 13px;
   font-weight: 500;
+  color: rgba(255, 255, 255, .9);
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.chevron { transition: transform .2s; opacity: .6; }
+.chevron { transition: transform .2s; opacity: .6; color: var(--text-white); }
 .chevron.open { transform: rotate(180deg); }
 
 /* ── Profile panel ── */
@@ -643,40 +625,46 @@ onUnmounted(() => {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  width: 240px;
 }
 
 .profile-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
+  gap: 12px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color);
 }
+
 .profile-head-info { min-width: 0; }
+
 .profile-head-name {
   font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
+  margin: 0 0 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .profile-head-email {
   font-size: 11px;
   color: var(--text-secondary);
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .profile-list { padding: 6px; }
+
 .profile-item {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 9px 10px;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 13px;
   color: var(--text-primary);
   text-decoration: none;
@@ -684,18 +672,24 @@ onUnmounted(() => {
   border: none;
   width: 100%;
   text-align: left;
+  cursor: pointer;
   transition: var(--transition);
   font-family: var(--font-khmer);
 }
 .profile-item:hover { background: var(--bg-input); }
-.profile-item svg   { flex-shrink: 0; opacity: .55; }
+.profile-item svg { flex-shrink: 0; opacity: .55; }
 .profile-item:hover svg { opacity: 1; }
 
-.profile-sep { height: 1px; background: var(--border-color); margin: 4px 0; }
+.profile-sep {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
 
 .profile-item--danger { color: var(--color-danger); }
 .profile-item--danger svg { opacity: .7; }
 .profile-item--danger:hover { background: var(--color-danger-light); }
+.profile-item--danger:hover svg { opacity: 1; }
 
 /* ── Panel transitions ── */
 :global(.panel-enter-active),
@@ -704,5 +698,5 @@ onUnmounted(() => {
 :global(.panel-leave-to)     { opacity: 0; transform: translateY(-6px); }
 
 :global(.notif-panel),
-:global(.profile-panel) { z-index: 999999 !important; }
+:global(.profile-panel) { z-index: 9999 !important; }
 </style>

@@ -1,15 +1,11 @@
 <template>
-  <!-- Modal -->
   <div class="modal-overlay">
     <div class="modal-container">
 
       <!-- Header -->
       <div class="modal-header">
         <h3>{{ title }}</h3>
-
-        <button class="close-btn" @click="close">
-          ✕
-        </button>
+        <button class="close-btn" @click="close">✕</button>
       </div>
 
       <!-- Body -->
@@ -40,7 +36,6 @@ function close() {
 </script>
 
 <style scoped>
-/* Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -48,55 +43,49 @@ function close() {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.45);
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   z-index: 999;
 }
 
-/* Modal Box */
-/* Modal Box */
-/* Modal Box */
 .modal-container {
   width: fit-content;
-  min-width: 300px;
-  max-width: min(500px, 90vw);  /* កុំឲ្យលើស 500px ឬ 90% screen */
-  max-height: 90vh;             /* កុំឲ្យលើស 90% screen height */
-  background: white;
-  border-radius: 16px;
+  min-width: 400px;
+  max-width: 500px;
+  max-height: 90vh;
+  background: var(--bg-card);
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow);
   animation: popup 0.25s ease;
   display: flex;
-  flex-direction: column;       /* ឲ្យ body scroll បាន */
+  flex-direction: column;
 }
 
-/* Body */
 .modal-body {
   padding: 20px;
-  overflow-y: auto;             /* scroll លើ content ខាងក្នុង */
+  overflow-y: auto;
   flex: 1;
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
-/* Animation */
+
 @keyframes popup {
   from {
     transform: scale(0.9);
     opacity: 0;
   }
-
   to {
     transform: scale(1);
     opacity: 1;
   }
 }
 
-/* Header */
 .modal-header {
   padding: 18px 20px;
-  border-bottom: 1px solid #f0f0f0;
-
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -105,30 +94,27 @@ function close() {
 .modal-header h3 {
   margin: 0;
   font-size: 20px;
+  color: var(--text-primary);
 }
 
-/* Close Button */
 .close-btn {
   border: none;
   background: transparent;
   font-size: 20px;
   cursor: pointer;
-  color: #666;
-
-  transition: 0.2s;
+  color: var(--text-secondary);
+  transition: var(--transition);
 }
 
 .close-btn:hover {
-  color: #ff4d4f;
+  color: var(--color-danger);
   transform: rotate(90deg);
 }
 
-
-/* Footer */
 .modal-footer {
   padding: 16px 20px;
-  border-top: 1px solid #f0f0f0;
-
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
   display: flex;
   justify-content: flex-end;
   gap: 10px;

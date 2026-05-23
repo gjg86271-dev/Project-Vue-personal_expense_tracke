@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@100..700&display=swap');
+@import url('cropperjs/dist/cropper.css');
 
 :root {
   /* font */
@@ -17,8 +18,10 @@
   --color-danger-light: #fee2e2;
 
   /* background */
-  --bg-body: #f0f4fb;       /* ស្រស់ស្អាត ជាង #f3f6fb */
-  --bg-sidebar: #1a5caa;    /* ពណ៌ navy ស្រស់ */
+  --bg-body: #f0f4fb;
+  /* ស្រស់ស្អាត ជាង #f3f6fb */
+  --bg-sidebar: #1a5caa;
+  /* ពណ៌ navy ស្រស់ */
   --bg-card: #ffffff;
   --bg-input: #f9fafb;
 
@@ -39,7 +42,7 @@
   /* transition */
   --transition: 0.25s ease;
 
-    /* blobs */
+  /* blobs */
   --blob-color-a: rgba(200, 217, 255, 0.55);
   --blob-color-b: rgba(181, 212, 244, 0.45);
   --blob-color-c: rgba(221, 232, 255, 0.60);
@@ -50,20 +53,37 @@
   /* deco rings */
   --ring-border: rgba(55, 138, 221, 0.10);
   --ring-glow-a: rgba(55, 138, 221, 0.04);
-  --ring-glow-b: rgba(24,  95, 165, 0.04);
+  --ring-glow-b: rgba(24, 95, 165, 0.04);
+
+  --bg-body: #f0f4fb;
+  --bg-card: #ffffff;
+  --bg-sidebar: #1a5caa;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-color: #dbe3ee;
+  --color-primary: #1a62d4;
+  --color-primary-hover: #145ab0;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --radius: 14px;
 }
 
 /* dark mode */
 .dark {
-  --bg-body: #0a1120;       /* ខ្មៅជ្រៅ navy ស្អាតជាង slate */
-  --bg-sidebar: #0f1c2e;    /* navy ងងឹត */
-  --bg-card: #1e293b;
-  --bg-input: #1a2840;      /* ស្រមោល navy */
+  --bg-body: #0a1120;
+  /* ខ្មៅជ្រៅ navy ស្អាតជាង slate */
+  --bg-sidebar: #0f1c2e;
+  /* navy ងងឹត */
+  --bg-card: #0f1c2e;
+  --bg-input: #1a2840;
+  /* ស្រមោល navy */
 
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
 
-  --border-color: #1e3352;  /* border navy ទន់ */
+  --border-color: #1e3352;
+  /* border navy ទន់ */
 
   --color-primary: #3b82f6;
   --color-primary-hover: #2563eb;
@@ -76,9 +96,9 @@
 
   --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 
-   /* blobs — ពណ៌ navy ស្រស់ ស៊ីគ្នានឹង bg ងងឹត */
+  /* blobs — ពណ៌ navy ស្រស់ ស៊ីគ្នានឹង bg ងងឹត */
   --blob-color-a: rgba(59, 130, 246, 0.10);
-  --blob-color-b: rgba(37,  99, 235, 0.08);
+  --blob-color-b: rgba(37, 99, 235, 0.08);
   --blob-color-c: rgba(96, 165, 250, 0.07);
 
   /* dot grid */
@@ -87,7 +107,7 @@
   /* deco rings */
   --ring-border: rgba(96, 165, 250, 0.08);
   --ring-glow-a: rgba(59, 130, 246, 0.04);
-  --ring-glow-b: rgba(37,  99, 235, 0.03);
+  --ring-glow-b: rgba(37, 99, 235, 0.03);
 }
 
 /* global */

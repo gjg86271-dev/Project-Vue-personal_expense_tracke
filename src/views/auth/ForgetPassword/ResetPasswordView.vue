@@ -30,7 +30,6 @@ const token = String(
   ) || ''
 )
 
-
 if (!token) {
   router.replace({ name: 'forgetPassword' })
 }
@@ -120,13 +119,13 @@ const submitResetPassword = async () => {
         <div class="icon-circle">
           <i class="bi bi-lock" aria-hidden="true"></i>
         </div>
-    
 
-        <h1 class="" >ភ្លេចពាក្យសម្ងាត់?</h1>
-        <p class="subtitle ​">បង្កើតពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក</p>
-
+        <h1>ភ្លេចពាក្យសម្ងាត់?</h1>
+        <p class="subtitle">បង្កើតពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក</p>
 
         <form class="reset-form" @submit.prevent="submitResetPassword" novalidate>
+
+          <!-- New password -->
           <div class="field-group">
             <label class="field-label" for="new-password">ពាក្យសម្ងាត់ថ្មី</label>
             <div class="input-shell" :class="{ 'is-invalid': errors.password }">
@@ -136,7 +135,7 @@ const submitResetPassword = async () => {
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="new-password"
-                placeholder="***************"
+                placeholder="បញ្ចូលពាក្យសម្ងាត់ថ្មី"
                 :disabled="isLoading"
                 @input="clearError('password')"
               />
@@ -153,6 +152,7 @@ const submitResetPassword = async () => {
             <p v-if="errors.password" class="field-error">{{ errors.password }}</p>
           </div>
 
+          <!-- Confirm password -->
           <div class="field-group">
             <label class="field-label" for="confirm-password">បញ្ជាក់ពាក្យសម្ងាត់</label>
             <div class="input-shell" :class="{ 'is-invalid': errors.confirmPassword }">
@@ -162,7 +162,7 @@ const submitResetPassword = async () => {
                 v-model="form.confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 autocomplete="new-password"
-                placeholder="***************"
+                placeholder="បញ្ជាក់ពាក្យសម្ងាត់ម្តងទៀត"
                 :disabled="isLoading"
                 @input="clearError('confirmPassword')"
               />
@@ -185,8 +185,8 @@ const submitResetPassword = async () => {
 
           <button class="primary-button" type="submit" :disabled="isLoading">
             <span>{{ isLoading ? 'កំពុងរក្សាទុក...' : 'ត្រឡប់ទៅ​ចូលប្រើប្រាស់' }}</span>
-      
           </button>
+
         </form>
       </div>
     </section>
@@ -209,7 +209,7 @@ const submitResetPassword = async () => {
 .reset-wrapper {
   display: flex;
   align-items: stretch;
-  width: min(100%, 760px);
+  width: min(100%, 780px);
   border-radius: 24px;
   overflow: hidden;
   box-shadow:
@@ -221,14 +221,15 @@ const submitResetPassword = async () => {
 .reset-card {
   flex: 1;
   min-width: 0;
-  padding: 40px 36px;
+  padding: 44px 40px;
   background: #ffffff;
 }
 
+/* Icon */
 .icon-circle {
   position: relative;
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +245,6 @@ const submitResetPassword = async () => {
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-
 .icon-circle::before {
   content: '';
   position: absolute;
@@ -256,10 +256,10 @@ const submitResetPassword = async () => {
 .icon-circle::after {
   content: '';
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 12px;
-  height: 12px;
+  right: 10px;
+  bottom: 10px;
+  width: 13px;
+  height: 13px;
   border: 2px solid #ffffff;
   border-radius: 50%;
   background: #22c55e;
@@ -269,59 +269,64 @@ const submitResetPassword = async () => {
 .icon-circle .bi {
   position: relative;
   z-index: 1;
-  font-size: 29px;
+  font-size: 28px;
   line-height: 1;
 }
 
-
+/* Title & subtitle */
 h1 {
   margin: 0;
   color: #151a2d;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 900;
   line-height: 1.25;
   text-align: center;
 }
 
 .subtitle {
-  margin: 7px 0 21px;
-  color: #9aa7bb;
-  font-size: 9.5px;
-  line-height: 1.5;
+  margin: 10px 0 26px;
+  color: #8b9bb0;
+  font-size: 15px;
+  line-height: 1.6;
   text-align: center;
 }
 
+/* Form */
 .reset-form {
   display: grid;
-  gap: 13px;
+  gap: 16px;
 }
 
 .field-group {
   min-width: 0;
 }
 
+/* Label */
 .field-label {
   display: block;
-  margin: 0 0 7px 2px;
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 600;
+  margin: 0 0 8px 4px;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 700;
 }
 
+/* Input shell */
 .input-shell {
   display: flex;
   align-items: center;
-  height: 38px;
-  border: 1.5px solid #657996;
+  height: 52px;
+  border: 1.5px solid #c4cdd9;
   border-radius: 999px;
-  padding: 0 13px;
-  background: #ffffff;
+  padding: 0 16px;
+  background: #f8fafc;
+  gap: 10px;
   transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
 }
 
 .input-shell:focus-within {
   border-color: #2d57b7;
-  box-shadow: 0 0 0 3px rgba(45, 87, 183, 0.13);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(45, 87, 183, 0.12);
 }
 
 .input-shell.is-invalid {
@@ -329,12 +334,15 @@ h1 {
   background: #fff7f7;
 }
 
+/* Icon inside input */
 .field-icon {
   flex-shrink: 0;
-  color: #9aacbf;
-  font-size: 13px;
+  color: #94a3b8;
+  font-size: 16px;
+  line-height: 1;
 }
 
+/* Input field */
 .input-shell input {
   flex: 1;
   min-width: 0;
@@ -342,15 +350,16 @@ h1 {
   height: 100%;
   border: 0;
   outline: 0;
-  padding: 0 10px;
+  padding: 0;
   color: #1d2740;
   background: transparent;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 15px;
 }
 
 .input-shell input::placeholder {
   color: #b7c3d3;
+  font-size: 14px;
 }
 
 .input-shell input:disabled {
@@ -358,18 +367,19 @@ h1 {
   opacity: 0.6;
 }
 
+/* Eye toggle */
 .eye-button {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 0;
   padding: 0;
-  color: #9aacbf;
+  color: #94a3b8;
   background: transparent;
-  font-size: 13px;
+  font-size: 16px;
   cursor: pointer;
   transition: color 0.15s;
 }
@@ -382,73 +392,61 @@ h1 {
   cursor: not-allowed;
 }
 
+/* Error */
 .field-error {
-  margin: 5px 0 0 2px;
+  margin: 6px 0 0 4px;
   color: #ef4444;
-  font-size: 10px;
-  line-height: 1.35;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
+/* Forgot link */
 .login-help {
   width: max-content;
   max-width: 100%;
   color: #657996;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
   text-decoration: none;
+  transition: color 0.18s;
 }
 
 .login-help:hover {
   color: #2d57b7;
 }
 
+/* Submit button */
 .primary-button {
   width: 100%;
-  height: 40px;
+  height: 52px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 10px;
   border: 0;
   border-radius: 999px;
   padding: 0 20px;
   color: #ffffff;
-  background: #2857bd;
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #2b65cc 0%, #1a4faa 100%);
+  box-shadow: 0 4px 16px rgba(26, 79, 170, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 900;
+  font-size: 16px;
+  font-weight: 800;
   cursor: pointer;
   transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
 }
 
 .primary-button:hover:not(:disabled) {
+  opacity: 0.93;
   transform: translateY(-1px);
-  box-shadow:
-    inset 0 -2px 0 rgba(0, 0, 0, 0.1),
-    0 7px 18px rgba(40, 87, 189, 0.25);
+  box-shadow: 0 7px 22px rgba(26, 79, 170, 0.36);
 }
 
-.primary-button:disabled {
-  cursor: wait;
-  opacity: 0.66;
-}
+.primary-button:active:not(:disabled) { transform: translateY(0); }
+.primary-button:disabled { cursor: wait; opacity: 0.66; }
 
-.primary-button i {
-  font-size: 14px;
-}
-
-.spin {
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* Responsive */
 @media (max-width: 900px) {
   .reset-page {
     align-items: flex-start;
@@ -461,7 +459,7 @@ h1 {
   }
 
   .reset-card {
-    padding: 28px 24px 25px;
+    padding: 32px 28px;
   }
 }
 
@@ -476,7 +474,15 @@ h1 {
   }
 
   .reset-card {
-    padding: 24px 20px 25px;
+    padding: 28px 20px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 14px;
   }
 }
 </style>

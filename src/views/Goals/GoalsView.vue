@@ -1,19 +1,19 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard bg-transparent">
     <!-- HEADER -->
-    <div class="header">
-      <div>
-        <h1 class="fonts">គោលដៅសន្សំ</h1>
-        <p class="fonts">
-          តាមដាន និងគ្រប់គ្រងគោលដៅសន្សំប្រាក់របស់អ្នក
-        </p>
+
+      <div class="header-card">
+        <div>
+          <h1>គោលដៅសន្សំ</h1>
+          <p>តាមដាន និងគ្រប់គ្រងគោលដៅសន្សំប្រាក់របស់អ្នក</p>
+        </div>
+        <button class="add-btn fonts" @click="showModal = true">
+          បន្ថែមគោលដៅថ្មី
+          <span>+</span>
+        </button>
       </div>
 
-      <button class="add-btn fonts" @click="showModal = true">
-        បន្ថែមគោលដៅថ្មី
-        <span>+</span>
-      </button>
-    </div>
+
 
     <!-- ADD MODAL -->
     <div v-if="showModal" class="modal-overlay">
@@ -28,21 +28,13 @@
           <div class="form-group">
             <label class="fonts">ឈ្មោះគោលដៅ</label>
 
-            <input
-              type="text"
-              v-model="form.name"
-              placeholder="ឧ. ទិញម៉ូតូ"
-            />
+            <input type="text" v-model="form.name" placeholder="ឧ. ទិញម៉ូតូ" />
           </div>
 
           <div class="form-group">
             <label class="fonts">ចំនួនទឹកប្រាក់គោលដៅ ($)</label>
 
-            <input
-              type="number"
-              v-model="form.targetAmount"
-              placeholder="0.00"
-            />
+            <input type="number" v-model="form.targetAmount" placeholder="0.00" />
           </div>
 
           <div class="form-group">
@@ -108,11 +100,7 @@
               ចំនួនទឹកប្រាក់ដែលត្រូវបន្ថែម ($)
             </label>
 
-            <input
-              type="number"
-              v-model="progressAmount"
-              placeholder="0.00"
-            />
+            <input type="number" v-model="progressAmount" placeholder="0.00" />
           </div>
 
           <button type="submit" class="submit-btn fonts">
@@ -209,13 +197,10 @@
         </div>
 
         <div class="progress-bar">
-          <div
-            class="progress-fill"
-            :style="{
-              width: goal.progress + '%',
-              background: goal.color,
-            }"
-          ></div>
+          <div class="progress-fill" :style="{
+            width: goal.progress + '%',
+            background: goal.color,
+          }"></div>
         </div>
       </div>
 
@@ -250,15 +235,9 @@
     <div v-if="showMessageModal" class="message-modal-overlay">
       <div class="message-modal-box">
         <div class="message-icon" :class="messageType">
-          <i
-            v-if="messageType === 'success'"
-            class="bi bi-check-circle-fill"
-          ></i>
+          <i v-if="messageType === 'success'" class="bi bi-check-circle-fill"></i>
 
-          <i
-            v-if="messageType === 'error'"
-            class="bi bi-x-circle-fill"
-          ></i>
+          <i v-if="messageType === 'error'" class="bi bi-x-circle-fill"></i>
         </div>
 
         <h2 class="fonts message-title">
@@ -358,8 +337,8 @@ const goals = computed(() => {
         progress >= 70
           ? "#16a34a"
           : progress >= 30
-          ? "#ff7a00"
-          : "#ef4444",
+            ? "#ff7a00"
+            : "#ef4444",
     };
   });
 });
@@ -565,10 +544,53 @@ function formatDate(date) {
   box-sizing: border-box;
 }
 
+/* HEADER CARD */
+.header-card {
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.header-card h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: var(--text-white);
+}
+
+.header-card p {
+  font-size: 12px;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* BUTTON */
+.add-btn {
+  height: 46px;
+  padding: 0 20px;
+  font-size: 15px;
+  white-space: nowrap;
+  font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif !important;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-white);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.add-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* DASHBOARD */
 .dashboard {
-  min-height: 100vh;
-  padding: 32px;
-  background: #f6f8fc;
   font-family: "Kantumruy Pro", sans-serif;
 }
 
@@ -585,30 +607,12 @@ function formatDate(date) {
 .header h1 {
   font-size: 34px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .header p {
-  color: #6b7280;
+  color: var(--text-secondary);
   margin-top: 8px;
-}
-
-.add-btn {
-  border: none;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  padding: 14px 22px;
-  border-radius: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  transition: 0.3s;
-}
-
-.add-btn:hover {
-  transform: translateY(-2px);
 }
 
 /* STATS */
@@ -620,29 +624,29 @@ function formatDate(date) {
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .stat-card h4 {
-  color: #6b7280;
+  color: var(--text-secondary);
   margin-bottom: 10px;
 }
 
 .stat-card h2 {
   font-size: 32px;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 /* GOAL CARD */
 .goal-card {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 28px;
   margin-bottom: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .goal-top {
@@ -659,17 +663,19 @@ function formatDate(date) {
 
 .title-row h3 {
   font-size: 24px;
+  color: var(--text-primary);
 }
 
 .status {
-  background: #10b981;
-  color: white;
+  background: var(--color-success);
+  color: var(--text-white);
   padding: 6px 14px;
   border-radius: 999px;
   font-size: 13px;
   font-weight: 700;
 }
 
+/* ACTIONS */
 .actions {
   display: flex;
   gap: 12px;
@@ -678,13 +684,14 @@ function formatDate(date) {
 .actions span {
   width: 42px;
   height: 42px;
-  background: #f3f4f6;
+  background: var(--bg-input);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: 0.3s;
+  color: var(--text-primary);
 }
 
 .actions span:hover {
@@ -692,7 +699,7 @@ function formatDate(date) {
 }
 
 .delete-action {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 /* PROGRESS */
@@ -707,14 +714,9 @@ function formatDate(date) {
 .progress-bar {
   width: 100%;
   height: 14px;
-  background: #e5e7eb;
+  background: var(--border-color);
   border-radius: 999px;
   overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  transition: 0.4s;
 }
 
 /* BOTTOM */
@@ -726,27 +728,28 @@ function formatDate(date) {
 
 .goal-bottom h2 {
   font-size: 30px;
+  color: var(--text-primary);
 }
 
 .remaining h2 {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 /* SAVE BTN */
 .save-btn {
   width: 100%;
   border: none;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
+  color: var(--text-white);
   padding: 16px;
   border-radius: 18px;
   cursor: pointer;
   font-weight: 700;
   transition: 0.3s;
-}
-
-.save-btn:hover {
-  transform: translateY(-2px);
 }
 
 /* MODAL */
@@ -765,10 +768,11 @@ function formatDate(date) {
 .modal-box {
   width: 100%;
   max-width: 500px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 30px;
   padding: 28px;
   animation: modalPop 0.3s ease;
+  color: var(--text-primary);
 }
 
 @keyframes modalPop {
@@ -776,7 +780,6 @@ function formatDate(date) {
     opacity: 0;
     transform: scale(0.9);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
@@ -792,7 +795,7 @@ function formatDate(date) {
 .close-btn {
   width: 40px;
   height: 40px;
-  background: #f3f4f6;
+  background: var(--bg-input);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -800,6 +803,7 @@ function formatDate(date) {
   cursor: pointer;
 }
 
+/* FORM */
 .form-group {
   margin-bottom: 20px;
 }
@@ -807,21 +811,27 @@ function formatDate(date) {
 .form-group label {
   display: block;
   margin-bottom: 10px;
+  color: var(--text-primary);
 }
 
 .form-group input {
   width: 100%;
   padding: 14px 16px;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .submit-btn {
   width: 100%;
   border: none;
-  background: linear-gradient(135deg, #6366f1, #7c3aed);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
+  color: var(--text-white);
   padding: 16px;
   border-radius: 18px;
   cursor: pointer;
@@ -832,7 +842,7 @@ function formatDate(date) {
 .delete-modal-box {
   width: 100%;
   max-width: 420px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 30px;
   padding: 34px 28px;
   text-align: center;
@@ -843,8 +853,8 @@ function formatDate(date) {
   width: 90px;
   height: 90px;
   margin: auto;
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -856,10 +866,11 @@ function formatDate(date) {
 .delete-title {
   font-size: 28px;
   margin-bottom: 12px;
+  color: var(--text-primary);
 }
 
 .delete-text {
-  color: #6b7280;
+  color: var(--text-secondary);
   line-height: 1.7;
   margin-bottom: 28px;
 }
@@ -880,12 +891,17 @@ function formatDate(date) {
 }
 
 .cancel-btn {
-  background: #f3f4f6;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .delete-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-danger),
+    #dc2626
+  );
+  color: var(--text-white);
 }
 
 /* MESSAGE MODAL */
@@ -902,10 +918,11 @@ function formatDate(date) {
 .message-modal-box {
   width: 100%;
   max-width: 380px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 30px;
   padding: 30px 24px;
   text-align: center;
+  color: var(--text-primary);
 }
 
 .message-icon {
@@ -921,29 +938,34 @@ function formatDate(date) {
 }
 
 .message-icon.success {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .message-icon.error {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .message-title {
   font-size: 26px;
   margin-bottom: 10px;
+  color: var(--text-primary);
 }
 
 .message-text {
-  color: #6b7280;
+  color: var(--text-secondary);
   margin-bottom: 24px;
 }
 
 .message-btn {
   border: none;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
+  color: var(--text-white);
   padding: 14px 26px;
   border-radius: 16px;
   cursor: pointer;
@@ -966,5 +988,21 @@ function formatDate(date) {
     flex-direction: column;
     gap: 18px;
   }
+}
+
+/* FORCE GLOBAL TEXT COLOR */
+.dashboard {
+  color: var(--text-primary);
+}
+
+/* MAKE ALL TEXT INHERIT */
+.dashboard p,
+.dashboard span,
+.dashboard h1,
+.dashboard h2,
+.dashboard h3,
+.dashboard h4,
+.dashboard label {
+  color: inherit;
 }
 </style>

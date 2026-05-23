@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card border-0">
     <div class="top">
       <div>
         <h3>ទិដ្ឋភាពថវិកា</h3>
@@ -73,7 +73,7 @@ const left = computed(() => totalBudget.value - props.totalexpenses);
   width: 100%;
   padding: 30px;
   border-radius: 30px;
-  background: #ffffff;
+  background-color: var(--bg-card);
   border: 1px solid #eef2f7;
   box-shadow:
     0 10px 35px rgba(0, 0, 0, 0.06),
@@ -119,14 +119,14 @@ const left = computed(() => totalBudget.value - props.totalexpenses);
 .top h3 {
   font-size: 30px;
   font-weight: 800;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 8px;
   letter-spacing: -0.5px;
 }
 
 .top p {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -142,7 +142,7 @@ const left = computed(() => totalBudget.value - props.totalexpenses);
   margin: 0;
   font-size: 42px;
   font-weight: 900;
-  color: #111827;
+  color: var(--text-primary);
   line-height: 1;
 }
 
