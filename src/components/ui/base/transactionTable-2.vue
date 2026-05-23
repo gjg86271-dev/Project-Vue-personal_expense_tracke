@@ -254,7 +254,7 @@ onMounted(() => {
   border: 1.5px solid var(--border-color);
   transition: border-color var(--transition);
 }
-.mobile-card--today { border-color: var(var(--shadow)); }
+.mobile-card--today { border-color: var(--shadow); }
 .mobile-card__left  { display: flex; align-items: center; gap: 12px; }
 .mobile-icon {
   width: 40px; height: 40px; border-radius: 12px;
