@@ -4,10 +4,17 @@ import { useRoute, useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import { useAuthStore } from '@/stores/authStore'
 import AuthTimelineSidebar from '@/components/auth/AuthTimelineSidebar.vue'
+import { useValidator } from '@/composables/useValidator'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+
+// ✅ Use shared validator composable with password fields
+const { errors, validateResetPassword, clearFieldError } = useValidator([
+  'password',
+  'passwordConfirmation',
+])
 
 const sidebarSteps = [
   { id: 1, label: 'អ៊ីមែល', status: 'completed' },
@@ -34,55 +41,27 @@ if (!token) {
   router.replace({ name: 'forgetPassword' })
 }
 
+// ✅ Field names match useValidator's validateResetPassword expectations
 const form = reactive({
   password: '',
-  confirmPassword: '',
-})
-
-const errors = reactive({
-  password: '',
-  confirmPassword: '',
+  passwordConfirmation: '',
 })
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const isLoading = ref(false)
 
-const clearError = (field) => {
-  errors[field] = ''
-}
-
-const validateForm = () => {
-  errors.password = ''
-  errors.confirmPassword = ''
-
-  if (!form.password) {
-    errors.password = 'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មី'
-  } else if (form.password.length < 8) {
-    errors.password = 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 8 តួអក្សរ'
-  }
-
-  if (!form.confirmPassword) {
-    errors.confirmPassword = 'សូមបញ្ជាក់ពាក្យសម្ងាត់'
-  } else if (form.password !== form.confirmPassword) {
-    errors.confirmPassword = 'ពាក្យសម្ងាត់មិនត្រូវគ្នា'
-  }
-
-  return !errors.password && !errors.confirmPassword
-}
-
 const submitResetPassword = async () => {
-  if (!validateForm()) return
+  // ✅ Delegate validation to the shared composable
+  if (!validateResetPassword(form)) return
 
   isLoading.value = true
 
   try {
-    const resetPayload = {
+    await authStore.resetPassword({
       token,
       newPassword: form.password,
-    }
-
-    await authStore.resetPassword(resetPayload)
+    })
 
     await Swal.fire({
       icon: 'success',
@@ -137,7 +116,7 @@ const submitResetPassword = async () => {
                 autocomplete="new-password"
                 placeholder="បញ្ចូលពាក្យសម្ងាត់ថ្មី"
                 :disabled="isLoading"
-                @input="clearError('password')"
+                @input="clearFieldError('password')"
               />
               <button
                 class="eye-button"
@@ -155,16 +134,16 @@ const submitResetPassword = async () => {
           <!-- Confirm password -->
           <div class="field-group">
             <label class="field-label" for="confirm-password">បញ្ជាក់ពាក្យសម្ងាត់</label>
-            <div class="input-shell" :class="{ 'is-invalid': errors.confirmPassword }">
+            <div class="input-shell" :class="{ 'is-invalid': errors.passwordConfirmation }">
               <i class="bi bi-lock field-icon" aria-hidden="true"></i>
               <input
                 id="confirm-password"
-                v-model="form.confirmPassword"
+                v-model="form.passwordConfirmation"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 autocomplete="new-password"
                 placeholder="បញ្ជាក់ពាក្យសម្ងាត់ម្តងទៀត"
                 :disabled="isLoading"
-                @input="clearError('confirmPassword')"
+                @input="clearFieldError('passwordConfirmation')"
               />
               <button
                 class="eye-button"
@@ -176,7 +155,7 @@ const submitResetPassword = async () => {
                 <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" aria-hidden="true"></i>
               </button>
             </div>
-            <p v-if="errors.confirmPassword" class="field-error">{{ errors.confirmPassword }}</p>
+            <p v-if="errors.passwordConfirmation" class="field-error">{{ errors.passwordConfirmation }}</p>
           </div>
 
           <RouterLink class="login-help" :to="{ name: 'login' }">
@@ -225,7 +204,6 @@ const submitResetPassword = async () => {
   background: #ffffff;
 }
 
-/* Icon */
 .icon-circle {
   position: relative;
   width: 64px;
@@ -273,7 +251,6 @@ const submitResetPassword = async () => {
   line-height: 1;
 }
 
-/* Title & subtitle */
 h1 {
   margin: 0;
   color: #151a2d;
@@ -291,7 +268,6 @@ h1 {
   text-align: center;
 }
 
-/* Form */
 .reset-form {
   display: grid;
   gap: 16px;
@@ -301,7 +277,6 @@ h1 {
   min-width: 0;
 }
 
-/* Label */
 .field-label {
   display: block;
   margin: 0 0 8px 4px;
@@ -310,7 +285,6 @@ h1 {
   font-weight: 700;
 }
 
-/* Input shell */
 .input-shell {
   display: flex;
   align-items: center;
@@ -334,7 +308,6 @@ h1 {
   background: #fff7f7;
 }
 
-/* Icon inside input */
 .field-icon {
   flex-shrink: 0;
   color: #94a3b8;
@@ -342,7 +315,6 @@ h1 {
   line-height: 1;
 }
 
-/* Input field */
 .input-shell input {
   flex: 1;
   min-width: 0;
@@ -367,7 +339,6 @@ h1 {
   opacity: 0.6;
 }
 
-/* Eye toggle */
 .eye-button {
   width: 28px;
   height: 28px;
@@ -384,15 +355,9 @@ h1 {
   transition: color 0.15s;
 }
 
-.eye-button:hover:not(:disabled) {
-  color: #2d57b7;
-}
+.eye-button:hover:not(:disabled) { color: #2d57b7; }
+.eye-button:disabled { cursor: not-allowed; }
 
-.eye-button:disabled {
-  cursor: not-allowed;
-}
-
-/* Error */
 .field-error {
   margin: 6px 0 0 4px;
   color: #ef4444;
@@ -400,7 +365,6 @@ h1 {
   line-height: 1.4;
 }
 
-/* Forgot link */
 .login-help {
   width: max-content;
   max-width: 100%;
@@ -412,11 +376,8 @@ h1 {
   transition: color 0.18s;
 }
 
-.login-help:hover {
-  color: #2d57b7;
-}
+.login-help:hover { color: #2d57b7; }
 
-/* Submit button */
 .primary-button {
   width: 100%;
   height: 52px;
@@ -446,43 +407,17 @@ h1 {
 .primary-button:active:not(:disabled) { transform: translateY(0); }
 .primary-button:disabled { cursor: wait; opacity: 0.66; }
 
-/* Responsive */
 @media (max-width: 900px) {
-  .reset-page {
-    align-items: flex-start;
-    padding: 18px 12px;
-  }
-
-  .reset-wrapper {
-    flex-direction: column;
-    border-radius: 20px;
-  }
-
-  .reset-card {
-    padding: 32px 28px;
-  }
+  .reset-page { align-items: flex-start; padding: 18px 12px; }
+  .reset-wrapper { flex-direction: column; border-radius: 20px; }
+  .reset-card { padding: 32px 28px; }
 }
 
 @media (max-width: 480px) {
-  .reset-page {
-    padding: 0;
-  }
-
-  .reset-wrapper {
-    min-height: 100vh;
-    border-radius: 0;
-  }
-
-  .reset-card {
-    padding: 28px 20px;
-  }
-
-  h1 {
-    font-size: 22px;
-  }
-
-  .subtitle {
-    font-size: 14px;
-  }
+  .reset-page { padding: 0; }
+  .reset-wrapper { min-height: 100vh; border-radius: 0; }
+  .reset-card { padding: 28px 20px; }
+  h1 { font-size: 22px; }
+  .subtitle { font-size: 14px; }
 }
 </style>

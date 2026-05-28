@@ -72,7 +72,7 @@ const left = computed(() => totalBudget.value - props.totalexpenses);
   overflow: hidden;
   width: 100%;
   padding: 30px;
-  border-radius: 30px;
+  border-radius: 16px;
   background-color: var(--bg-card);
   border: 1px solid #eef2f7;
   box-shadow:

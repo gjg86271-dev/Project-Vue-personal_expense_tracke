@@ -4,15 +4,16 @@ import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import AuthTimelineSidebar from '@/components/auth/AuthTimelineSidebar.vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useValidator } from '@/composables/useValidator'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// ✅ Use shared validator composable for email field
+const { errors, validateForgetPassword, clearFieldError } = useValidator(['email'])
 
 const form = reactive({ email: '' })
 const isLoading = ref(false)
-const emailError = ref('')
 
 const steps = [
   { id: 1, label: 'បង្កើតគណនី', status: 'active' },
@@ -20,20 +21,9 @@ const steps = [
   { id: 3, label: 'ចូលប្រើប្រាស់', status: 'pending' },
 ]
 
-const validateEmail = () => {
-  emailError.value = ''
-
-  if (!form.email.trim()) {
-    emailError.value = 'សូមបញ្ចូលអ៊ីមែល'
-  } else if (!emailPattern.test(form.email.trim())) {
-    emailError.value = 'សូមបញ្ចូលអ៊ីមែលឱ្យបានត្រឹមត្រូវ'
-  }
-
-  return !emailError.value
-}
-
 const sendOtp = async () => {
-  if (!validateEmail()) return
+  // ✅ Delegate email validation to the shared composable
+  if (!validateForgetPassword(form)) return
 
   isLoading.value = true
 
@@ -82,7 +72,7 @@ const sendOtp = async () => {
         <form class="send-otp-form" @submit.prevent="sendOtp" novalidate>
           <div class="field-group">
             <label class="field-label" for="email">អ៊ីមែល</label>
-            <div class="input-shell" :class="{ 'is-invalid': emailError }">
+            <div class="input-shell" :class="{ 'is-invalid': errors.email }">
               <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
               <input
                 id="email"
@@ -91,12 +81,12 @@ const sendOtp = async () => {
                 autocomplete="email"
                 placeholder="Example@gmail.com"
                 required
-                @input="emailError = ''"
+                @input="clearFieldError('email')"
               />
             </div>
-            <p v-if="emailError" class="field-error">
+            <p v-if="errors.email" class="field-error">
               <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-              {{ emailError }}
+              {{ errors.email }}
             </p>
           </div>
 

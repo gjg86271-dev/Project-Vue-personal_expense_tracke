@@ -141,7 +141,14 @@
                 <td class="text-muted">{{ new Date(item.createdAt).toLocaleDateString('en-GB') }}</td>
                 <td>
                   <button class="btn btn-sm action-btn-view" @click="openDetailModal(item)"><i class="bi bi-eye"></i></button>
-                  <button class="btn btn-sm action-btn-edit" @click="openModal(item)"><i class="bi bi-pencil-square"></i></button>
+                  <!-- ✅ FIX: disable edit for system categories -->
+                  <button
+                    class="btn btn-sm action-btn-edit"
+                    @click="openModal(item)"
+                    :disabled="item.isSystem"
+                    :title="item.isSystem ? 'មិនអាចកែប្រែ System' : 'កែប្រែ'">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
                   <button class="btn btn-sm action-btn-delete" @click="confirmDelete(item)"
                     :disabled="item.isSystem" :title="item.isSystem ? 'មិនអាចលុប System' : 'លុប'">
                     <i class="bi bi-trash"></i>
@@ -174,7 +181,14 @@
             </div>
             <div class="mobile-card__actions">
               <button class="btn btn-sm action-btn-view p-1" @click="openDetailModal(item)"><i class="bi bi-eye"></i></button>
-              <button class="btn btn-sm action-btn-edit p-1" @click="openModal(item)"><i class="bi bi-pencil-square"></i></button>
+              <!-- ✅ FIX: disable edit for system categories (mobile) -->
+              <button
+                class="btn btn-sm action-btn-edit p-1"
+                @click="openModal(item)"
+                :disabled="item.isSystem"
+                :title="item.isSystem ? 'មិនអាចកែប្រែ System' : 'កែប្រែ'">
+                <i class="bi bi-pencil-square"></i>
+              </button>
               <button class="btn btn-sm action-btn-delete p-1" @click="confirmDelete(item)" :disabled="item.isSystem"><i class="bi bi-trash"></i></button>
             </div>
           </div>
@@ -182,7 +196,6 @@
 
         <!-- ✅ PAGINATION with loading state -->
         <div v-if="totalPages > 1" class="pagination-wrap mt-4">
-          <!-- skeleton ពេល paginate -->
           <div v-if="pageChanging" class="pagination-skeleton">
             <div v-for="n in 5" :key="n" class="skeleton pag-btn-sk"></div>
           </div>
@@ -216,10 +229,8 @@
               </button>
             </div>
 
-            <!-- ✅ Form body with loading overlay -->
             <div class="swal-body" style="position: relative;">
 
-              <!-- Loading overlay ពេល save -->
               <div v-if="saveLoading" class="form-loading-overlay">
                 <div class="form-spinner"></div>
                 <span>កំពុងរក្សាទុក...</span>
@@ -269,22 +280,6 @@
                 </div>
               </div>
 
-              <div v-if="!isEditing" class="field-group mb-0">
-                <div class="system-toggle">
-                  <div class="system-toggle__info">
-                    <i class="bi bi-shield-fill text-primary"></i>
-                    <div>
-                      <div class="system-toggle__label">ប្រភេទ System</div>
-                      <div class="system-toggle__desc">System category មិនអាចលុបបាន</div>
-                    </div>
-                  </div>
-                  <div class="form-check form-switch mb-0">
-                    <input class="form-check-input" type="checkbox" id="isSystemCheck"
-                      v-model="form.isSystem" :disabled="saveLoading" />
-                    <label class="form-check-label" for="isSystemCheck"></label>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div class="swal-footer">
@@ -364,7 +359,12 @@
             </div>
             <div class="swal-footer">
               <button class="swal-btn swal-btn--cancel" @click="closeDetailModal">បិទ</button>
-              <button class="swal-btn swal-btn--confirm" @click="closeDetailModal(); openModal(detailItem)">
+              <!-- ✅ FIX: disable edit button in detail modal for system categories -->
+              <button
+                class="swal-btn swal-btn--confirm"
+                @click="closeDetailModal(); openModal(detailItem)"
+                :disabled="detailItem?.isSystem"
+                :title="detailItem?.isSystem ? 'មិនអាចកែប្រែ System' : 'កែប្រែ'">
                 <i class="bi bi-pencil-square"></i> កែប្រែ
               </button>
             </div>
@@ -427,7 +427,7 @@ import { useCategoryStore } from '@/stores/categoryStore'
 const categoryStore = useCategoryStore()
 
 const loading       = ref(false)
-const pageChanging  = ref(false)   // ✅ pagination loading
+const pageChanging  = ref(false)
 const saveLoading   = ref(false)
 const deleteLoading = ref(false)
 const detailLoading = ref(false)
@@ -481,7 +481,6 @@ const filteredItems = computed(() =>
 const currentPage = ref(categoryStore.params?._page ?? 1)
 const totalPages  = computed(() => categoryStore.meta?.totalPages ?? 1)
 
-// ✅ pagination loading
 watch(currentPage, async (page) => {
   pageChanging.value = true
   try {
@@ -509,6 +508,9 @@ function validate() {
 }
 
 function openModal(item = null) {
+  // ✅ FIX: block opening modal for system categories
+  if (item?.isSystem) return
+
   Object.keys(errors).forEach(k => delete errors[k])
   formError.value = ''
   showModal.value = true
@@ -874,7 +876,7 @@ onMounted(async () => {
   cursor: pointer; font-family: var(--font-khmer);
   display: flex; align-items: center; justify-content: center; gap: 7px; transition: var(--transition);
 }
-.swal-btn:disabled { opacity: 0.6; cursor: wait; }
+.swal-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .swal-btn--cancel { background: var(--bg-input); color: var(--text-secondary); }
 .swal-btn--cancel:hover:not(:disabled) { background: var(--bg-body); color: var(--text-primary); }
 .swal-btn--confirm { flex: 2; background: var(--color-primary); color: var(--text-white); box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary) 30%, transparent); }

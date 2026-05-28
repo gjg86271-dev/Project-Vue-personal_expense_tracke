@@ -1,117 +1,98 @@
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@100..700&display=swap');
 @import url('cropperjs/dist/cropper.css');
 
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════ */
 :root {
-  /* font */
   --font-khmer: 'Kantumruy Pro', sans-serif;
 
-  /* primary — bluer, more vivid */
-  --color-primary: #1a62d4;
+  /* Primary */
+  --color-primary:       #1a62d4;
   --color-primary-hover: #145ab0;
 
-  /* income */
-  --color-success: #16a34a;
+  /* Semantic */
+  --color-success:       #16a34a;
   --color-success-light: #dcfce7;
+  --color-danger:        #dc2626;
+  --color-danger-light:  #fee2e2;
 
-  /* expense */
-  --color-danger: #dc2626;
-  --color-danger-light: #fee2e2;
-
-  /* background */
-  --bg-body: #f0f4fb;
-  /* ស្រស់ស្អាត ជាង #f3f6fb */
+  /* Surfaces */
+  --bg-body:    #f0f4fb;
   --bg-sidebar: #1a5caa;
-  /* ពណ៌ navy ស្រស់ */
-  --bg-card: #ffffff;
-  --bg-input: #f9fafb;
+  --bg-card:    #ffffff;
+  --bg-input:   #f9fafb;
 
-  /* text */
-  --text-primary: #111827;
+  /* Text */
+  --text-primary:   #111827;
   --text-secondary: #6b7280;
-  --text-white: #ffffff;
+  --text-white:     #ffffff;
 
-  /* border */
+  /* Border & Shadow */
   --border-color: #dbe3ee;
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow:       0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg:    0 8px 24px rgba(0, 0, 0, 0.10);
 
-  /* shadow */
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Radius */
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
 
-  /* radius */
-  --radius: 14px;
-
-  /* transition */
-  --transition: 0.25s ease;
-
-  /* blobs */
+  /* Decorative */
   --blob-color-a: rgba(200, 217, 255, 0.55);
   --blob-color-b: rgba(181, 212, 244, 0.45);
   --blob-color-c: rgba(221, 232, 255, 0.60);
+  --dot-color:    rgba(55,  138, 221, 0.12);
+  --ring-border:  rgba(55,  138, 221, 0.10);
+  --ring-glow-a:  rgba(55,  138, 221, 0.04);
+  --ring-glow-b:  rgba(24,  95,  165, 0.04);
 
-  /* dot grid */
-  --dot-color: rgba(55, 138, 221, 0.12);
-
-  /* deco rings */
-  --ring-border: rgba(55, 138, 221, 0.10);
-  --ring-glow-a: rgba(55, 138, 221, 0.04);
-  --ring-glow-b: rgba(24, 95, 165, 0.04);
-
-  --bg-body: #f0f4fb;
-  --bg-card: #ffffff;
-  --bg-sidebar: #1a5caa;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #dbe3ee;
-  --color-primary: #1a62d4;
-  --color-primary-hover: #145ab0;
-  --color-success: #16a34a;
-  --color-danger: #dc2626;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --radius: 14px;
+  /* Mode animation */
+  --mode-duration: 0.55s;
+  --mode-easing:   cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* dark mode */
+/* ═══════════════════════════════════════════
+   DARK MODE TOKENS
+═══════════════════════════════════════════ */
 .dark {
-  --bg-body: #0a1120;
-  /* ខ្មៅជ្រៅ navy ស្អាតជាង slate */
-  --bg-sidebar: #0f1c2e;
-  /* navy ងងឹត */
-  --bg-card: #0f1c2e;
-  --bg-input: #1a2840;
-  /* ស្រមោល navy */
+  --color-primary:       #3b82f6;
+  --color-primary-hover: #2563eb;
 
-  --text-primary: #f1f5f9;
+  --color-success:       #4ade80;
+  --color-success-light: #14532d;
+  --color-danger:        #f87171;
+  --color-danger-light:  #450a0a;
+
+  --bg-body:    #0a1120;
+  --bg-sidebar: #0f1c2e;
+  --bg-card:    #0f1c2e;
+  --bg-input:   #1a2840;
+
+  --text-primary:   #f1f5f9;
   --text-secondary: #94a3b8;
 
   --border-color: #1e3352;
-  /* border navy ទន់ */
+  --shadow-sm:    0 1px 3px  rgba(0, 0, 0, 0.30);
+  --shadow:       0 4px 16px rgba(0, 0, 0, 0.50);
+  --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.60);
 
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-
-  /* success/danger — brighter for dark bg */
-  --color-success: #4ade80;
-  --color-success-light: #14532d;
-  --color-danger: #f87171;
-  --color-danger-light: #450a0a;
-
-  --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-
-  /* blobs — ពណ៌ navy ស្រស់ ស៊ីគ្នានឹង bg ងងឹត */
-  --blob-color-a: rgba(59, 130, 246, 0.10);
-  --blob-color-b: rgba(37, 99, 235, 0.08);
-  --blob-color-c: rgba(96, 165, 250, 0.07);
-
-  /* dot grid */
-  --dot-color: rgba(96, 165, 250, 0.08);
-
-  /* deco rings */
-  --ring-border: rgba(96, 165, 250, 0.08);
-  --ring-glow-a: rgba(59, 130, 246, 0.04);
-  --ring-glow-b: rgba(37, 99, 235, 0.03);
+  --blob-color-a: rgba(59,  130, 246, 0.10);
+  --blob-color-b: rgba(37,  99,  235, 0.08);
+  --blob-color-c: rgba(96,  165, 250, 0.07);
+  --dot-color:    rgba(96,  165, 250, 0.08);
+  --ring-border:  rgba(96,  165, 250, 0.08);
+  --ring-glow-a:  rgba(59,  130, 246, 0.04);
+  --ring-glow-b:  rgba(37,  99,  235, 0.03);
 }
 
-/* global */
-* {
+/* ═══════════════════════════════════════════
+   GLOBAL RESET
+═══════════════════════════════════════════ */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -121,5 +102,98 @@
 body {
   background: var(--bg-body);
   color: var(--text-primary);
-  transition: var(--transition);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   SMOOTH COLOR TRANSITION
+   Class added temporarily via JS during toggle
+   — avoids slowing every hover/focus globally
+═══════════════════════════════════════════ */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition:
+    background-color var(--mode-duration) var(--mode-easing),
+    border-color     var(--mode-duration) var(--mode-easing),
+    color            var(--mode-duration) var(--mode-easing),
+    box-shadow       var(--mode-duration) var(--mode-easing),
+    fill             var(--mode-duration) var(--mode-easing),
+    stroke           var(--mode-duration) var(--mode-easing) !important;
+}
+
+/* ═══════════════════════════════════════════
+   RIPPLE REVEAL — View Transitions API
+   Chrome 111+ | Falls back to instant toggle
+
+   JS to add in your toggle button handler:
+   ──────────────────────────────────────────
+   function toggleDark(event) {
+     const x = event?.clientX ?? window.innerWidth  - 32
+     const y = event?.clientY ?? 32
+     const root = document.documentElement
+
+     root.style.setProperty('--ripple-x', x + 'px')
+     root.style.setProperty('--ripple-y', y + 'px')
+
+     const goingDark = !root.classList.contains('dark')
+     root.setAttribute('data-theme-to', goingDark ? 'dark' : 'light')
+
+     // add class for color transition
+     root.classList.add('theme-transitioning')
+
+     const toggle = () => {
+       root.classList.toggle('dark')
+       root.removeAttribute('data-theme-to')
+     }
+
+     if (!document.startViewTransition) {
+       toggle()
+       setTimeout(() => root.classList.remove('theme-transitioning'), 600)
+       return
+     }
+
+     const transition = document.startViewTransition(toggle)
+     transition.finished.finally(() => root.classList.remove('theme-transitioning'))
+   }
+═══════════════════════════════════════════ */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--mode-duration);
+  animation-timing-function: var(--mode-easing);
+  animation-fill-mode: both;
+  mix-blend-mode: normal;
+}
+
+/* Going → DARK: dark layer ripples in */
+:root[data-theme-to="dark"]::view-transition-new(root) {
+  animation-name: ripple-in;
+}
+:root[data-theme-to="dark"]::view-transition-old(root) {
+  animation-name: ripple-out;
+}
+
+/* Going → LIGHT: light layer ripples in */
+:root[data-theme-to="light"]::view-transition-new(root) {
+  animation-name: ripple-in;
+}
+:root[data-theme-to="light"]::view-transition-old(root) {
+  animation-name: ripple-out;
+}
+
+@keyframes ripple-in {
+  from {
+    clip-path: circle(0% at var(--ripple-x, 95%) var(--ripple-y, 5%));
+  }
+  to {
+    clip-path: circle(160% at var(--ripple-x, 95%) var(--ripple-y, 5%));
+  }
+}
+
+@keyframes ripple-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }

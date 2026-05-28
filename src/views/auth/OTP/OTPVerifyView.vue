@@ -4,12 +4,15 @@ import { useRoute, useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import AuthTimelineSidebar from '@/components/auth/AuthTimelineSidebar.vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useValidator } from '@/composables/useValidator'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// ✅ Use shared validator composable for email field
+const { errors, validateForgetPassword, clearFieldError } = useValidator(['email'])
+
 const otpLength = 6
 
 const form = reactive({
@@ -20,8 +23,7 @@ const form = reactive({
 const step = ref(form.email ? 'otp' : 'email')
 const isLoading = ref(false)
 const resendSeconds = ref(0)
-const emailError = ref('')
-const otpError = ref('')
+const otpError = ref('')        // OTP error stays local — not part of useValidator
 const otpInputs = ref([])
 let resendTimer = null
 
@@ -41,18 +43,6 @@ const maskedEmail = computed(() => {
 
 const otpCode = computed(() => form.otp.join(''))
 const canSubmitOtp = computed(() => otpCode.value.length === otpLength)
-
-const validateEmail = () => {
-  emailError.value = ''
-
-  if (!form.email.trim()) {
-    emailError.value = 'សូមបញ្ចូលអ៊ីមែល'
-  } else if (!emailPattern.test(form.email.trim())) {
-    emailError.value = 'សូមបញ្ចូលអ៊ីមែលឱ្យបានត្រឹមត្រូវ'
-  }
-
-  return !emailError.value
-}
 
 const clearTimer = () => {
   if (resendTimer) {
@@ -81,7 +71,8 @@ const resetOtp = async () => {
 }
 
 const sentOtp = async () => {
-  if (!validateEmail()) return
+  // ✅ Delegate email validation to the shared composable
+  if (!validateForgetPassword(form)) return
 
   isLoading.value = true
   otpError.value = ''
@@ -196,6 +187,7 @@ const changeEmail = async () => {
   step.value = 'email'
   await resetOtp()
   otpError.value = ''
+  clearFieldError('email')
   clearTimer()
 }
 
@@ -223,7 +215,7 @@ onBeforeUnmount(clearTimer)
           <form class="otp-form" @submit.prevent="sentOtp" novalidate>
             <div class="field-group">
               <label class="field-label" for="email">អ៊ីមែល</label>
-              <div class="input-shell" :class="{ 'is-invalid': emailError }">
+              <div class="input-shell" :class="{ 'is-invalid': errors.email }">
                 <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
                 <input
                   id="email"
@@ -232,10 +224,10 @@ onBeforeUnmount(clearTimer)
                   autocomplete="email"
                   placeholder="Example@gmail.com"
                   required
-                  @input="emailError = ''"
+                  @input="clearFieldError('email')"
                 />
               </div>
-              <p v-if="emailError" class="field-error">{{ emailError }}</p>
+              <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
             </div>
 
             <div class="info-note">

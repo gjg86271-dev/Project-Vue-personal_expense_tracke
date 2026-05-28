@@ -22,6 +22,8 @@ import LandingFtView from '@/views/landingAllpage/LandingFtView.vue'
 import LandingAboutView from '@/views/landingAllpage/LandingAboutView.vue'
 import LandingHomeView from '@/views/landingAllpage/LandingHomeView.vue'
 
+import NotFoundView from '@/views/NotFoundView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
 
@@ -31,35 +33,33 @@ const router = createRouter({
       redirect: '/landing/homelanding',
     },
 
-    // Landing — guestOnly
     {
       path: '/landing',
       component: LandingView,
       redirect: '/landing/homelanding',
-      meta: { guestOnly: true },
       children: [
         {
           path: 'homelanding',
           name: 'landing',
           component: LandingHomeView,
-          meta: { title: 'Landing Page', guestOnly: true },
+          meta: { title: 'Landing Page' },
         },
         {
           path: 'function',
           name: 'landingfunction',
           component: LandingFtView,
-          meta: { title: 'Function Page', guestOnly: true },
+          meta: { title: 'Function Page' },
         },
         {
           path: 'about',
           name: 'landingabout',
           component: LandingAboutView,
-          meta: { title: 'About Page', guestOnly: true },
+          meta: { title: 'About Page' },
         },
       ],
     },
 
-    // Auth — guestOnly
+    // Auth — guestOnly (login, register, etc.)
     {
       path: '/login',
       name: 'login',
@@ -158,7 +158,9 @@ const router = createRouter({
     // 404
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/landing/homelanding',
+      name: 'not-found',
+      component: NotFoundView,
+      meta: { title: 'Page Not Found' },
     },
   ],
 })
@@ -174,15 +176,11 @@ router.beforeEach(async (to) => {
     localStorage.getItem('role') || sessionStorage.getItem('role')
 
   // ── Email change token redirect ──────────────────────────────────────────
-  // Backend sends email link to /landing/homelanding?token=xxx
-  // We intercept here and redirect to /dashboard/profile?token=xxx
   const emailToken = to.query.token
   if (emailToken && to.path.startsWith('/landing')) {
     if (isAuthenticated) {
-      // User is logged in → go straight to profile with token
       return { name: 'profile', query: { token: emailToken } }
     } else {
-      // User is not logged in → save token then go to login
       sessionStorage.setItem('pendingEmailToken', emailToken)
       return { name: 'login' }
     }
@@ -193,16 +191,15 @@ router.beforeEach(async (to) => {
     return { name: 'landing' }
   }
 
-  // 2. Guest-only route but already logged in
+  // 2. Guest-only route (login/register/etc.) but already logged in
   if (to.meta.guestOnly && isAuthenticated) {
     const role = getRole()
 
-    // ADMIN ចូល login/register page → ត្រលប់ landing
     if (role?.toUpperCase() === 'ADMIN') {
+      // Admin has no dashboard, send them to landing (which is now public — no loop)
       return { name: 'landing' }
     }
 
-    // ✅ FIX: check pendingEmailToken — redirect ទៅ profile ជាមួយ token
     const pendingToken = sessionStorage.getItem('pendingEmailToken')
     if (pendingToken) {
       sessionStorage.removeItem('pendingEmailToken')
@@ -216,7 +213,6 @@ router.beforeEach(async (to) => {
   if (to.meta.userOnly && isAuthenticated) {
     let role = getRole()
 
-    // Role មិនទាន់មាននៅ storage → fetch ពី profile
     if (!role) {
       try {
         const { useAuthStore } = await import('@/stores/authStore')

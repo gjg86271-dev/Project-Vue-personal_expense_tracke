@@ -1,5 +1,5 @@
 <template>
-  <div class="font detail-page">
+  <div class="font detail-page bg-transparent">
 
     <!-- BACK BUTTON -->
     <button class="back-btn" @click="router.back()">
@@ -512,6 +512,7 @@ onMounted(async () => {
   font-weight: 600;
   box-shadow: var(--shadow);
   transition: var(--transition);
+  color: var(--color-primary);
 }
 
 .back-btn:hover {

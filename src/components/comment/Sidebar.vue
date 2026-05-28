@@ -1,6 +1,26 @@
 <template>
   <aside :class="['sidebar', { 'sidebar--collapsed': isCollapsed }]">
 
+    <!-- ══ MOBILE PROFILE SECTION (បង្ហាញតែ mobile < 768px) ══ -->
+    <div v-if="isMobile" class="sidebar__profile">
+      <div class="sidebar__profile-avatar">
+        <img v-if="userStore.avatarUrl" :src="userStore.avatarUrl" :alt="userStore.displayName" class="sidebar__profile-img" />
+        <span v-else>{{ avatarInitials }}</span>
+      </div>
+      <div class="sidebar__profile-info">
+        <p class="sidebar__profile-name">{{ userStore.displayName || '—' }}</p>
+        <p class="sidebar__profile-email">{{ userStore.email || '—' }}</p>
+      </div>
+    </div>
+
+    <RouterLink v-if="isMobile" to="/dashboard/profile" class="sidebar__item sidebar__profile-link">
+      <i class="bi bi-person-circle sidebar__icon"></i>
+      <span class="sidebar__label">គណនីរបស់ខ្ញុំ</span>
+    </RouterLink>
+
+    <hr v-if="isMobile" class="sidebar__divider" />
+    <!-- ══ END MOBILE PROFILE ══ -->
+
     <!-- HEADER -->
     <div class="sidebar__header">
       <h2 v-show="!isCollapsed" class="sidebar__title sidebar__title--full">ម៉ីនុយ</h2>
@@ -54,8 +74,10 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useUserStore } from '@/stores/Userstore'
 import Swal from 'sweetalert2'
 
 defineProps({
@@ -67,7 +89,30 @@ defineProps({
 
 const router    = useRouter()
 const authStore = useAuthStore()
+const userStore = useUserStore()
 
+// ── Mobile breakpoint ──────────────────────────────────────────────────────
+const MOBILE_BREAKPOINT = 768
+const isMobile = ref(window.innerWidth < MOBILE_BREAKPOINT)
+
+function handleResize() {
+  isMobile.value = window.innerWidth < MOBILE_BREAKPOINT
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
+// ── Avatar initials ────────────────────────────────────────────────────────
+const avatarInitials = computed(() =>
+  (userStore.displayName || '').trim().charAt(0).toUpperCase() || 'U'
+)
+
+// ── Logout ─────────────────────────────────────────────────────────────────
 async function handleLogout() {
   const confirm = await Swal.fire({
     title:              'ចាកចេញ?',
@@ -83,7 +128,7 @@ async function handleLogout() {
   if (!confirm.isConfirmed) return
 
   authStore.logout()
-  router.push({ name: 'landing' })  // ✅ landing = guestOnly → redirect ត្រឹមត្រូវ
+  router.push({ name: 'landing' })
 }
 </script>
 
@@ -110,6 +155,67 @@ async function handleLogout() {
   padding: 24px 8px;
   align-items: center;
 }
+
+/* ══ MOBILE PROFILE ════════════════════════════════════════════════════════ */
+.sidebar__profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px 16px;
+  width: 100%;
+}
+
+.sidebar__profile-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(26, 98, 212, 0.25);
+  color: var(--text-white);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.sidebar__profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sidebar__profile-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar__profile-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-white);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-khmer);
+}
+
+.sidebar__profile-email {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__profile-link {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 4px;
+}
+/* ══ END MOBILE PROFILE ════════════════════════════════════════════════════ */
 
 .sidebar__header { width: 100%; overflow: hidden; }
 
