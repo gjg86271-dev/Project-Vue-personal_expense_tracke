@@ -86,10 +86,10 @@
                                 <div class="icon-wrapper green">
                                     <i class="bi bi-graph-up-arrow"></i>
                                 </div>
-                                <h6 class="card-title">កាត់បន្ថែមចំណេញតាំក់លុយ</h6>
+                                <h6 class="card-title">កាត់បន្ថែមចំណាយតាមថវិកា</h6>
                                 <p class="card-desc">
-                                    គ្រប់ និងតាមដានការចំណាយរបស់អ្នក
-                                    បញ្ចូលទិន្នន័យ នៃពីដំណេញតាមប្រចាំថ្ងៃ
+                                    គ្រប់គ្រងចំណាយ និងតាមដានការចំណាយរបស់អ្នក
+                                    បញ្ចូលទិន្នន័យ នៃចំណាយចំណូលប្រចាំថ្ងៃ
                                 </p>
                             </div>
                         </div>
@@ -102,9 +102,9 @@
                                 <div class="icon-wrapper orange">
                                     <i class="bi bi-pin-angle-fill"></i>
                                 </div>
-                                <h6 class="card-title">ការតាមដានចំណេញម្ដងម្ដច</h6>
+                                <h6 class="card-title">តាមដានចំណូល</h6>
                                 <p class="card-desc">
-                                    តំណាងចំណេញ និងប្រៀបផ្ទឹមចំណាយ
+                                    គ្រប់គ្រាងថវិកាដែលចំណូល ទៅលើ
                                     ការគ្រប់គ្រងតម្លៃម្ហូបអាហារ
                                 </p>
                             </div>
