@@ -59,6 +59,16 @@ const router = createRouter({
       ],
     },
 
+    // ── Email change verification redirect ─────────────────────────────────
+    // Backend sends link to /verify-change-email?token=xxx
+    // This route catches it and redirects to /dashboard/profile?token=xxx
+    {
+      path: '/verify-change-email',
+      name: 'verify-change-email',
+      component: () => import('@/views/auth/VerifyChangeEmailView.vue'),
+      meta: { title: 'Verify Email Change' },
+    },
+
     // Auth — guestOnly (login, register, etc.)
     {
       path: '/login',
@@ -176,14 +186,30 @@ router.beforeEach(async (to) => {
     localStorage.getItem('role') || sessionStorage.getItem('role')
 
   // ── Email change token redirect ──────────────────────────────────────────
+  // Handles token arriving on ANY route (landing, verify-change-email, etc.)
+  // but skip if already heading to profile (avoid infinite loop)
   const emailToken = to.query.token
-  if (emailToken && to.path.startsWith('/landing')) {
+  const isVerifyRoute = to.name === 'verify-change-email'
+  const isProfileRoute = to.name === 'profile'
+
+  if (emailToken && !isProfileRoute && !isVerifyRoute) {
     if (isAuthenticated) {
       return { name: 'profile', query: { token: emailToken } }
     } else {
       sessionStorage.setItem('pendingEmailToken', emailToken)
       return { name: 'login' }
     }
+  }
+
+  // ── verify-change-email route guard ─────────────────────────────────────
+  // VerifyChangeEmailView handles its own redirect via onMounted,
+  // but if user is not authenticated we save the token and send to login first
+  if (isVerifyRoute && !isAuthenticated) {
+    const token = to.query.token
+    if (token) {
+      sessionStorage.setItem('pendingEmailToken', token)
+    }
+    return { name: 'login' }
   }
 
   // 1. Route requires auth but not logged in → go to landing
